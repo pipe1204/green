@@ -30,7 +30,7 @@ export default function Footer() {
     <>
       {/* Main Footer Content */}
       <footer className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
           {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -116,14 +116,14 @@ export default function Footer() {
         <div className="max-w-md mx-auto flex space-x-3">
           <Button
             onClick={handleQuestionClick}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-12 md:h-10 text-sm font-normal"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
             Preguntanos algo
           </Button>
           <Button
             onClick={handleTestRideClick}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-12 md:h-10 text-sm font-normal"
           >
             <Calendar className="w-4 h-4 mr-2" />
             Agenda una prueba
@@ -132,7 +132,7 @@ export default function Footer() {
       </div>
 
       {/* Add bottom padding to body to account for sticky buttons */}
-      <div className="h-16"></div>
+      <div className="h-20 md:h-16"></div>
     </>
   );
 }

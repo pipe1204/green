@@ -31,11 +31,12 @@ export interface ProductImage {
 }
 
 export interface ProductSpecifications {
-  battery: {
-    capacity: string;
-    range: string;
-    chargingTime: string;
-  };
+  battery: string;
+  range: string;
+  chargeTime: string;
+  warranty: string;
+  delivery: string;
+  environmental: string;
   performance: {
     maxSpeed: string;
     power: string;

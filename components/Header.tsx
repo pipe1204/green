@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, X, Car, Zap, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -22,7 +24,12 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-black">GREEN</h1>
+              <button
+                onClick={() => router.push("/")}
+                className="text-2xl font-bold text-black hover:text-blue-600 transition-colors duration-200 cursor-pointer"
+              >
+                GREEN
+              </button>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { Product, ColorOption } from "@/types";
@@ -13,6 +14,7 @@ interface ProductCatalogProps {
 export default function ProductCatalog({
   onOrderProduct,
 }: ProductCatalogProps) {
+  const router = useRouter();
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
@@ -138,7 +140,7 @@ export default function ProductCatalog({
                   <div>
                     <span className="text-gray-500">Rango:</span>
                     <p className="font-semibold">
-                      {product.specifications.battery.range}
+                      {product.specifications.range} km
                     </p>
                   </div>
                   <div>
@@ -194,7 +196,11 @@ export default function ProductCatalog({
                   >
                     Ordena este modelo
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.push(`/product/${product.id}`)}
+                  >
                     Ver detalles
                   </Button>
                 </div>
@@ -219,8 +225,8 @@ export default function ProductCatalog({
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8 text-red-600" />
               </div>
               <h4 className="font-semibold mb-2">Energía Limpia</h4>
               <p className="text-gray-600 text-sm">

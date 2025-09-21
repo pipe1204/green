@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { featuredProducts } from "@/data/products";
 
 export default function HeroSection() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -86,6 +88,7 @@ export default function HeroSection() {
             variant="default"
             size="lg"
             className="border-white text-white text-lg px-8 py-4"
+            onClick={() => router.push(`/product/${currentProduct.id}`)}
           >
             Aprende más
           </Button>

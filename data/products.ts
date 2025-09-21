@@ -69,11 +69,12 @@ export const products: Product[] = [
       },
     ],
     specifications: {
-      battery: {
-        capacity: "72V 50Ah",
-        range: "120 km",
-        chargingTime: "2 horas",
-      },
+      battery: "72V 50Ah",
+      range: "120",
+      chargeTime: "2",
+      warranty: "2 años de garantía completa",
+      delivery: "5-7 días hábiles",
+      environmental: "Cero emisiones de CO2",
       performance: {
         maxSpeed: "80 km/h",
         power: "5000W",
@@ -155,11 +156,12 @@ export const products: Product[] = [
       },
     ],
     specifications: {
-      battery: {
-        capacity: "36V 10Ah",
-        range: "25 km",
-        chargingTime: "3 horas",
-      },
+      battery: "36V 10Ah",
+      range: "25",
+      chargeTime: "3",
+      warranty: "1 año de garantía",
+      delivery: "3-5 días hábiles",
+      environmental: "Cero emisiones directas",
       performance: {
         maxSpeed: "25 km/h",
         power: "350W",
@@ -241,11 +243,12 @@ export const products: Product[] = [
       },
     ],
     specifications: {
-      battery: {
-        capacity: "48V 15Ah",
-        range: "60 km",
-        chargingTime: "4 horas",
-      },
+      battery: "48V 15Ah",
+      range: "60",
+      chargeTime: "4",
+      warranty: "2 años de garantía",
+      delivery: "7-10 días hábiles",
+      environmental: "Explora la naturaleza sin contaminar",
       performance: {
         maxSpeed: "45 km/h",
         power: "250W",
