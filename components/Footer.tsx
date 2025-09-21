@@ -8,8 +8,6 @@ import {
   Calendar,
   MessageCircle,
   Leaf,
-  Car,
-  Zap,
   Phone,
   Mail,
   MapPin,

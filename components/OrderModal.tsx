@@ -13,9 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Product, ColorOption, Customer } from "@/types";
-import { Calendar, CreditCard, Truck, CheckCircle } from "lucide-react";
+import { Product, ColorOption } from "@/types";
+import { CreditCard, CheckCircle } from "lucide-react";
 
 const customerSchema = z.object({
   firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -46,7 +45,6 @@ export default function OrderModal({
   product,
   selectedColor,
 }: OrderModalProps) {
-  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -126,7 +124,6 @@ export default function OrderModal({
   };
 
   const handleClose = () => {
-    setCurrentStep(1);
     setIsSubmitted(false);
     reset();
     onClose();

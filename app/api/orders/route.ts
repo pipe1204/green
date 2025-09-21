@@ -3,8 +3,8 @@ import { Order, Customer, PaymentSchedule } from "@/types";
 
 // In a real application, you would use a database
 // For now, we'll use in-memory storage
-let orders: Order[] = [];
-let customers: Customer[] = [];
+const orders: Order[] = [];
+const customers: Customer[] = [];
 
 export async function POST(request: NextRequest) {
   try {
