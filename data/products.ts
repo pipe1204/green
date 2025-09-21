@@ -6,7 +6,7 @@ export const products: Product[] = [
     name: "Eco Rider Pro",
     model: "ERP-2024",
     type: "motorbike",
-    price: 8500000, // COP
+    price: 3500000, // COP
     description:
       "La motocicleta eléctrica premium de Green, diseñada para el conductor moderno que busca rendimiento, eficiencia y responsabilidad ambiental.",
     features: [
@@ -24,7 +24,7 @@ export const products: Product[] = [
         id: "forest-green",
         name: "Verde Bosque",
         hex: "#2d5016",
-        image: "/images/eco-rider-pro/forest-green.jpg",
+        image: "/images/eco-rider-pro/eco-rider-2.png",
         description:
           "Un verde profundo que representa nuestra conexión con la naturaleza",
       },
@@ -32,40 +32,30 @@ export const products: Product[] = [
         id: "snow-white",
         name: "Blanco Nieve",
         hex: "#ffffff",
-        image: "/images/eco-rider-pro/snow-white.jpg",
+        image: "/images/eco-rider-pro/eco-rider-2.png",
         description: "Pureza y elegancia en cada viaje",
       },
       {
         id: "midnight-black",
         name: "Negro Medianoche",
         hex: "#1a1a1a",
-        image: "/images/eco-rider-pro/midnight-black.jpg",
+        image: "/images/eco-rider-pro/eco-rider-2.png",
         description: "Sofisticación y poder en movimiento",
       },
       {
         id: "ocean-blue",
         name: "Azul Océano",
         hex: "#1e3a8a",
-        image: "/images/eco-rider-pro/ocean-blue.jpg",
+        image: "/images/eco-rider-pro/eco-rider-2.png",
         description: "Profundidad y calma como el mar",
       },
     ],
     images: [
       {
-        id: "hero-1",
-        url: "/images/eco-rider-pro/hero-1.jpg",
-        alt: "Eco Rider Pro en paisaje natural",
+        id: "eco-rider-2",
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "Eco Rider Pro",
         isHero: true,
-      },
-      {
-        id: "detail-1",
-        url: "/images/eco-rider-pro/detail-1.jpg",
-        alt: "Detalle del panel de control",
-      },
-      {
-        id: "detail-2",
-        url: "/images/eco-rider-pro/detail-2.jpg",
-        alt: "Sistema de carga",
       },
     ],
     specifications: {
@@ -106,7 +96,7 @@ export const products: Product[] = [
     name: "Urban Scooter Lite",
     model: "USL-2024",
     type: "scooter",
-    price: 4500000, // COP
+    price: 2500000, // COP
     description:
       "El scooter eléctrico perfecto para la ciudad. Ligero, ágil y perfecto para desplazamientos urbanos cortos.",
     features: [
@@ -193,7 +183,7 @@ export const products: Product[] = [
     name: "Mountain Bike Eléctrica",
     model: "MBE-2024",
     type: "bicycle",
-    price: 6500000, // COP
+    price: 3000000, // COP
     description:
       "Para los aventureros que buscan explorar la naturaleza con el poder de la tecnología eléctrica sostenible.",
     features: [
@@ -279,7 +269,9 @@ export const products: Product[] = [
 
 export const featuredProducts = products.filter(
   (product) =>
-    product.id === "eco-rider-pro" || product.id === "urban-scooter-lite"
+    product.id === "eco-rider-pro" ||
+    product.id === "urban-scooter-lite" ||
+    product.id === "mountain-bike-electric"
 );
 
 export const getProductById = (id: string): Product | undefined => {

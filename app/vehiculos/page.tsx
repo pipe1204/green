@@ -148,16 +148,6 @@ export default function VehiculosPage() {
               </div>
             </div>
 
-            {/* Filter Toggle */}
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2"
-            >
-              <Filter className="w-4 h-4" />
-              <span>Filtros</span>
-            </Button>
-
             {/* Sort */}
             <select
               value={sortBy}
@@ -194,6 +184,16 @@ export default function VehiculosPage() {
                 <List className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Filter Toggle */}
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center space-x-2"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Filtros</span>
+            </Button>
           </div>
 
           {/* Filters Panel */}

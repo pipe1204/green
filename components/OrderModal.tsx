@@ -13,8 +13,258 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Product, ColorOption } from "@/types";
 import { CreditCard, CheckCircle } from "lucide-react";
+
+// Colombian departments and cities data
+const colombianData = {
+  departments: [
+    "Antioquia",
+    "Atlántico",
+    "Bogotá D.C.",
+    "Bolívar",
+    "Boyacá",
+    "Caldas",
+    "Caquetá",
+    "Cauca",
+    "Cesar",
+    "Córdoba",
+    "Cundinamarca",
+    "Huila",
+    "La Guajira",
+    "Magdalena",
+    "Meta",
+    "Nariño",
+    "Norte de Santander",
+    "Quindío",
+    "Risaralda",
+    "Santander",
+    "Sucre",
+    "Tolima",
+    "Valle del Cauca",
+  ],
+  citiesByDepartment: {
+    Antioquia: [
+      "Medellín",
+      "Bello",
+      "Itagüí",
+      "Envigado",
+      "Apartadó",
+      "Turbo",
+      "Rionegro",
+      "Copacabana",
+      "La Estrella",
+      "Sabaneta",
+    ],
+    Atlántico: [
+      "Barranquilla",
+      "Soledad",
+      "Malambo",
+      "Sabanagrande",
+      "Puerto Colombia",
+      "Galapa",
+      "Usiacurí",
+    ],
+    "Bogotá D.C.": ["Bogotá"],
+    Bolívar: [
+      "Cartagena",
+      "Magangué",
+      "Turbaco",
+      "Arjona",
+      "Mahates",
+      "María la Baja",
+      "San Pablo",
+      "Simití",
+      "Santa Rosa",
+      "San Juan Nepomuceno",
+    ],
+    Boyacá: [
+      "Tunja",
+      "Duitama",
+      "Sogamoso",
+      "Chiquinquirá",
+      "Villa de Leyva",
+      "Paipa",
+      "Barbosa",
+      "Moniquirá",
+    ],
+    Caldas: [
+      "Manizales",
+      "La Dorada",
+      "Riosucio",
+      "Anserma",
+      "Viterbo",
+      "Supía",
+      "Pensilvania",
+      "Aguadas",
+    ],
+    Caquetá: [
+      "Florencia",
+      "San Vicente del Caguán",
+      "Puerto Rico",
+      "La Montañita",
+      "El Paujíl",
+      "Cartagena del Chairá",
+    ],
+    Cauca: [
+      "Popayán",
+      "Santander de Quilichao",
+      "Patía",
+      "Puerto Tejada",
+      "Corinto",
+      "Miranda",
+      "Padilla",
+    ],
+    Cesar: [
+      "Valledupar",
+      "Aguachica",
+      "Codazzi",
+      "La Paz",
+      "San Diego",
+      "Manaure",
+      "Chimichagua",
+    ],
+    Córdoba: [
+      "Montería",
+      "Sahagún",
+      "Ciénaga de Oro",
+      "Cereté",
+      "Montelíbano",
+      "Lorica",
+      "Tierralta",
+      "Ayapel",
+    ],
+    Cundinamarca: [
+      "Soacha",
+      "Girardot",
+      "Zipaquirá",
+      "Facatativá",
+      "Chía",
+      "Madrid",
+      "Mosquera",
+      "Fusagasugá",
+    ],
+    Huila: [
+      "Neiva",
+      "Pitalito",
+      "Garzón",
+      "La Plata",
+      "Campoalegre",
+      "San Agustín",
+      "Timaná",
+    ],
+    "La Guajira": [
+      "Riohacha",
+      "Maicao",
+      "Uribia",
+      "Manaure",
+      "San Juan del Cesar",
+      "Villanueva",
+      "El Molino",
+    ],
+    Magdalena: [
+      "Santa Marta",
+      "Ciénaga",
+      "Fundación",
+      "Aracataca",
+      "Zona Bananera",
+      "Pivijay",
+      "Plato",
+    ],
+    Meta: [
+      "Villavicencio",
+      "Acacías",
+      "Granada",
+      "San Martín",
+      "El Castillo",
+      "Cubarral",
+      "Restrepo",
+    ],
+    Nariño: [
+      "Pasto",
+      "Tumaco",
+      "Ipiales",
+      "Túquerres",
+      "La Unión",
+      "Potosí",
+      "Aldana",
+      "Cumbal",
+    ],
+    "Norte de Santander": [
+      "Cúcuta",
+      "Ocaña",
+      "Pamplona",
+      "Villa del Rosario",
+      "Los Patios",
+      "El Zulia",
+      "Villa Caro",
+    ],
+    Quindío: [
+      "Armenia",
+      "Calarcá",
+      "La Tebaida",
+      "Montenegro",
+      "Quimbaya",
+      "Circasia",
+      "Filandia",
+      "Salento",
+    ],
+    Risaralda: [
+      "Pereira",
+      "Dosquebradas",
+      "Santa Rosa de Cabal",
+      "Cartago",
+      "La Virginia",
+      "Chinchiná",
+      "Marsella",
+    ],
+    Santander: [
+      "Bucaramanga",
+      "Floridablanca",
+      "Girón",
+      "Piedecuesta",
+      "Barrancabermeja",
+      "San Gil",
+      "Socorro",
+    ],
+    Sucre: [
+      "Sincelejo",
+      "Corozal",
+      "Morroa",
+      "Los Palmitos",
+      "Galeras",
+      "San Onofre",
+      "Tolú",
+    ],
+    Tolima: [
+      "Ibagué",
+      "Girardot",
+      "Espinal",
+      "Melgar",
+      "Guamo",
+      "Saldaña",
+      "Purificación",
+      "Natagaima",
+    ],
+    "Valle del Cauca": [
+      "Cali",
+      "Palmira",
+      "Buenaventura",
+      "Tuluá",
+      "Cartago",
+      "Buga",
+      "Yumbo",
+      "Ginebra",
+    ],
+  },
+};
 
 const customerSchema = z.object({
   firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -47,6 +297,8 @@ export default function OrderModal({
 }: OrderModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
 
   const {
     register,
@@ -61,6 +313,21 @@ export default function OrderModal({
   const installmentAmount = product
     ? Math.round((product.price - downPayment) / 4)
     : 0;
+
+  const handleDepartmentChange = (department: string) => {
+    setSelectedDepartment(department);
+    setSelectedCity(""); // Reset city when department changes
+  };
+
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+  };
+
+  const availableCities = selectedDepartment
+    ? colombianData.citiesByDepartment[
+        selectedDepartment as keyof typeof colombianData.citiesByDepartment
+      ] || []
+    : [];
 
   const paymentSchedule = [
     { number: 1, amount: downPayment, label: "Pago inicial", dueDate: "Hoy" },
@@ -91,6 +358,12 @@ export default function OrderModal({
   ];
 
   const onSubmit = async (data: CustomerFormData) => {
+    // Validate department and city selection
+    if (!selectedDepartment || !selectedCity) {
+      alert("Por favor selecciona un departamento y una ciudad");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -100,7 +373,11 @@ export default function OrderModal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customer: data,
+          customer: {
+            ...data,
+            city: selectedCity,
+            state: selectedDepartment,
+          },
           productId: product!.id,
           selectedColor: selectedColor!,
           totalAmount: product!.price,
@@ -155,9 +432,9 @@ export default function OrderModal({
                 <div>
                   <h3 className="font-semibold text-lg">{product.name}</h3>
                   <p className="text-gray-600">Color: {selectedColor.name}</p>
-                    <p className="text-2xl font-bold text-blue-600">
-                      ${product.price.toLocaleString("es-CO")} COP
-                    </p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    ${product.price.toLocaleString("es-CO")} COP
+                  </p>
                 </div>
               </div>
             </div>
@@ -182,9 +459,9 @@ export default function OrderModal({
                       <p className="text-sm font-medium text-gray-600">
                         {payment.label}
                       </p>
-                        <p className="text-lg font-bold text-blue-600">
-                          ${payment.amount.toLocaleString("es-CO")}
-                        </p>
+                      <p className="text-lg font-bold text-blue-600">
+                        ${payment.amount.toLocaleString("es-CO")}
+                      </p>
                       <p className="text-xs text-gray-500">{payment.dueDate}</p>
                     </div>
                   </div>
@@ -287,11 +564,30 @@ export default function OrderModal({
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Ciudad *
                   </label>
-                  <Input
-                    {...register("city")}
-                    placeholder="Bogotá"
-                    className={errors.city ? "border-red-500" : ""}
-                  />
+                  <Select
+                    onValueChange={handleCityChange}
+                    value={selectedCity}
+                    disabled={!selectedDepartment}
+                  >
+                    <SelectTrigger
+                      className={errors.city ? "border-red-500" : ""}
+                    >
+                      <SelectValue
+                        placeholder={
+                          selectedDepartment
+                            ? "Selecciona ciudad"
+                            : "Primero selecciona departamento"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCities.map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {errors.city && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.city.message}
@@ -302,11 +598,23 @@ export default function OrderModal({
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Departamento *
                   </label>
-                  <Input
-                    {...register("state")}
-                    placeholder="Cundinamarca"
-                    className={errors.state ? "border-red-500" : ""}
-                  />
+                  <Select
+                    onValueChange={handleDepartmentChange}
+                    value={selectedDepartment}
+                  >
+                    <SelectTrigger
+                      className={errors.state ? "border-red-500" : ""}
+                    >
+                      <SelectValue placeholder="Selecciona departamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colombianData.departments.map((department) => (
+                        <SelectItem key={department} value={department}>
+                          {department}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {errors.state && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.state.message}

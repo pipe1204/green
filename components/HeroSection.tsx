@@ -13,7 +13,7 @@ export default function HeroSection() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % featuredProducts.length);
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(timer);
   }, []);
@@ -35,13 +35,22 @@ export default function HeroSection() {
   const currentProduct = featuredProducts[currentSlide];
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ paddingTop: "4rem" }}
+    >
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" style={{ top: "4rem" }}>
         <div
           className="w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: `url('/images/hero-bg-${currentSlide + 1}.jpg')`,
+            backgroundImage: `url(${
+              currentSlide === 0
+                ? "/hero-image-1.png"
+                : currentSlide === 1
+                ? "/hero-image-2.png"
+                : "/images/eco-rider-pro/eco-rider-2.png"
+            })`,
           }}
         />
         <div className="absolute inset-0 bg-black/30" />
