@@ -155,9 +155,9 @@ export default function OrderModal({
                 <div>
                   <h3 className="font-semibold text-lg">{product.name}</h3>
                   <p className="text-gray-600">Color: {selectedColor.name}</p>
-                  <p className="text-2xl font-bold text-primary">
-                    ${product.price.toLocaleString("es-CO")} COP
-                  </p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      ${product.price.toLocaleString("es-CO")} COP
+                    </p>
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function OrderModal({
                     key={payment.number}
                     className={`p-4 rounded-lg border ${
                       payment.number === 1
-                        ? "border-primary bg-primary/5"
+                        ? "border-blue-600 bg-blue-50"
                         : "border-gray-200 bg-white"
                     }`}
                   >
@@ -182,9 +182,9 @@ export default function OrderModal({
                       <p className="text-sm font-medium text-gray-600">
                         {payment.label}
                       </p>
-                      <p className="text-lg font-bold text-primary">
-                        ${payment.amount.toLocaleString("es-CO")}
-                      </p>
+                        <p className="text-lg font-bold text-blue-600">
+                          ${payment.amount.toLocaleString("es-CO")}
+                        </p>
                       <p className="text-xs text-gray-500">{payment.dueDate}</p>
                     </div>
                   </div>

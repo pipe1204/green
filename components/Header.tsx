@@ -22,7 +22,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-primary">GREEN</h1>
+              <h1 className="text-2xl font-bold text-black">GREEN</h1>
             </div>
           </div>
 
@@ -35,7 +35,7 @@ export default function Header() {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-primary transition-colors duration-200"
+                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors duration-200"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>
@@ -86,7 +86,7 @@ export default function Header() {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors duration-200"
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Icon className="w-4 h-4" />
