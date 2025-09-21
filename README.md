@@ -224,21 +224,21 @@ green/
 
 ### Eco Rider Pro
 
-- **Precio**: $8,500,000 COP
+- **Precio**: $3,500,000 COP
 - **Tipo**: Motocicleta eléctrica
 - **Rango**: 120 km
 - **Velocidad máxima**: 80 km/h
 
 ### Urban Scooter Lite
 
-- **Precio**: $4,500,000 COP
+- **Precio**: $2,500,000 COP
 - **Tipo**: Scooter eléctrico
 - **Rango**: 25 km
 - **Velocidad máxima**: 25 km/h
 
 ### Mountain Bike Eléctrica
 
-- **Precio**: $6,500,000 COP
+- **Precio**: $2,500,000 COP
 - **Tipo**: Bicicleta eléctrica
 - **Rango**: 60 km
 - **Velocidad máxima**: 45 km/h
