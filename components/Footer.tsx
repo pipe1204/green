@@ -9,6 +9,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Bike,
 } from "lucide-react";
 
 export default function Footer() {
@@ -125,7 +126,8 @@ export default function Footer() {
             onClick={handleTestRideClick}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-12 md:h-10 text-sm font-normal"
           >
-            <Calendar className="w-4 h-4 mr-2" />
+            {/* <Calendar className="w-4 h-4 mr-2" /> */}
+            <Bike className="w-4 h-4 mr-2" />
             Agenda una prueba
           </Button>
         </div>
