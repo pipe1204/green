@@ -20,7 +20,10 @@ export default function Footer() {
 
   const handleQuestionClick = () => {
     // You can implement a simple contact modal or redirect to a contact page
-    window.open("mailto:info@green.co?subject=Consulta sobre vehículos eléctricos", "_blank");
+    window.open(
+      "mailto:info@green.co?subject=Consulta sobre vehículos eléctricos",
+      "_blank"
+    );
   };
 
   return (
@@ -111,19 +114,19 @@ export default function Footer() {
       {/* Sticky Bottom Actions - Always visible */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-50">
         <div className="max-w-md mx-auto flex space-x-3">
-          <Button 
+          <Button
             onClick={handleQuestionClick}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Pregunta
+            Preguntanos algo
           </Button>
-          <Button 
+          <Button
             onClick={handleTestRideClick}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
           >
             <Calendar className="w-4 h-4 mr-2" />
-            Prueba
+            Agenda una prueba
           </Button>
         </div>
       </div>

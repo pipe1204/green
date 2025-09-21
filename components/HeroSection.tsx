@@ -83,9 +83,9 @@ export default function HeroSection() {
             Ordena este modelo
           </Button>
           <Button
-            variant="outline"
+            variant="default"
             size="lg"
-            className="border-white text-white hover:bg-white hover:text-black text-lg px-8 py-4"
+            className="border-white text-white text-lg px-8 py-4"
           >
             Aprende más
           </Button>
