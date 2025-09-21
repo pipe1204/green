@@ -10,11 +10,10 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { name: "Vehículos", href: "#vehiculos", icon: Car },
-    { name: "Energía", href: "#energia", icon: Zap },
-    { name: "Carga", href: "#carga", icon: Zap },
-    { name: "Descubrir", href: "#descubrir", icon: Leaf },
-    { name: "Tienda", href: "#tienda", icon: Car },
+    { name: "Vehículos", href: "/vehiculos", icon: Car },
+    { name: "Energía", href: "/energia", icon: Zap },
+    { name: "Carga", href: "/carga", icon: Zap },
+    { name: "Descubrir", href: "/descubrir", icon: Leaf },
   ];
 
   return (
@@ -39,14 +38,14 @@ export default function Header() {
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <button
                     key={item.name}
-                    href={item.href}
+                    onClick={() => router.push(item.href)}
                     className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors duration-200"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>
-                  </a>
+                  </button>
                 );
               })}
             </div>
@@ -90,15 +89,17 @@ export default function Header() {
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <button
                     key={item.name}
-                    href={item.href}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200 w-full text-left"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>
-                  </a>
+                  </button>
                 );
               })}
               <div className="pt-4 border-t border-gray-200">
