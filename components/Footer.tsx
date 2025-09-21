@@ -24,49 +24,11 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <>
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Test Ride Section */}
-          <div className="bg-gray-50 p-8 rounded-lg">
-            <div className="flex items-center mb-6">
-              <Calendar className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Programa una Prueba</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              Experimenta la emoción de conducir un vehículo eléctrico. Programa
-              una prueba gratuita y descubre por qué Green es la mejor opción.
-            </p>
-            <Button
-              onClick={handleTestRideClick}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Programar Prueba Gratuita
-            </Button>
-          </div>
-
-          {/* Questions Section */}
-          <div className="bg-gray-50 p-8 rounded-lg">
-            <div className="flex items-center mb-6">
-              <MessageCircle className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Haz una Pregunta</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              ¿Tienes dudas sobre nuestros vehículos? Nuestro equipo de expertos
-              está aquí para ayudarte.
-            </p>
-            <Button
-              onClick={handleQuestionClick}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Enviar Pregunta
-            </Button>
-          </div>
-        </div>
-
-        {/* Contact Info */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h4 className="font-semibold mb-4 flex items-center text-gray-900">
@@ -117,57 +79,57 @@ export default function Footer() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Bottom Bar */}
-      <div className="bg-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-gray-600 mb-4 md:mb-0">
-              © 2024 Green. Todos los derechos reservados.
-            </div>
-            <div className="flex space-x-6 text-sm text-gray-600">
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Privacidad
-              </a>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Términos
-              </a>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Contacto
-              </a>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Noticias
-              </a>
-              <a href="#" className="hover:text-gray-900 transition-colors">
-                Ubicaciones
-              </a>
+          {/* Bottom Bar */}
+          <div className="mt-16 pt-8 border-t border-gray-200">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="text-sm text-gray-600 mb-4 md:mb-0">
+                © 2024 Green. Todos los derechos reservados.
+              </div>
+              <div className="flex space-x-6 text-sm text-gray-600">
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Privacidad
+                </a>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Términos
+                </a>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Contacto
+                </a>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Noticias
+                </a>
+                <a href="#" className="hover:text-gray-900 transition-colors">
+                  Ubicaciones
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </footer>
 
-      {/* Sticky Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50 md:hidden">
-        <div className="flex space-x-4">
+      {/* Sticky Bottom Actions - Always visible */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-50">
+        <div className="max-w-md mx-auto flex space-x-3">
           <Button 
-            variant="outline" 
-            className="flex-1"
             onClick={handleQuestionClick}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
             Pregunta
           </Button>
           <Button 
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
             onClick={handleTestRideClick}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-10 text-sm font-normal"
           >
             <Calendar className="w-4 h-4 mr-2" />
             Prueba
           </Button>
         </div>
       </div>
-    </footer>
+
+      {/* Add bottom padding to body to account for sticky buttons */}
+      <div className="h-16"></div>
+    </>
   );
 }
