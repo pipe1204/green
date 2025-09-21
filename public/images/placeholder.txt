@@ -1,0 +1,45 @@
+# Placeholder Images
+
+This directory contains placeholder references for the Green e-commerce website images.
+
+## Required Images:
+
+### Hero Backgrounds:
+- hero-bg-1.jpg (Nature/forest background for Eco Rider Pro)
+- hero-bg-2.jpg (Urban/city background for Urban Scooter Lite)
+
+### Product Images:
+- eco-rider-pro/
+  - forest-green.jpg
+  - snow-white.jpg
+  - midnight-black.jpg
+  - ocean-blue.jpg
+  - hero-1.jpg
+  - detail-1.jpg
+  - detail-2.jpg
+
+- urban-scooter-lite/
+  - lime-green.jpg
+  - sunset-orange.jpg
+  - storm-gray.jpg
+  - hero-2.jpg
+  - folded.jpg
+
+- mountain-bike-electric/
+  - earth-brown.jpg
+  - sky-blue.jpg
+  - forest-dark.jpg
+  - hero-3.jpg
+  - trail.jpg
+
+## Image Specifications:
+- Hero images: 1920x1080px minimum
+- Product images: 800x600px minimum
+- All images should be optimized for web (WebP format preferred)
+- High quality, professional photography showcasing the products in natural/urban environments
+
+## Notes:
+- Images should emphasize environmental benefits
+- Include nature/forest backgrounds where appropriate
+- Show products in real-world usage scenarios
+- Maintain Tesla-inspired clean, premium aesthetic
