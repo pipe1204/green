@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import HowItWorksSection from "@/components/HowItWorksSection";
 import ProductCatalog from "@/components/ProductCatalog";
 import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
@@ -50,6 +51,7 @@ export default function Home() {
 
       <main>
         <HeroSection />
+        <HowItWorksSection />
         <ProductCatalog onOrderProduct={handleOrderProduct} />
       </main>
 
