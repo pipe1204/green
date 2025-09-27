@@ -2,53 +2,67 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import SplitText from "@/components/SplitText";
+import TextType from "@/components/TextType";
+import CircularText from "./CircularText";
+import FuzzyText from "./FuzzyText";
 
 export default function HeroSection() {
   const router = useRouter();
 
   return (
     <section
-      className="relative min-h-screen flex items-center overflow-hidden bg-white"
+      className="relative min-h-screen flex items-center overflow-hidden bg-white mt-10"
       style={{ paddingTop: "4rem" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <div className="text-left">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Compara Vehículos Eléctricos
-            </h1>
+        <div className="flex flex-col items-center justify-center text-center min-h-[80vh]">
+          {/* Main Content */}
+          <div className="max-w-4xl mx-auto">
+            <SplitText
+              text="Descubre tu Próximo Vehículo"
+              tag="h1"
+              className="text-6xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight"
+              splitType="words, chars"
+              delay={50}
+              duration={0.8}
+              from={{ opacity: 0, y: 60 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.2}
+            />
+            <FuzzyText
+              baseIntensity={0.2}
+              hoverIntensity={0.8}
+              enableHover={true}
+              color="#000"
+            >
+              Eléctrico
+            </FuzzyText>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              Encuentra el vehículo eléctrico perfecto para ti. Compara
-              características, precios y especificaciones de diferentes marcas y
-              modelos en un solo lugar.
+              Busca y compara{" "}
+              <TextType
+                words={[
+                  "características",
+                  "precios",
+                  "vida de la batería",
+                  "garantía",
+                  "autonomía",
+                  "especificaciones",
+                  "rendimiento",
+                  "red de concesionarios",
+                ]}
+                className="text-blue-600 font-semibold"
+                typingSpeed={80}
+                deletingSpeed={40}
+                pauseTime={2500}
+              />{" "}
+              de diferentes marcas y modelos de vehiculos electricos en un solo
+              lugar.
             </p>
 
-            {/* Key Benefits */}
-            <div className="mb-8 space-y-4">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <span className="text-lg text-gray-700">
-                  Compara hasta 3 modelos lado a lado
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <span className="text-lg text-gray-700">
-                  Filtros por batería, autonomía y garantía
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <span className="text-lg text-gray-700">
-                  Información actualizada de múltiples marcas
-                </span>
-              </div>
-            </div>
-
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
                 className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 flex items-center space-x-2"
@@ -66,33 +80,15 @@ export default function HeroSection() {
                 Agendar una Prueba
               </Button>
             </div>
-
-            {/* Stats */}
-            <div className="mt-12 grid grid-cols-3 gap-8">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">50+</p>
-                <p className="text-sm text-gray-600">Modelos disponibles</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">15+</p>
-                <p className="text-sm text-gray-600">Marcas comparadas</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-blue-600">100%</p>
-                <p className="text-sm text-gray-600">Información verificada</p>
-              </div>
+            <div className="my-10">
+              <CircularText
+                text="AHORRA*AYUDA*AMBIENTE*"
+                onHover="speedUp"
+                spinDuration={20}
+                textColor="text-black"
+                className="custom-class"
+              />
             </div>
-          </div>
-
-          {/* Right Image */}
-          <div className="relative">
-            <div
-              className="w-full h-96 lg:h-[500px] bg-cover bg-center bg-no-repeat rounded-lg shadow-2xl"
-              style={{
-                backgroundImage: `url("/hero-image-1.png")`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg" />
           </div>
         </div>
       </div>

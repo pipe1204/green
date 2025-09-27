@@ -1,28 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
-import { Product, ColorOption } from "@/types";
-import { Car, Zap, Leaf, Settings } from "lucide-react";
+import { Car, Leaf } from "lucide-react";
 
-interface ProductCatalogProps {
-  onOrderProduct: (product: Product, selectedColor: ColorOption) => void;
-}
-
-export default function ProductCatalog({
-  onOrderProduct,
-}: ProductCatalogProps) {
-  const router = useRouter();
+export default function ProductCatalog() {
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
-
-  const filteredProducts =
-    selectedType === "all"
-      ? products
-      : products.filter((product) => product.type === selectedType);
 
   const typeIcons = {
     motorbike: Car,
@@ -36,11 +19,6 @@ export default function ProductCatalog({
     scooter: "Scooters",
     bicycle: "Bicicletas",
     car: "Carros",
-  };
-
-  const handleColorSelect = (product: Product, color: ColorOption) => {
-    setSelectedProduct(product);
-    setSelectedColor(color);
   };
 
   return (
@@ -82,51 +60,6 @@ export default function ProductCatalog({
               </Button>
             );
           })}
-        </div>
-
-        {/* Comparison Features */}
-        <div className="mt-20 text-center">
-          <h3 className="text-3xl font-bold text-gray-900 mb-8">
-            ¿Por qué Comparar con Nosotros?
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="w-8 h-8 text-blue-600" />
-              </div>
-              <h4 className="font-semibold mb-2">Información Neutral</h4>
-              <p className="text-gray-600 text-sm">
-                Datos objetivos sin sesgo de marca
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-red-600" />
-              </div>
-              <h4 className="font-semibold mb-2">Actualización Constante</h4>
-              <p className="text-gray-600 text-sm">
-                Especificaciones siempre actualizadas
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Settings className="w-8 h-8 text-yellow-600" />
-              </div>
-              <h4 className="font-semibold mb-2">Filtros Avanzados</h4>
-              <p className="text-gray-600 text-sm">
-                Encuentra exactamente lo que necesitas
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Car className="w-8 h-8 text-purple-600" />
-              </div>
-              <h4 className="font-semibold mb-2">Múltiples Marcas</h4>
-              <p className="text-gray-600 text-sm">
-                Compara todas las opciones disponibles
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>

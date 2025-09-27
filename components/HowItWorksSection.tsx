@@ -22,7 +22,7 @@ export default function HowItWorksSection() {
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Cómo Funciona Nuestra Plataforma
           </h2>

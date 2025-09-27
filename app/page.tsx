@@ -8,6 +8,7 @@ import ProductCatalog from "@/components/ProductCatalog";
 import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
 import { Product, ColorOption } from "@/types";
+import ComparisonSection from "@/components/ComparisonSection";
 
 export default function Home() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -51,8 +52,9 @@ export default function Home() {
 
       <main>
         <HeroSection />
+        <ProductCatalog />
         <HowItWorksSection />
-        <ProductCatalog onOrderProduct={handleOrderProduct} />
+        <ComparisonSection />
       </main>
 
       <Footer />
