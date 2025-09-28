@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X, Car, Zap, Leaf } from "lucide-react";
+import { Menu, X, Zap, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
@@ -10,7 +10,6 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { name: "Vehículos", href: "/vehiculos", icon: Car },
     { name: "Energía", href: "/energia", icon: Zap },
     { name: "Carga", href: "/carga", icon: Zap },
     { name: "Descubrir", href: "/descubrir", icon: Leaf },
@@ -25,7 +24,7 @@ export default function Header() {
             <div className="flex-shrink-0">
               <button
                 onClick={() => router.push("/")}
-                className="text-2xl font-bold text-black hover:text-blue-600 transition-colors duration-200 cursor-pointer"
+                className="text-2xl font-bold text-black hover:text-green-600 transition-colors duration-200 cursor-pointer"
               >
                 GREEN
               </button>
@@ -41,7 +40,7 @@ export default function Header() {
                   <button
                     key={item.name}
                     onClick={() => router.push(item.href)}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                    className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition-colors duration-200"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>

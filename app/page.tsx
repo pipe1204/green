@@ -1,67 +1,69 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import ProductCatalog from "@/components/ProductCatalog";
-import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
-import { Product, ColorOption } from "@/types";
+import { ComparisonProvider } from "@/components/context/ComparisonContext";
+
+// Lazy load heavy components
+const Lightning = dynamic(() => import("@/components/Lightning"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-white" />,
+});
+
+const CTASection = dynamic(() => import("@/components/CTASection"), {
+  ssr: false,
+  loading: () => <div className="w-full py-16 bg-white" />,
+});
+
+const HowItWorksSection = dynamic(
+  () => import("@/components/HowItWorksSection"),
+  {
+    ssr: false,
+    loading: () => <div className="w-full py-16 bg-white" />,
+  }
+);
+
+const ComparisonSection = dynamic(
+  () => import("@/components/ComparisonSection"),
+  {
+    ssr: false,
+    loading: () => <div className="w-full py-16 bg-white" />,
+  }
+);
 
 export default function Home() {
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
-
-  useEffect(() => {
-    const handleOpenOrderModal = (event: CustomEvent) => {
-      const { product, color } = event.detail;
-      handleOrderProduct(product, color);
-    };
-
-    window.addEventListener(
-      "openOrderModal",
-      handleOpenOrderModal as EventListener
-    );
-
-    return () => {
-      window.removeEventListener(
-        "openOrderModal",
-        handleOpenOrderModal as EventListener
-      );
-    };
-  }, []);
-
-  const handleOrderProduct = (product: Product, color: ColorOption) => {
-    setSelectedProduct(product);
-    setSelectedColor(color);
-    setIsOrderModalOpen(true);
-  };
-
-  const handleCloseOrderModal = () => {
-    setIsOrderModalOpen(false);
-    setSelectedProduct(null);
-    setSelectedColor(null);
-  };
-
   return (
-    <div className="min-h-screen bg-white pb-16">
-      <Header />
+    <ComparisonProvider>
+      <div className="min-h-screen bg-white pb-16">
+        <Header />
+        <main>
+          <div className="relative w-full min-h-screen">
+            {/* Lightning Background */}
+            <div className="absolute inset-0 z-0 overflow-hidden lightning-container">
+              <Lightning
+                hue={220}
+                xOffset={0}
+                speed={0.8}
+                intensity={0.6}
+                size={1.2}
+              />
+            </div>
+            {/* Hero Section Overlay */}
+            <div className="relative z-10">
+              {/* Subtle gradient overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 pointer-events-none"></div>
+              <HeroSection />
+            </div>
+          </div>
+          <HowItWorksSection />
+          <ComparisonSection />
+        </main>
+        <CTASection targetSection="vehiculos" />
 
-      <main>
-        <HeroSection />
-        <ProductCatalog onOrderProduct={handleOrderProduct} />
-      </main>
-
-      <Footer />
-
-      {/* Order Modal */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={handleCloseOrderModal}
-        product={selectedProduct}
-        selectedColor={selectedColor}
-      />
-    </div>
+        <Footer />
+      </div>
+    </ComparisonProvider>
   );
 }

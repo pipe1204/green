@@ -2,15 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  MessageCircle,
-  Leaf,
-  Phone,
-  Mail,
-  MapPin,
-  Bike,
-} from "lucide-react";
+import { MessageCircle, Leaf, Phone, Mail, MapPin, Bike } from "lucide-react";
 
 export default function Footer() {
   const router = useRouter();

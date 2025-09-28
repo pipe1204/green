@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   model: string;
-  type: "motorbike" | "scooter" | "bicycle" | "other";
+  type: "motorbike" | "scooter" | "bicycle" | "car" | "truck" | "other";
   price: number;
   description: string;
   features: string[];
@@ -55,82 +55,35 @@ export interface ProductSpecifications {
   };
 }
 
-export interface Customer {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: Address;
-  preferences: {
-    newsletter: boolean;
-    smsUpdates: boolean;
-  };
+export interface SearchFilters {
+  vehicleType: string[];
+  batteryRange: string[];
+  warranty: string[];
+  priceMin: number;
+  priceMax: number;
+  location: string[];
+  reviews: string[];
+  availability: string[];
+  passengerCapacity: string[];
+  chargingTime: string[];
+  maxSpeed: string[];
+  power: string[];
+  brands: string[];
 }
 
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
+export interface SortOption {
+  value: string;
+  label: string;
 }
 
-export interface Order {
-  id: string;
-  customerId: string;
-  productId: string;
-  selectedColor: ColorOption;
-  totalAmount: number;
-  downPayment: number;
-  installmentAmount: number;
-  status: OrderStatus;
-  paymentSchedule: PaymentSchedule;
-  deliveryAddress: Address;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type OrderStatus =
-  | "pending"
-  | "down-payment-received"
-  | "payment-1-completed"
-  | "payment-2-completed"
-  | "payment-3-completed"
-  | "payment-4-completed"
-  | "ready-for-delivery"
-  | "delivered"
-  | "cancelled";
-
-export interface PaymentSchedule {
-  downPayment: {
-    amount: number;
-    dueDate: Date;
-    status: "pending" | "completed";
-  };
-  installments: {
-    amount: number;
-    dueDate: Date;
-    status: "pending" | "completed";
-    installmentNumber: number;
+export interface FilterSection {
+  title: string;
+  filters: {
+    key: string;
+    label: string;
+    type: "checkbox" | "range" | "select";
+    options?: { value: string; label: string; count?: number }[];
+    min?: number;
+    max?: number;
   }[];
-}
-
-export interface ContactForm {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  type: "question" | "test-ride" | "general";
-}
-
-export interface TestRideRequest {
-  name: string;
-  email: string;
-  phone: string;
-  preferredDate: string;
-  preferredTime: string;
-  location: string;
-  productInterest: string;
-  message?: string;
 }

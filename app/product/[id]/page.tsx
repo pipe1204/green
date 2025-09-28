@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { Product, ColorOption } from "@/types";
-import OrderModal from "@/components/OrderModal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -25,7 +24,6 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   useEffect(() => {
     const productId = params.id as string;
@@ -39,15 +37,7 @@ export default function ProductPage() {
     }
   }, [params.id]);
 
-  const handleOrderProduct = () => {
-    if (product && selectedColor) {
-      setIsOrderModalOpen(true);
-    }
-  };
-
-  const handleCloseOrderModal = () => {
-    setIsOrderModalOpen(false);
-  };
+  const handleOrderProduct = () => {};
 
   if (!product) {
     return (
@@ -351,14 +341,6 @@ export default function ProductPage() {
       </main>
 
       <Footer />
-
-      {/* Order Modal */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={handleCloseOrderModal}
-        product={product}
-        selectedColor={selectedColor}
-      />
     </div>
   );
 }

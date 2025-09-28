@@ -2,10 +2,7 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import {
-  Zap,
-  Leaf,
   Battery,
   Recycle,
   Sun,
@@ -14,70 +11,99 @@ import {
   TreePine,
   TrendingUp,
   Shield,
-  Clock,
-  Globe,
 } from "lucide-react";
+import GlitchText from "@/components/GlitchText";
+import CTASection from "@/components/CTASection";
+import ElectricBorder from "@/components/ElectricBorder";
+import SplashCursor from "@/components/SplashCursor";
 
 export default function EnergiaPage() {
   return (
     <div className="min-h-screen bg-white pb-20">
+      <SplashCursor />
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
         {/* Hero Section */}
-        <div className="py-16 text-center">
+        <div className="pt-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Energía Limpia para el Futuro
+            Energía Limpia para el{" "}
+            <GlitchText
+              speed={1}
+              enableShadows={true}
+              enableOnHover={false}
+              color="text-black"
+              className="text-4xl md:text-6xl font-bold"
+            >
+              Futuro
+            </GlitchText>
           </h1>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
-            Descubre cómo nuestros vehículos eléctricos están transformando el
+            Descubre cómo los vehículos eléctricos están transformando el
             transporte con energía 100% renovable y cero emisiones.
           </p>
-          <Button
-            size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
-            Conoce Nuestra Tecnología
-          </Button>
         </div>
 
         {/* Energy Sources */}
         <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Fuentes de Energía Renovables
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
-              <Sun className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Energía Solar
-              </h3>
-              <p className="text-gray-600">
-                Nuestros centros de carga utilizan paneles solares para generar
-                electricidad limpia directamente del sol.
-              </p>
-            </div>
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
-              <Wind className="w-16 h-16 text-blue-500 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Energía Eólica
-              </h3>
-              <p className="text-gray-600">
-                Parques eólicos proporcionan energía renovable para cargar
-                nuestros vehículos de forma sostenible.
-              </p>
-            </div>
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
-              <Droplets className="w-16 h-16 text-cyan-500 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Energía Hidroeléctrica
-              </h3>
-              <p className="text-gray-600">
-                Centrales hidroeléctricas generan energía limpia aprovechando la
-                fuerza del agua en movimiento.
-              </p>
-            </div>
+            <ElectricBorder
+              color="#00b4d8"
+              speed={1}
+              chaos={0.5}
+              thickness={2}
+              style={{ borderRadius: 16, padding: 18 }}
+            >
+              <div className="text-center p-8 bg-gray-50 rounded-lg">
+                <Sun className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Energía Solar
+                </h3>
+                <p className="text-gray-600">
+                  Algunos centros de carga utilizan paneles solares para generar
+                  electricidad limpia directamente del sol.
+                </p>
+              </div>
+            </ElectricBorder>
+            <ElectricBorder
+              color="#00b4d8"
+              speed={1}
+              chaos={0.5}
+              thickness={2}
+              style={{ borderRadius: 16, padding: 18 }}
+            >
+              <div className="text-center p-8 bg-gray-50 rounded-lg">
+                <Wind className="w-16 h-16 text-blue-500 mx-auto mb-6" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Energía Eólica
+                </h3>
+                <p className="text-gray-600">
+                  Parques eólicos proporcionan energía renovable para cargar
+                  vehículos eléctricos de forma sostenible.
+                </p>
+              </div>
+            </ElectricBorder>
+            <ElectricBorder
+              color="#00b4d8"
+              speed={1}
+              chaos={0.5}
+              thickness={2}
+              style={{ borderRadius: 16, padding: 18 }}
+            >
+              <div className="text-center p-8 bg-gray-50 rounded-lg">
+                <Droplets className="w-16 h-16 text-cyan-500 mx-auto mb-6" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Energía Hidroeléctrica
+                </h3>
+                <p className="text-gray-600">
+                  Centrales hidroeléctricas generan energía limpia aprovechando
+                  la fuerza del agua en movimiento.
+                </p>
+              </div>
+            </ElectricBorder>
           </div>
         </div>
 
@@ -85,12 +111,12 @@ export default function EnergiaPage() {
         <div className="py-16 bg-gray-50 rounded-lg">
           <div className="max-w-4xl mx-auto text-center">
             <Battery className="w-20 h-20 text-blue-600 mx-auto mb-8" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Tecnología de Baterías de Litio
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Nuestras baterías de última generación ofrecen mayor autonomía,
-              carga más rápida y vida útil extendida.
+              Las baterías de última generación ofrecen mayor autonomía, carga
+              más rápida y vida útil extendida.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
@@ -123,7 +149,7 @@ export default function EnergiaPage() {
 
         {/* Environmental Impact */}
         <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Impacto Ambiental Positivo
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -173,7 +199,7 @@ export default function EnergiaPage() {
         </div>
 
         {/* Charging Infrastructure */}
-        <div className="py-16 bg-gray-50 rounded-lg">
+        {/* <div className="py-16 bg-gray-50 rounded-lg">
           <div className="max-w-4xl mx-auto text-center">
             <Zap className="w-20 h-20 text-blue-600 mx-auto mb-8" />
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
@@ -210,11 +236,11 @@ export default function EnergiaPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Statistics */}
         <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Números que Importan
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -237,37 +263,8 @@ export default function EnergiaPage() {
           </div>
         </div>
 
-        {/* Future Vision */}
-        <div className="py-16 bg-gray-50 rounded-lg">
-          <div className="max-w-4xl mx-auto text-center">
-            <Globe className="w-20 h-20 text-green-600 mx-auto mb-8" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Visión del Futuro
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Trabajamos hacia un futuro donde el transporte eléctrico sea la
-              norma, no la excepción. Un mundo más limpio, silencioso y
-              sostenible para las próximas generaciones.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Únete al Cambio
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => window.open("/vehiculos", "_self")}
-              >
-                Ver Vehículos
-              </Button>
-            </div>
-          </div>
-        </div>
+        <CTASection targetUrl="/" />
       </main>
-
       <Footer />
     </div>
   );
