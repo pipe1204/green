@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import {
   batteryRanges,
-  brands,
   cities,
   priceRanges,
   vehicleTypes,
@@ -80,7 +79,7 @@ export default function ProductCatalog() {
     <section id="vehiculos" className="w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Search & Filter Interface */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12 max-w-7xl mx-auto">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-8 mb-12 max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-2">
               <Search className="w-6 h-6 text-blue-600" />
@@ -227,29 +226,6 @@ export default function ProductCatalog() {
                   {warrantyOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Brand */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Car className="w-4 h-4 mr-2" />
-                Marca
-              </label>
-              <Select
-                value={searchFilters.brand}
-                onValueChange={(value) => handleFilterChange("brand", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brands.map((brand) => (
-                    <SelectItem key={brand} value={brand}>
-                      {brand}
                     </SelectItem>
                   ))}
                 </SelectContent>

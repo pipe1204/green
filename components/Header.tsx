@@ -24,7 +24,7 @@ export default function Header() {
             <div className="flex-shrink-0">
               <button
                 onClick={() => router.push("/")}
-                className="text-2xl font-bold text-black hover:text-blue-600 transition-colors duration-200 cursor-pointer"
+                className="text-2xl font-bold text-black hover:text-green-600 transition-colors duration-200 cursor-pointer"
               >
                 GREEN
               </button>

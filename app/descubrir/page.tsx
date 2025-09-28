@@ -10,15 +10,10 @@ import {
   MessageCircle,
   Award,
   TrendingUp,
-  Globe,
-  Leaf,
-  Car,
-  Zap,
-  MapPin,
   Calendar,
-  Clock,
   CheckCircle,
 } from "lucide-react";
+import CTASection from "@/components/CTASection";
 
 export default function DescubrirPage() {
   return (
@@ -45,7 +40,7 @@ export default function DescubrirPage() {
 
         {/* Learning Resources */}
         <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Centro de Aprendizaje
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -110,7 +105,7 @@ export default function DescubrirPage() {
 
         {/* Success Stories */}
         <div className="py-16 bg-gray-50 rounded-lg">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Historias de Éxito
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -127,9 +122,9 @@ export default function DescubrirPage() {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                "Mi Eco Rider Pro ha transformado mi rutina diaria. Ahorro
+                &quot;Mi Eco Rider Pro ha transformado mi rutina diaria. Ahorro
                 $300,000 COP mensuales en transporte y contribuyo al medio
-                ambiente."
+                ambiente.&quot;
               </p>
               <div className="flex items-center text-sm text-green-600">
                 <TrendingUp className="w-4 h-4 mr-1" />
@@ -148,8 +143,9 @@ export default function DescubrirPage() {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                "Como repartidor, mi Urban Scooter Lite es perfecto. Silencioso,
-                eficiente y me permite trabajar sin contaminar la ciudad."
+                &quot;Como repartidor, mi Urban Scooter Lite es perfecto.
+                Silencioso, eficiente y me permite trabajar sin contaminar la
+                ciudad.&quot;
               </p>
               <div className="flex items-center text-sm text-green-600">
                 <TrendingUp className="w-4 h-4 mr-1" />
@@ -168,8 +164,9 @@ export default function DescubrirPage() {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                "Mi Mountain Bike Eléctrica me permite explorar la naturaleza
-                sin esfuerzo. Es perfecta para mis aventuras de fin de semana."
+                &quot;Mi Mountain Bike Eléctrica me permite explorar la
+                naturaleza sin esfuerzo. Es perfecta para mis aventuras de fin
+                de semana.&quot;
               </p>
               <div className="flex items-center text-sm text-green-600">
                 <TrendingUp className="w-4 h-4 mr-1" />
@@ -181,7 +178,7 @@ export default function DescubrirPage() {
 
         {/* Environmental Impact */}
         <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Tu Impacto en el Planeta
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -241,7 +238,7 @@ export default function DescubrirPage() {
 
         {/* Events & News */}
         <div className="py-16 bg-gray-50 rounded-lg">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Eventos y Noticias
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -285,75 +282,7 @@ export default function DescubrirPage() {
           </div>
         </div>
 
-        {/* Getting Started */}
-        <div className="py-16">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            Comienza tu Viaje Eléctrico
-          </h2>
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">1</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Explora
-                </h3>
-                <p className="text-gray-600">
-                  Conoce nuestros vehículos y encuentra el perfecto para ti
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">2</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Prueba
-                </h3>
-                <p className="text-gray-600">
-                  Programa una prueba gratuita y experimenta la diferencia
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">3</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Únete
-                </h3>
-                <p className="text-gray-600">
-                  Haz el cambio y únete a la revolución eléctrica
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="py-16 bg-blue-600 rounded-lg text-center text-white">
-          <h2 className="text-3xl font-bold mb-6">¿Listo para Descubrir?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Explora nuestros vehículos, programa una prueba gratuita y descubre
-            por qué miles de colombianos ya eligieron Green.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
-              onClick={() => window.open("/vehiculos", "_self")}
-            >
-              Ver Vehículos
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-blue-600"
-              onClick={() => window.open("/test-ride", "_self")}
-            >
-              Programar Prueba
-            </Button>
-          </div>
-        </div>
+        <CTASection />
       </main>
 
       <Footer />

@@ -1,53 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
-import ProductCatalog from "@/components/ProductCatalog";
-import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
-import { Product, ColorOption } from "@/types";
 import ComparisonSection from "@/components/ComparisonSection";
+import CTASection from "@/components/CTASection";
 import { ComparisonProvider } from "@/components/context/ComparisonContext";
-import LaserFlow from "@/components/LaserFlow";
 
 export default function Home() {
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
-
-  useEffect(() => {
-    const handleOpenOrderModal = (event: CustomEvent) => {
-      const { product, color } = event.detail;
-      handleOrderProduct(product, color);
-    };
-
-    window.addEventListener(
-      "openOrderModal",
-      handleOpenOrderModal as EventListener
-    );
-
-    return () => {
-      window.removeEventListener(
-        "openOrderModal",
-        handleOpenOrderModal as EventListener
-      );
-    };
-  }, []);
-
-  const handleOrderProduct = (product: Product, color: ColorOption) => {
-    setSelectedProduct(product);
-    setSelectedColor(color);
-    setIsOrderModalOpen(true);
-  };
-
-  const handleCloseOrderModal = () => {
-    setIsOrderModalOpen(false);
-    setSelectedProduct(null);
-    setSelectedColor(null);
-  };
-
   return (
     <ComparisonProvider>
       <div className="min-h-screen bg-white pb-16">
@@ -57,20 +18,9 @@ export default function Home() {
           <HowItWorksSection />
           <ComparisonSection />
         </main>
-        <div
-          style={{ height: "500px", position: "relative", overflow: "hidden" }}
-        >
-          <LaserFlow />
-        </div>
-        <Footer />
+        <CTASection targetSection="vehiculos" />
 
-        {/* Order Modal */}
-        <OrderModal
-          isOpen={isOrderModalOpen}
-          onClose={handleCloseOrderModal}
-          product={selectedProduct}
-          selectedColor={selectedColor}
-        />
+        <Footer />
       </div>
     </ComparisonProvider>
   );
