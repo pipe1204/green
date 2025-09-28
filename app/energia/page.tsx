@@ -15,10 +15,12 @@ import {
 import GlitchText from "@/components/GlitchText";
 import CTASection from "@/components/CTASection";
 import ElectricBorder from "@/components/ElectricBorder";
+import SplashCursor from "@/components/SplashCursor";
 
 export default function EnergiaPage() {
   return (
     <div className="min-h-screen bg-white pb-20">
+      <SplashCursor />
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">

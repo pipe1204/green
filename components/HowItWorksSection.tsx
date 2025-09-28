@@ -20,10 +20,9 @@ export default function HowItWorksSection() {
         </div>
 
         {/* Steps */}
-
         <div className="py-16">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               <ElectricBorder
                 color="#00b4d8"
                 speed={1}
