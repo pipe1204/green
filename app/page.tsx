@@ -9,6 +9,7 @@ import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
 import { Product, ColorOption } from "@/types";
 import ComparisonSection from "@/components/ComparisonSection";
+import { ComparisonProvider } from "@/components/context/ComparisonContext";
 
 export default function Home() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -47,25 +48,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-16">
-      <Header />
+    <ComparisonProvider>
+      <div className="min-h-screen bg-white pb-16">
+        <Header />
 
-      <main>
-        <HeroSection />
-        <ProductCatalog />
-        <HowItWorksSection />
-        <ComparisonSection />
-      </main>
+        <main>
+          <HeroSection />
+          <ProductCatalog />
+          <HowItWorksSection />
+          <ComparisonSection />
+        </main>
 
-      <Footer />
+        <Footer />
 
-      {/* Order Modal */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={handleCloseOrderModal}
-        product={selectedProduct}
-        selectedColor={selectedColor}
-      />
-    </div>
+        {/* Order Modal */}
+        <OrderModal
+          isOpen={isOrderModalOpen}
+          onClose={handleCloseOrderModal}
+          product={selectedProduct}
+          selectedColor={selectedColor}
+        />
+      </div>
+    </ComparisonProvider>
   );
 }

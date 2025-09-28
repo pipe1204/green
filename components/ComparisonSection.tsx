@@ -7,7 +7,7 @@ export default function ComparisonSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Comparison Features */}
         <div className="text-center">
-          <h3 className="text-3xl font-bold text-gray-900 mb-8">
+          <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
             ¿Por qué Comparar con Nosotros?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

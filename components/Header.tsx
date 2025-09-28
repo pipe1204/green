@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X, Car, Zap, Leaf } from "lucide-react";
+import { Menu, X, Zap, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
@@ -10,7 +10,6 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { name: "Vehículos", href: "/vehiculos", icon: Car },
     { name: "Energía", href: "/energia", icon: Zap },
     { name: "Carga", href: "/carga", icon: Zap },
     { name: "Descubrir", href: "/descubrir", icon: Leaf },

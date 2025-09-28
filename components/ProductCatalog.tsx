@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Car, Leaf } from "lucide-react";
+import { Car } from "lucide-react";
 
 export default function ProductCatalog() {
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -26,7 +26,7 @@ export default function ProductCatalog() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Compara por Categoría
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -38,14 +38,6 @@ export default function ProductCatalog() {
 
         {/* Filter Tabs */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <Button
-            variant={selectedType === "all" ? "default" : "outline"}
-            onClick={() => setSelectedType("all")}
-            className="flex items-center space-x-2"
-          >
-            <Leaf className="w-4 h-4" />
-            <span>Todos</span>
-          </Button>
           {Object.keys(typeLabels).map((type) => {
             const Icon = typeIcons[type as keyof typeof typeIcons];
             return (

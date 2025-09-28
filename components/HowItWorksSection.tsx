@@ -1,29 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Search,
-  Filter,
-  ArrowRight,
-  Users,
-  Shield,
-  Zap,
-  Target,
-  BarChart3,
-  Star,
-  GitCompare,
-} from "lucide-react";
+import { Users, Shield, Zap, Star } from "lucide-react";
+import DecryptedText from "./DecryptedText";
 
 export default function HowItWorksSection() {
-  const router = useRouter();
-
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Cómo Funciona Nuestra Plataforma
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -43,11 +29,15 @@ export default function HowItWorksSection() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Explora y Filtra
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Navega por nuestra base de datos de vehículos eléctricos y usa
+                <DecryptedText
+                  text="Navega por nuestra base de datos de vehículos eléctricos y usa
                   filtros avanzados para encontrar opciones que se ajusten a tus
-                  necesidades específicas.
-                </p>
+                  necesidades específicas."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
               </div>
 
               <div className="text-center">
@@ -57,11 +47,16 @@ export default function HowItWorksSection() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Compara Modelos
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Selecciona hasta 3 vehículos para comparar lado a lado. Ve
+                <DecryptedText
+                  text="Selecciona hasta 3 vehículos para comparar lado a lado. Ve
                   especificaciones, precios, garantías y características en una
-                  tabla clara y fácil de entender.
-                </p>
+                  tabla clara y fácil de entender."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
+                <p className="text-gray-600 mb-6"></p>
               </div>
 
               <div className="text-center">
@@ -71,11 +66,15 @@ export default function HowItWorksSection() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Toma tu Decisión
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Con toda la información en tus manos, toma la decisión más
+                <DecryptedText
+                  text="Con toda la información en tus manos, toma la decisión más
                   informada. Conectamos contigo con concesionarios verificados
-                  para completar tu compra.
-                </p>
+                  para completar tu compra."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
               </div>
             </div>
           </div>
@@ -83,7 +82,7 @@ export default function HowItWorksSection() {
 
         {/* Features */}
         <div className="py-16 bg-gray-50 rounded-lg">
-          <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">
+          <h3 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             ¿Por qué Elegir Nuestra Plataforma?
           </h3>
           <div className="max-w-4xl mx-auto">
