@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -31,6 +32,7 @@ import {
 } from "@/data/products";
 
 export default function ProductCatalog() {
+  const router = useRouter();
   const [searchFilters, setSearchFilters] = useState({
     vehicleType: "",
     batteryRange: "",
@@ -54,8 +56,17 @@ export default function ProductCatalog() {
   };
 
   const handleSearch = () => {
-    // Search functionality will be implemented later
-    console.log("Search filters:", searchFilters);
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+
+    Object.entries(searchFilters).forEach(([key, value]) => {
+      if (value) {
+        queryParams.append(key, value);
+      }
+    });
+
+    // Navigate to results page with filters
+    router.push(`/resultados?${queryParams.toString()}`);
   };
 
   const clearFilters = () => {

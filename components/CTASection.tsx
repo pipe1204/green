@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Search } from "lucide-react";
-import LaserFlow from "@/components/LaserFlow";
+import Lightning from "@/components/Lightning";
 
 interface CTASectionProps {
   targetSection?: string;
@@ -31,46 +31,36 @@ export default function CTASection({
 
   return (
     <section
-      className="relative w-full py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 overflow-hidden"
+      className="relative w-full py-16 bg-white overflow-hidden"
       style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
     >
-      {/* LaserFlow Background */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1,
-        }}
-      >
-        <LaserFlow
-          color="#00b4d8"
-          wispDensity={1.2}
-          fogIntensity={0.3}
-          flowSpeed={0.4}
-          wispSpeed={12.0}
-          wispIntensity={4.0}
-          flowStrength={0.3}
-          verticalSizing={1.8}
-          horizontalSizing={0.6}
+      {/* Lightning Background */}
+      <div className="absolute inset-0 z-0">
+        <Lightning
+          hue={220}
+          xOffset={0}
+          speed={0.8}
+          intensity={0.6}
+          size={1.2}
         />
       </div>
 
-      {/* Content */}
+      {/* Content Overlay */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+        {/* Subtle gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 pointer-events-none"></div>
+
+        <div className="text-center relative">
           {/* Main Heading */}
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 drop-shadow-lg">
             Encuentra tu Vehículo
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 drop-shadow-lg">
               Eléctrico Perfecto
             </span>
           </h2>
 
           {/* Subheading */}
-          <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
             Compara especificaciones, precios y características de diferentes
             marcas y modelos de vehículos eléctricos. Encuentra el que mejor se
             adapte a tus necesidades y presupuesto.
@@ -88,14 +78,11 @@ export default function CTASection({
           </Button>
 
           {/* Additional Info */}
-          <p className="text-sm text-gray-300 mt-6">
+          <p className="text-sm text-gray-500 mt-6 drop-shadow-md">
             ✨ Comparación gratuita • Sin compromiso • Resultados instantáneos
           </p>
         </div>
       </div>
-
-      {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/20 z-5"></div>
     </section>
   );
 }
