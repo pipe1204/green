@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   Zap,
-  Leaf,
   Battery,
   Recycle,
   Sun,
@@ -14,9 +13,9 @@ import {
   TreePine,
   TrendingUp,
   Shield,
-  Clock,
   Globe,
 } from "lucide-react";
+import GlitchText from "@/components/GlitchText";
 
 export default function EnergiaPage() {
   return (
@@ -27,7 +26,16 @@ export default function EnergiaPage() {
         {/* Hero Section */}
         <div className="py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Energía Limpia para el Futuro
+            <GlitchText
+              speed={1}
+              enableShadows={true}
+              enableOnHover={false}
+              color="text-black"
+              className="text-4xl md:text-6xl font-bold"
+            >
+              Energía Limpia
+            </GlitchText>{" "}
+            para el Futuro
           </h1>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
             Descubre cómo nuestros vehículos eléctricos están transformando el
@@ -35,7 +43,7 @@ export default function EnergiaPage() {
           </p>
           <Button
             size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
             Conoce Nuestra Tecnología
@@ -267,7 +275,6 @@ export default function EnergiaPage() {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

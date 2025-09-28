@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { Product, ColorOption } from "@/types";
 import ComparisonSection from "@/components/ComparisonSection";
 import { ComparisonProvider } from "@/components/context/ComparisonContext";
+import LaserFlow from "@/components/LaserFlow";
 
 export default function Home() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -51,14 +52,16 @@ export default function Home() {
     <ComparisonProvider>
       <div className="min-h-screen bg-white pb-16">
         <Header />
-
         <main>
           <HeroSection />
-          <ProductCatalog />
           <HowItWorksSection />
           <ComparisonSection />
         </main>
-
+        <div
+          style={{ height: "500px", position: "relative", overflow: "hidden" }}
+        >
+          <LaserFlow />
+        </div>
         <Footer />
 
         {/* Order Modal */}

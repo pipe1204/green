@@ -1,19 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import SplitText from "@/components/SplitText";
 import TextType from "@/components/TextType";
 import CircularText from "./CircularText";
 import FuzzyText from "./FuzzyText";
+import ProductCatalog from "./ProductCatalog";
 
 export default function HeroSection() {
-  const router = useRouter();
-
   return (
     <section
-      className="relative min-h-screen flex items-center overflow-hidden bg-white mt-10"
+      className="relative min-h-screen flex flex-col items-center overflow-hidden bg-white"
       style={{ paddingTop: "4rem" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -31,7 +26,7 @@ export default function HeroSection() {
             >
               Eléctrico
             </FuzzyText>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
               Busca y compara{" "}
               <TextType
                 words={[
@@ -52,37 +47,18 @@ export default function HeroSection() {
               de diferentes marcas y modelos de vehiculos electricos en un solo
               lugar.
             </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-4 flex items-center space-x-2"
-                onClick={() => router.push("/vehiculos")}
-              >
-                <span>Explorar Vehículos</span>
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 text-lg px-8 py-4"
-                onClick={() => router.push("/test-ride")}
-              >
-                Agendar una Prueba
-              </Button>
-            </div>
-            <div className="my-10">
-              <CircularText
-                text="AHORRA*AYUDA*AMBIENTE*"
-                onHover="speedUp"
-                spinDuration={20}
-                textColor="text-black"
-                className="custom-class"
-              />
-            </div>
           </div>
         </div>
+      </div>
+      <ProductCatalog />
+      <div className="my-10">
+        <CircularText
+          text="AHORRA*AYUDA*AMBIENTE*"
+          onHover="speedUp"
+          spinDuration={20}
+          textColor="text-black"
+          className="custom-class"
+        />
       </div>
     </section>
   );

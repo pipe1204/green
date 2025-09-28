@@ -2,6 +2,7 @@
 
 import { Users, Shield, Zap, Star } from "lucide-react";
 import DecryptedText from "./DecryptedText";
+import ElectricBorder from "./ElectricBorder";
 
 export default function HowItWorksSection() {
   return (
@@ -19,63 +20,94 @@ export default function HowItWorksSection() {
         </div>
 
         {/* Steps */}
+
         <div className="py-16">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">1</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Explora y Filtra
-                </h3>
-                <DecryptedText
-                  text="Navega por nuestra base de datos de vehículos eléctricos y usa
+              <ElectricBorder
+                color="#00b4d8"
+                speed={1}
+                chaos={0.5}
+                thickness={2}
+                style={{ borderRadius: 16, padding: 18 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-2xl font-bold text-orange-600">
+                      1
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    Explora y Filtra
+                  </h3>
+                  <DecryptedText
+                    text="Navega por nuestra base de datos de vehículos eléctricos y usa
                   filtros avanzados para encontrar opciones que se ajusten a tus
                   necesidades específicas."
-                  animateOn="view"
-                  revealDirection="center"
-                  speed={100}
-                  maxIterations={20}
-                />
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">2</span>
+                    animateOn="view"
+                    revealDirection="center"
+                    speed={100}
+                    maxIterations={20}
+                  />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Compara Modelos
-                </h3>
-                <DecryptedText
-                  text="Selecciona hasta 3 vehículos para comparar lado a lado. Ve
+              </ElectricBorder>
+
+              <ElectricBorder
+                color="#00b4d8"
+                speed={1}
+                chaos={0.5}
+                thickness={2}
+                style={{ borderRadius: 16, padding: 18 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-2xl font-bold text-orange-600">
+                      2
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    Compara Modelos
+                  </h3>
+                  <DecryptedText
+                    text="Selecciona hasta 3 vehículos para comparar lado a lado. Ve
                   especificaciones, precios, garantías y características en una
                   tabla clara y fácil de entender."
-                  animateOn="view"
-                  revealDirection="center"
-                  speed={100}
-                  maxIterations={20}
-                />
-                <p className="text-gray-600 mb-6"></p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-blue-600">3</span>
+                    animateOn="view"
+                    revealDirection="center"
+                    speed={100}
+                    maxIterations={20}
+                  />
+                  <p className="text-gray-600 mb-6"></p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Toma tu Decisión
-                </h3>
-                <DecryptedText
-                  text="Con toda la información en tus manos, toma la decisión más
+              </ElectricBorder>
+
+              <ElectricBorder
+                color="#00b4d8"
+                speed={1}
+                chaos={0.5}
+                thickness={2}
+                style={{ borderRadius: 16, padding: 18 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-2xl font-bold text-orange-600">
+                      3
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    Toma tu Decisión
+                  </h3>
+                  <DecryptedText
+                    text="Con toda la información en tus manos, toma la decisión más
                   informada. Conectamos contigo con concesionarios verificados
                   para completar tu compra."
-                  animateOn="view"
-                  revealDirection="center"
-                  speed={100}
-                  maxIterations={20}
-                />
-              </div>
+                    animateOn="view"
+                    revealDirection="center"
+                    speed={100}
+                    maxIterations={20}
+                  />
+                </div>
+              </ElectricBorder>
             </div>
           </div>
         </div>

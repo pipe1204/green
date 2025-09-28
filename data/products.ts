@@ -1,4 +1,5 @@
 import { Product } from "@/types";
+import { Car } from "lucide-react";
 
 export const products: Product[] = [
   {
@@ -281,3 +282,62 @@ export const getProductById = (id: string): Product | undefined => {
 export const getProductsByType = (type: string): Product[] => {
   return products.filter((product) => product.type === type);
 };
+
+export const vehicleTypes = [
+  { value: "motorbike", label: "Motocicletas", icon: Car },
+  { value: "scooter", label: "Scooters", icon: Car },
+  { value: "bicycle", label: "Bicicletas", icon: Car },
+  { value: "car", label: "Carros", icon: Car },
+  { value: "truck", label: "Camiones", icon: Car },
+];
+
+export const batteryRanges = [
+  { value: "0-50", label: "0-50 km" },
+  { value: "50-100", label: "50-100 km" },
+  { value: "100-200", label: "100-200 km" },
+  { value: "200-300", label: "200-300 km" },
+  { value: "300+", label: "300+ km" },
+];
+
+export const warrantyOptions = [
+  { value: "1-year", label: "1 año" },
+  { value: "2-years", label: "2 años" },
+  { value: "3-years", label: "3 años" },
+  { value: "5-years", label: "5 años" },
+  { value: "lifetime", label: "Vida útil" },
+];
+
+export const priceRanges = [
+  { value: "0-2000000", label: "Menos de $2M" },
+  { value: "2000000-5000000", label: "$2M - $5M" },
+  { value: "5000000-10000000", label: "$5M - $10M" },
+  { value: "10000000-20000000", label: "$10M - $20M" },
+  { value: "20000000+", label: "Más de $20M" },
+];
+
+export const cities = [
+  "Bogotá",
+  "Medellín",
+  "Cali",
+  "Barranquilla",
+  "Cartagena",
+  "Bucaramanga",
+  "Pereira",
+  "Santa Marta",
+  "Ibagué",
+  "Manizales",
+];
+
+export const brands = [
+  "Tesla",
+  "BMW",
+  "Mercedes-Benz",
+  "Audi",
+  "Volkswagen",
+  "Nissan",
+  "Chevrolet",
+  "Hyundai",
+  "Kia",
+  "BYD",
+  "NIO",
+];
