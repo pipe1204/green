@@ -24,7 +24,6 @@ export default function EnergiaPage() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        {/* Hero Section */}
         <div className="pt-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Energía Limpia para el{" "}
@@ -44,7 +43,6 @@ export default function EnergiaPage() {
           </p>
         </div>
 
-        {/* Energy Sources */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Fuentes de Energía Renovables
@@ -107,7 +105,6 @@ export default function EnergiaPage() {
           </div>
         </div>
 
-        {/* Battery Technology */}
         <div className="py-16 bg-gray-50 rounded-lg">
           <div className="max-w-4xl mx-auto text-center">
             <Battery className="w-20 h-20 text-blue-600 mx-auto mb-8" />
@@ -147,7 +144,6 @@ export default function EnergiaPage() {
           </div>
         </div>
 
-        {/* Environmental Impact */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Impacto Ambiental Positivo
@@ -238,7 +234,6 @@ export default function EnergiaPage() {
           </div>
         </div> */}
 
-        {/* Statistics */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Números que Importan
@@ -263,7 +258,7 @@ export default function EnergiaPage() {
           </div>
         </div>
 
-        <CTASection targetUrl="/" />
+        <CTASection />
       </main>
       <Footer />
     </div>

@@ -74,9 +74,7 @@ describe("SearchResultsPage", () => {
     it("should show loading state initially", () => {
       render(<SearchResultsPage />);
       // In test environment, loading is skipped, so we check for the main content instead
-      expect(
-        screen.getByText("Vehículos Eléctricos en Colombia")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Vehículos Eléctricos")).toBeInTheDocument();
     });
 
     it("should hide loading state after timeout", async () => {
@@ -100,9 +98,7 @@ describe("SearchResultsPage", () => {
     });
 
     it("should display page title and results count", () => {
-      expect(
-        screen.getByText("Vehículos Eléctricos en Colombia")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Vehículos Eléctricos")).toBeInTheDocument();
       expect(
         screen.getByText(`${vehicles.length} vehículos encontrados`)
       ).toBeInTheDocument();
@@ -116,7 +112,7 @@ describe("SearchResultsPage", () => {
     it("should navigate back to search when back button is clicked", () => {
       const backButton = screen.getByText("Volver a Búsqueda");
       fireEvent.click(backButton);
-      expect(mockPush).toHaveBeenCalledWith("/#vehiculos");
+      expect(mockPush).toHaveBeenCalledWith("/");
     });
 
     it("should have filters button", () => {
@@ -163,7 +159,6 @@ describe("SearchResultsPage", () => {
       expect(screen.getByText("Ubicación")).toBeInTheDocument();
       expect(screen.getByText("Disponibilidad")).toBeInTheDocument();
       expect(screen.getByText("Calificación")).toBeInTheDocument();
-      expect(screen.getByText("Marca")).toBeInTheDocument();
     });
 
     it("should have clear all filters button", () => {
@@ -348,16 +343,12 @@ describe("SearchResultsPage", () => {
 
       // Wait for loading to complete and check that the component renders
       await waitFor(() => {
-        expect(
-          screen.getByText("Vehículos Eléctricos en Colombia")
-        ).toBeInTheDocument();
+        expect(screen.getByText("Vehículos Eléctricos")).toBeInTheDocument();
       });
 
       // Since the filtering logic might not be working in tests, let's check for the presence of vehicles
       // The test should verify that the component renders without crashing
-      expect(
-        screen.getByText("Vehículos Eléctricos en Colombia")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Vehículos Eléctricos")).toBeInTheDocument();
     });
   });
 

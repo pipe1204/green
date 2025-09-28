@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import {
   Zap,
   MapPin,
@@ -10,12 +9,10 @@ import {
   Battery,
   Home,
   Building,
-  Car,
   Smartphone,
   Wifi,
   Shield,
   CheckCircle,
-  Navigation,
 } from "lucide-react";
 import ElectricBorder from "@/components/ElectricBorder";
 import CTASection from "@/components/CTASection";
@@ -26,7 +23,6 @@ export default function CargaPage() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        {/* Hero Section */}
         <div className="py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Carga Inteligente y Rápida
@@ -38,13 +34,11 @@ export default function CargaPage() {
           </p>
         </div>
 
-        {/* Charging Options */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Opciones de Carga
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Home Charging */}
             <ElectricBorder
               color="#00b4d8"
               speed={1}
@@ -78,7 +72,6 @@ export default function CargaPage() {
               </div>
             </ElectricBorder>
 
-            {/* Public Charging */}
             <ElectricBorder
               color="#00b4d8"
               speed={1}
@@ -146,7 +139,6 @@ export default function CargaPage() {
           </div>
         </div>
 
-        {/* Charging Process */}
         <div className="py-16 bg-gray-50 rounded-lg">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Cómo Cargar tu Vehículo
@@ -201,7 +193,6 @@ export default function CargaPage() {
           </div>
         </div>
 
-        {/* Smart Features */}
         <div className="py-16 bg-gray-50 rounded-lg">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Características Inteligentes
@@ -268,7 +259,6 @@ export default function CargaPage() {
           </div>
         </div>
 
-        {/* CTA Section */}
         <CTASection />
       </main>
 

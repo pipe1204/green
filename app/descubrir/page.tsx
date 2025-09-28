@@ -23,7 +23,6 @@ export default function DescubrirPage() {
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        {/* Hero Section */}
         <div className="py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Descubre el Futuro
@@ -40,13 +39,11 @@ export default function DescubrirPage() {
           </Button>
         </div>
 
-        {/* Learning Resources */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Centro de Aprendizaje
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Guides */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <BookOpen className="w-12 h-12 text-blue-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -61,7 +58,6 @@ export default function DescubrirPage() {
               </Button>
             </div>
 
-            {/* Videos */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <Play className="w-12 h-12 text-red-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -75,7 +71,6 @@ export default function DescubrirPage() {
               </Button>
             </div>
 
-            {/* FAQ */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <MessageCircle className="w-12 h-12 text-green-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -89,7 +84,6 @@ export default function DescubrirPage() {
               </Button>
             </div>
 
-            {/* Community */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <Users className="w-12 h-12 text-purple-600 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -105,7 +99,6 @@ export default function DescubrirPage() {
           </div>
         </div>
 
-        {/* Success Stories */}
         <div className="py-16 bg-gray-50 rounded-lg">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Historias de Éxito
@@ -178,7 +171,6 @@ export default function DescubrirPage() {
           </div>
         </div>
 
-        {/* Environmental Impact */}
         <div className="py-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Tu Impacto en el Planeta
@@ -238,7 +230,6 @@ export default function DescubrirPage() {
           </div>
         </div>
 
-        {/* Events & News */}
         <div className="py-16 bg-gray-50 rounded-lg">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-12">
             Eventos y Noticias

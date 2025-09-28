@@ -24,6 +24,7 @@ import {
   Clock,
   Star,
   BatteryFull,
+  Loader2,
 } from "lucide-react";
 import {
   batteryRanges,
@@ -49,6 +50,7 @@ export default function ProductCatalog() {
     maxSpeed: "",
     power: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFilterChange = (field: string, value: string) => {
     setSearchFilters((prev) => ({
@@ -57,18 +59,29 @@ export default function ProductCatalog() {
     }));
   };
 
-  const handleSearch = () => {
-    // Build query parameters
-    const queryParams = new URLSearchParams();
+  const handleSearch = async () => {
+    setIsLoading(true);
 
-    Object.entries(searchFilters).forEach(([key, value]) => {
-      if (value) {
-        queryParams.append(key, value);
-      }
-    });
+    try {
+      // Build query parameters
+      const queryParams = new URLSearchParams();
 
-    // Navigate to results page with filters
-    router.push(`/resultados?${queryParams.toString()}`);
+      Object.entries(searchFilters).forEach(([key, value]) => {
+        if (value) {
+          queryParams.append(key, value);
+        }
+      });
+
+      // Navigate to results page with filters
+      router.push(`/resultados?${queryParams.toString()}`);
+    } catch (error) {
+      console.error("Error during search:", error);
+    } finally {
+      // Reset loading state after a short delay to show the loading animation
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
   };
 
   const clearFilters = () => {
@@ -392,11 +405,21 @@ export default function ProductCatalog() {
           <div className="flex justify-center">
             <Button
               onClick={handleSearch}
+              disabled={isLoading}
               size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <Search className="w-5 h-5 mr-2" />
-              Buscar Vehículos
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Buscando...
+                </>
+              ) : (
+                <>
+                  <Search className="w-5 h-5 mr-2" />
+                  Buscar Vehículos
+                </>
+              )}
             </Button>
           </div>
         </div>
