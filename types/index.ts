@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   model: string;
-  type: "motorbike" | "scooter" | "bicycle" | "other";
+  type: "motorbike" | "scooter" | "bicycle" | "car" | "truck" | "other";
   price: number;
   description: string;
   features: string[];

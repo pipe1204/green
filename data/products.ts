@@ -1,7 +1,74 @@
 import { Product } from "@/types";
-import { Car } from "lucide-react";
+import {
+  vehicles,
+  vehicleTypes,
+  batteryRanges,
+  warrantyOptions,
+  priceRanges,
+  cities,
+  brands,
+} from "./vehicles";
 
-export const products: Product[] = [
+// Convert vehicles to Product format for compatibility
+export const products: Product[] = vehicles.map((vehicle) => ({
+  id: vehicle.id,
+  name: vehicle.name,
+  model: vehicle.brand,
+  type: vehicle.type,
+  price: vehicle.price,
+  description: vehicle.description,
+  features: vehicle.features,
+  colors: [
+    {
+      id: "default",
+      name: "Color Estándar",
+      hex: "#000000",
+      image: vehicle.images[0]?.url || "/images/placeholder.jpg",
+      description: "Color estándar del vehículo",
+    },
+  ],
+  images: vehicle.images.map((img, index) => ({
+    id: `img-${index}`,
+    url: img.url,
+    alt: img.alt,
+    isHero: index === 0,
+  })),
+  specifications: {
+    battery: vehicle.specifications.battery,
+    range: vehicle.specifications.range,
+    chargeTime: vehicle.specifications.chargeTime,
+    warranty: vehicle.specifications.warranty,
+    delivery: vehicle.deliveryTime,
+    environmental: "Cero emisiones de CO2",
+    performance: {
+      maxSpeed: vehicle.specifications.performance.maxSpeed,
+      power: vehicle.specifications.performance.power,
+      torque: "N/A",
+    },
+    dimensions: {
+      weight: "N/A",
+      length: "N/A",
+      width: "N/A",
+      height: "N/A",
+    },
+    features: {
+      display: "Pantalla digital",
+      connectivity: ["Bluetooth", "App móvil"],
+      safety: ["Frenos", "Luces LED"],
+    },
+  },
+  environmentalBenefits: [
+    "Cero emisiones de CO2",
+    "Reduce la contaminación acústica",
+    "Ahorro en combustible",
+    "Contribuye a un aire más limpio",
+  ],
+  availability: vehicle.availability,
+  deliveryTime: vehicle.deliveryTime,
+}));
+
+// Legacy products for backward compatibility
+export const legacyProducts: Product[] = [
   {
     id: "eco-rider-pro",
     name: "Eco Rider Pro",
@@ -283,61 +350,12 @@ export const getProductsByType = (type: string): Product[] => {
   return products.filter((product) => product.type === type);
 };
 
-export const vehicleTypes = [
-  { value: "motorbike", label: "Motocicletas", icon: Car },
-  { value: "scooter", label: "Scooters", icon: Car },
-  { value: "bicycle", label: "Bicicletas", icon: Car },
-  { value: "car", label: "Carros", icon: Car },
-  { value: "truck", label: "Camiones", icon: Car },
-];
-
-export const batteryRanges = [
-  { value: "0-50", label: "0-50 km" },
-  { value: "50-100", label: "50-100 km" },
-  { value: "100-200", label: "100-200 km" },
-  { value: "200-300", label: "200-300 km" },
-  { value: "300+", label: "300+ km" },
-];
-
-export const warrantyOptions = [
-  { value: "1-year", label: "1 año" },
-  { value: "2-years", label: "2 años" },
-  { value: "3-years", label: "3 años" },
-  { value: "5-years", label: "5 años" },
-  { value: "lifetime", label: "Vida útil" },
-];
-
-export const priceRanges = [
-  { value: "0-2000000", label: "Menos de $2M" },
-  { value: "2000000-5000000", label: "$2M - $5M" },
-  { value: "5000000-10000000", label: "$5M - $10M" },
-  { value: "10000000-20000000", label: "$10M - $20M" },
-  { value: "20000000+", label: "Más de $20M" },
-];
-
-export const cities = [
-  "Bogotá",
-  "Medellín",
-  "Cali",
-  "Barranquilla",
-  "Cartagena",
-  "Bucaramanga",
-  "Pereira",
-  "Santa Marta",
-  "Ibagué",
-  "Manizales",
-];
-
-export const brands = [
-  "Tesla",
-  "BMW",
-  "Mercedes-Benz",
-  "Audi",
-  "Volkswagen",
-  "Nissan",
-  "Chevrolet",
-  "Hyundai",
-  "Kia",
-  "BYD",
-  "NIO",
-];
+// Re-export filter data from vehicles.ts
+export {
+  vehicleTypes,
+  batteryRanges,
+  warrantyOptions,
+  priceRanges,
+  cities,
+  brands,
+};

@@ -7,11 +7,11 @@ import ProductCatalog from "./ProductCatalog";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center overflow-hidden bg-white">
+    <section className="relative min-h-screen flex flex-col items-center overflow-hidden bg-white/80 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col items-center justify-center text-center min-h-[50vh] md:min-h-[80vh]">
           {/* Main Content */}
-          <h1 className="text-4xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight drop-shadow-lg">
             Descubre tu Próximo
           </h1>
           <div className="max-w-4xl mx-auto">
@@ -23,7 +23,7 @@ export default function HeroSection() {
             >
               Vehículo Eléctrico
             </FuzzyText>
-            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed drop-shadow-md">
               Busca y compara{" "}
               <TextType
                 words={[
