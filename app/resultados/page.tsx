@@ -2,9 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ElectricLoader from "@/components/ElectricLoader";
+
+// Lazy load heavy components
+const ElectricLoader = dynamic(() => import("@/components/ElectricLoader"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-16 h-16 bg-blue-100 rounded-full animate-pulse" />
+  ),
+});
 import { vehicles, Vehicle } from "@/data/vehicles";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

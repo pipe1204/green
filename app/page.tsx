@@ -1,13 +1,37 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
 import Footer from "@/components/Footer";
-import ComparisonSection from "@/components/ComparisonSection";
-import CTASection from "@/components/CTASection";
 import { ComparisonProvider } from "@/components/context/ComparisonContext";
-import Lightning from "@/components/Lightning";
+
+// Lazy load heavy components
+const Lightning = dynamic(() => import("@/components/Lightning"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-white" />,
+});
+
+const CTASection = dynamic(() => import("@/components/CTASection"), {
+  ssr: false,
+  loading: () => <div className="w-full py-16 bg-white" />,
+});
+
+const HowItWorksSection = dynamic(
+  () => import("@/components/HowItWorksSection"),
+  {
+    ssr: false,
+    loading: () => <div className="w-full py-16 bg-white" />,
+  }
+);
+
+const ComparisonSection = dynamic(
+  () => import("@/components/ComparisonSection"),
+  {
+    ssr: false,
+    loading: () => <div className="w-full py-16 bg-white" />,
+  }
+);
 
 export default function Home() {
   return (
@@ -17,7 +41,7 @@ export default function Home() {
         <main>
           <div className="relative w-full min-h-screen">
             {/* Lightning Background */}
-            <div className="absolute inset-0 z-0 overflow-hidden">
+            <div className="absolute inset-0 z-0 overflow-hidden lightning-container">
               <Lightning
                 hue={220}
                 xOffset={0}
