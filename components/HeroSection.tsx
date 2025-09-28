@@ -50,7 +50,7 @@ export default function HeroSection() {
       <ProductCatalog />
       <div className="my-10">
         <CircularText
-          text="AHORRA*AYUDA*AMBIENTE*"
+          text="AHORRA*Y*AYUDA*AL*AMBIENTE*"
           onHover="speedUp"
           spinDuration={20}
           textColor="text-black"

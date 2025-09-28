@@ -3,31 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Search } from "lucide-react";
 import Lightning from "@/components/Lightning";
+import { useRouter } from "next/navigation";
 
-interface CTASectionProps {
-  targetSection?: string;
-  targetUrl?: string;
-}
-
-export default function CTASection({
-  targetSection = "vehiculos",
-  targetUrl,
-}: CTASectionProps) {
-  const handleStartComparing = () => {
-    if (targetUrl) {
-      // Navigate to a specific URL
-      window.location.href = targetUrl;
-    } else {
-      // Scroll to a section on the current page
-      const element = document.getElementById(targetSection);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // Fallback: navigate to the main page with the target section
-        window.location.href = `/#${targetSection}`;
-      }
-    }
-  };
+export default function CTASection() {
+  const router = useRouter();
 
   return (
     <section
@@ -68,7 +47,7 @@ export default function CTASection({
 
           {/* CTA Button */}
           <Button
-            onClick={handleStartComparing}
+            onClick={() => router.push("/compara")}
             size="lg"
             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
           >
