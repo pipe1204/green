@@ -40,7 +40,7 @@ export default function Header() {
                   <button
                     key={item.name}
                     onClick={() => router.push(item.href)}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                    className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition-colors duration-200"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>

@@ -400,45 +400,6 @@ export default function ProductCatalog() {
             </Button>
           </div>
         </div>
-
-        {/* Quick Filter Chips */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12 max-w-7xl mx-auto">
-          <Button
-            variant="outline"
-            className="rounded-full px-4 py-2 text-sm"
-            onClick={() => handleFilterChange("batteryRange", "200+")}
-          >
-            <Battery className="w-4 h-4 mr-2" />
-            Alta Autonomía
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-full px-4 py-2 text-sm"
-            onClick={() => {
-              handleFilterChange("priceMin", "0");
-              handleFilterChange("priceMax", "5000000");
-            }}
-          >
-            <DollarSign className="w-4 h-4 mr-2" />
-            Menos de $5M
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-full px-4 py-2 text-sm"
-            onClick={() => handleFilterChange("warranty", "2-years")}
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Garantía 2+ Años
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-full px-4 py-2 text-sm"
-            onClick={() => handleFilterChange("availability", "in-stock")}
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Disponible Ahora
-          </Button>
-        </div>
       </div>
     </section>
   );
