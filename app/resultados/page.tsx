@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ElectricLoader from "@/components/ElectricLoader";
-import { vehicles } from "@/data/vehicles";
+import { vehicles, Vehicle } from "@/data/vehicles";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,7 +29,7 @@ interface SearchFilters {
   priceMin: string;
   priceMax: string;
   location: string;
-  brand: string;
+  reviews: string;
   availability: string;
   passengerCapacity: string;
   chargingTime: string;
@@ -38,7 +38,7 @@ interface SearchFilters {
 }
 
 interface VehicleCardProps {
-  vehicle: any;
+  vehicle: Vehicle;
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
@@ -174,21 +174,7 @@ export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [results, setResults] = useState<any[]>([]);
-  const [filters, setFilters] = useState<SearchFilters>({
-    vehicleType: "",
-    batteryRange: "",
-    warranty: "",
-    priceMin: "",
-    priceMax: "",
-    location: "",
-    brand: "",
-    availability: "",
-    passengerCapacity: "",
-    chargingTime: "",
-    maxSpeed: "",
-    power: "",
-  });
+  const [results, setResults] = useState<Vehicle[]>([]);
 
   useEffect(() => {
     // Simulate loading delay
@@ -204,15 +190,13 @@ export default function SearchResultsPage() {
       priceMin: searchParams.get("priceMin") || "",
       priceMax: searchParams.get("priceMax") || "",
       location: searchParams.get("location") || "",
-      brand: searchParams.get("brand") || "",
+      reviews: searchParams.get("reviews") || "",
       availability: searchParams.get("availability") || "",
       passengerCapacity: searchParams.get("passengerCapacity") || "",
       chargingTime: searchParams.get("chargingTime") || "",
       maxSpeed: searchParams.get("maxSpeed") || "",
       power: searchParams.get("power") || "",
     };
-
-    setFilters(searchFilters);
 
     // Filter vehicles based on search criteria
     let filteredVehicles = vehicles;
@@ -223,9 +207,10 @@ export default function SearchResultsPage() {
       );
     }
 
-    if (searchFilters.brand) {
+    if (searchFilters.reviews) {
+      const minRating = parseFloat(searchFilters.reviews.replace("+", ""));
       filteredVehicles = filteredVehicles.filter(
-        (v) => v.brand === searchFilters.brand
+        (v) => v.reviews.average >= minRating
       );
     }
 

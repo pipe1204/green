@@ -17,7 +17,7 @@ export default function Home() {
         <main>
           <div className="relative w-full min-h-screen">
             {/* Lightning Background */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 overflow-hidden">
               <Lightning
                 hue={220}
                 xOffset={0}

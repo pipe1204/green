@@ -35,7 +35,7 @@ export default function CTASection({
       style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
     >
       {/* Lightning Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <Lightning
           hue={220}
           xOffset={0}

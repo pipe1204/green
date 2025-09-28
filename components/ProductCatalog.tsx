@@ -22,6 +22,8 @@ import {
   Users,
   Battery,
   Clock,
+  Star,
+  BatteryFull,
 } from "lucide-react";
 import {
   batteryRanges,
@@ -40,7 +42,7 @@ export default function ProductCatalog() {
     priceMin: "",
     priceMax: "",
     location: "",
-    brand: "",
+    reviews: "",
     availability: "",
     passengerCapacity: "",
     chargingTime: "",
@@ -77,7 +79,7 @@ export default function ProductCatalog() {
       priceMin: "",
       priceMax: "",
       location: "",
-      brand: "",
+      reviews: "",
       availability: "",
       passengerCapacity: "",
       chargingTime: "",
@@ -141,7 +143,7 @@ export default function ProductCatalog() {
             {/* Battery Range */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Battery className="w-4 h-4 mr-2" />
+                <BatteryFull className="w-4 h-4 mr-2" />
                 Autonomía de Batería
               </label>
               <Select
@@ -291,6 +293,29 @@ export default function ProductCatalog() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Reviews */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center">
+                <Star className="w-4 h-4 mr-2" />
+                Calificación de Reseñas
+              </label>
+              <Select
+                value={searchFilters.reviews}
+                onValueChange={(value) => handleFilterChange("reviews", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar calificación" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="4.5+">4.5+ estrellas</SelectItem>
+                  <SelectItem value="4.0+">4.0+ estrellas</SelectItem>
+                  <SelectItem value="3.5+">3.5+ estrellas</SelectItem>
+                  <SelectItem value="3.0+">3.0+ estrellas</SelectItem>
+                  <SelectItem value="2.5+">2.5+ estrellas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Advanced Filters Row */}
@@ -320,7 +345,7 @@ export default function ProductCatalog() {
             {/* Power */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
-                <Zap className="w-4 h-4 mr-2" />
+                <Battery className="w-4 h-4 mr-2" />
                 Potencia del Motor
               </label>
               <Select

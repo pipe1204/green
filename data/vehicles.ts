@@ -31,6 +31,10 @@ export interface Vehicle {
     location: string;
     rating: number;
   };
+  reviews: {
+    average: number;
+    count: number;
+  };
 }
 
 export const vehicles: Vehicle[] = [
@@ -61,6 +65,7 @@ export const vehicles: Vehicle[] = [
     description: "Motorcycle eléctrica de alta gama con tecnología avanzada",
     features: ["Modo deportivo", "Carga rápida", "GPS integrado"],
     dealer: { name: "Zero Colombia", location: "Bogotá", rating: 4.8 },
+    reviews: { average: 4.7, count: 156 },
   },
   {
     id: "moto-002",
@@ -91,6 +96,7 @@ export const vehicles: Vehicle[] = [
     description: "Superbike eléctrica italiana de ultra alta gama",
     features: ["Suspensión Öhlins", "Frenos Brembo", "Modo carrera"],
     dealer: { name: "Energica Medellín", location: "Medellín", rating: 4.9 },
+    reviews: { average: 4.8, count: 89 },
   },
   {
     id: "moto-003",
@@ -118,6 +124,7 @@ export const vehicles: Vehicle[] = [
     description: "Primera motocicleta eléctrica de Harley-Davidson",
     features: ["Sonido simulado", "Carga rápida DC", "App conectada"],
     dealer: { name: "Harley Cali", location: "Cali", rating: 4.7 },
+    reviews: { average: 4.6, count: 203 },
   },
   {
     id: "moto-004",
@@ -143,6 +150,7 @@ export const vehicles: Vehicle[] = [
     description: "Enduro eléctrica para aventuras off-road",
     features: ["Suspensión WP", "Modo off-road", "Ligera"],
     dealer: { name: "KTM Colombia", location: "Bogotá", rating: 4.6 },
+    reviews: { average: 4.4, count: 78 },
   },
   {
     id: "moto-005",
@@ -170,6 +178,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter eléctrico premium de BMW",
     features: ["Pantalla TFT", "Carga rápida", "Modo eco"],
     dealer: { name: "BMW Motorrad", location: "Medellín", rating: 4.8 },
+    reviews: { average: 4.5, count: 134 },
   },
 
   // SCOOTERS
@@ -202,6 +211,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter eléctrico con el clásico diseño Vespa",
     features: ["Diseño clásico", "Silencioso", "Fácil manejo"],
     dealer: { name: "Vespa Colombia", location: "Bogotá", rating: 4.5 },
+    reviews: { average: 4.3, count: 267 },
   },
   {
     id: "scooter-002",
@@ -229,6 +239,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter urbano inteligente con conectividad",
     features: ["App conectada", "GPS", "Antirrobo"],
     dealer: { name: "Niu Colombia", location: "Cali", rating: 4.3 },
+    reviews: { average: 4.2, count: 189 },
   },
   {
     id: "scooter-003",
@@ -256,6 +267,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter con sistema de baterías intercambiables",
     features: ["Baterías intercambiables", "Red de carga", "Modo deportivo"],
     dealer: { name: "Gogoro Medellín", location: "Medellín", rating: 4.7 },
+    reviews: { average: 4.6, count: 145 },
   },
   {
     id: "scooter-004",
@@ -283,6 +295,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter urbano silencioso y eficiente",
     features: ["Ultra silencioso", "Eficiente", "Mantenimiento mínimo"],
     dealer: { name: "Silence Colombia", location: "Barranquilla", rating: 4.4 },
+    reviews: { average: 4.1, count: 98 },
   },
   {
     id: "scooter-005",
@@ -313,6 +326,7 @@ export const vehicles: Vehicle[] = [
     description: "Scooter plegable para movilidad urbana",
     features: ["Plegable", "Ligero", "Precio accesible"],
     dealer: { name: "Xiaomi Store", location: "Bogotá", rating: 4.2 },
+    reviews: { average: 4.0, count: 312 },
   },
 
   // BICYCLES
@@ -345,6 +359,7 @@ export const vehicles: Vehicle[] = [
     description: "Bicicleta eléctrica de alta gama para ciudad",
     features: ["Motor Fazua", "Ligera", "Suspensión"],
     dealer: { name: "Specialized Colombia", location: "Medellín", rating: 4.8 },
+    reviews: { average: 4.7, count: 178 },
   },
   {
     id: "bike-002",
@@ -375,6 +390,7 @@ export const vehicles: Vehicle[] = [
     description: "Mountain bike eléctrica para aventuras",
     features: ["Suspensión completa", "Frenos hidráulicos", "Modo turbo"],
     dealer: { name: "Trek Colombia", location: "Bogotá", rating: 4.6 },
+    reviews: { average: 4.5, count: 203 },
   },
   {
     id: "bike-003",
@@ -400,6 +416,7 @@ export const vehicles: Vehicle[] = [
     description: "Bicicleta eléctrica versátil para ciudad y carretera",
     features: ["Motor Yamaha", "Comfortable", "Eficiente"],
     dealer: { name: "Giant Colombia", location: "Cali", rating: 4.5 },
+    reviews: { average: 4.4, count: 156 },
   },
   {
     id: "bike-004",
@@ -427,6 +444,7 @@ export const vehicles: Vehicle[] = [
     description: "Bicicleta eléctrica premium con diseño italiano",
     features: ["Diseño italiano", "Motor Bosch", "Suspensión"],
     dealer: { name: "Cannondale Colombia", location: "Medellín", rating: 4.7 },
+    reviews: { average: 4.6, count: 134 },
   },
   {
     id: "bike-005",
@@ -452,6 +470,7 @@ export const vehicles: Vehicle[] = [
     description: "Bicicleta eléctrica de carretera de alta gama",
     features: ["Carbonio", "Motor Shimano", "Ultra ligera"],
     dealer: { name: "Scott Colombia", location: "Bogotá", rating: 4.9 },
+    reviews: { average: 4.8, count: 89 },
   },
 
   // CARS
@@ -479,8 +498,9 @@ export const vehicles: Vehicle[] = [
     power: "283",
     location: "Bogotá",
     description: "Sedán eléctrico premium con tecnología autónoma",
-    features: ["Autopilot", "Supercharger", 'Pantalla 15"'],
+    features: ["Autopilot", "Supercharger", "Pantalla 15"],
     dealer: { name: "Tesla Colombia", location: "Bogotá", rating: 4.9 },
+    reviews: { average: 4.8, count: 445 },
   },
   {
     id: "car-002",
@@ -506,6 +526,7 @@ export const vehicles: Vehicle[] = [
     description: "Hatchback eléctrico urbano de BMW",
     features: ["Diseño futurista", "Materiales reciclados", "iDrive"],
     dealer: { name: "BMW Colombia", location: "Medellín", rating: 4.6 },
+    reviews: { average: 4.5, count: 234 },
   },
   {
     id: "car-003",
@@ -533,6 +554,7 @@ export const vehicles: Vehicle[] = [
     description: "Hatchback eléctrico confiable y accesible",
     features: ["e-Pedal", "ProPILOT", "Carga bidireccional"],
     dealer: { name: "Nissan Colombia", location: "Cali", rating: 4.4 },
+    reviews: { average: 4.3, count: 189 },
   },
   {
     id: "car-004",
@@ -563,6 +585,7 @@ export const vehicles: Vehicle[] = [
     description: "SUV eléctrico con carga ultra rápida",
     features: ["Carga 800V", "V2L", 'Pantalla 12.3"'],
     dealer: { name: "Hyundai Colombia", location: "Bogotá", rating: 4.7 },
+    reviews: { average: 4.6, count: 167 },
   },
   {
     id: "car-005",
@@ -590,6 +613,7 @@ export const vehicles: Vehicle[] = [
     description: "SUV eléctrico familiar de Volkswagen",
     features: ["ID.Light", "AR HUD", "Carga inalámbrica"],
     dealer: { name: "Volkswagen Colombia", location: "Medellín", rating: 4.5 },
+    reviews: { average: 4.4, count: 123 },
   },
 
   // TRUCKS
@@ -619,6 +643,7 @@ export const vehicles: Vehicle[] = [
     description: "Pickup eléctrica de aventura y trabajo",
     features: ["4WD eléctrico", "Cama fría", "Tank Turn"],
     dealer: { name: "Rivian Colombia", location: "Bogotá", rating: 4.8 },
+    reviews: { average: 4.7, count: 78 },
   },
   {
     id: "truck-002",
@@ -649,6 +674,7 @@ export const vehicles: Vehicle[] = [
     description: "Pickup eléctrica icónica de Ford",
     features: ["Frunk", "Power Onboard", "BlueCruise"],
     dealer: { name: "Ford Colombia", location: "Cali", rating: 4.6 },
+    reviews: { average: 4.5, count: 145 },
   },
   {
     id: "truck-003",
@@ -679,6 +705,7 @@ export const vehicles: Vehicle[] = [
     description: "Pickup eléctrica futurista de Tesla",
     features: ["Exoesqueleto", "Vidrio blindado", "Autopilot"],
     dealer: { name: "Tesla Colombia", location: "Bogotá", rating: 4.9 },
+    reviews: { average: 4.8, count: 234 },
   },
 ];
 

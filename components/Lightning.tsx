@@ -22,8 +22,12 @@ const Lightning: React.FC<LightningProps> = ({
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + "px";
+      canvas.style.height = rect.height + "px";
     };
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
@@ -180,7 +184,6 @@ const Lightning: React.FC<LightningProps> = ({
 
     const startTime = performance.now();
     const render = () => {
-      resizeCanvas();
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
       const currentTime = performance.now();
@@ -200,7 +203,20 @@ const Lightning: React.FC<LightningProps> = ({
     };
   }, [hue, xOffset, speed, intensity, size]);
 
-  return <canvas ref={canvasRef} className="w-full h-full relative" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full absolute inset-0"
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+      }}
+    />
+  );
 };
 
 export default Lightning;
