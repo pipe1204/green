@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { TestDriveModal } from "@/components/resultados/TestDriveModal";
 import { vehicles } from "@/data/vehicles";
 import { Vehicle } from "@/data/vehicles";
 import Header from "@/components/Header";
@@ -35,6 +36,7 @@ export default function ProductPage() {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -59,19 +61,6 @@ export default function ProductPage() {
     setTimeout(() => {
       setIsSubmitting(false);
       alert("¡Gracias! El vendedor se pondrá en contacto contigo pronto.");
-    }, 1000);
-  };
-
-  const handleBookTestDrive = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert(
-        "¡Prueba de manejo programada! Te contactaremos para confirmar la fecha."
-      );
     }, 1000);
   };
 
@@ -322,75 +311,23 @@ export default function ProductPage() {
               </form>
             </div>
 
-            {/* Book Test Drive Form */}
+            {/* Book Test Drive Button */}
             <div className="bg-blue-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Calendar className="w-5 h-5 text-blue-600 mr-2" />
                 Programar Prueba de Manejo
               </h3>
-              <form onSubmit={handleBookTestDrive} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Tu nombre"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <Input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      placeholder="Tu teléfono"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="tu@email.com"
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Zap className="w-4 h-4 mr-2 animate-pulse" />
-                      Programando...
-                    </>
-                  ) : (
-                    <>
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Programar Prueba
-                    </>
-                  )}
-                </Button>
-              </form>
+              <p className="text-gray-600 mb-4">
+                Programa una prueba de manejo para experimentar este vehículo en
+                persona.
+              </p>
+              <Button
+                onClick={() => setIsTestDriveModalOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Programar Prueba
+              </Button>
             </div>
           </div>
         </div>
@@ -510,11 +447,7 @@ export default function ProductPage() {
               Contactar Vendedor
             </Button>
             <Button
-              onClick={() =>
-                document
-                  .querySelector("form:last-of-type")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={() => setIsTestDriveModalOpen(true)}
               variant="outline"
               size="lg"
             >
@@ -526,6 +459,13 @@ export default function ProductPage() {
       </main>
 
       <Footer />
+
+      {/* Test Drive Modal */}
+      <TestDriveModal
+        isOpen={isTestDriveModalOpen}
+        onClose={() => setIsTestDriveModalOpen(false)}
+        vehicle={vehicle}
+      />
     </div>
   );
 }

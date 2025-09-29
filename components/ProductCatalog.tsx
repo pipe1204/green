@@ -42,7 +42,7 @@ export default function ProductCatalog() {
     priceMin: "",
     priceMax: "",
     location: "",
-    reviews: "",
+    dealerRating: "",
     availability: "",
     passengerCapacity: "",
     chargingTime: "",
@@ -91,7 +91,7 @@ export default function ProductCatalog() {
       priceMin: "",
       priceMax: "",
       location: "",
-      reviews: "",
+      dealerRating: "",
       availability: "",
       passengerCapacity: "",
       chargingTime: "",
@@ -310,11 +310,13 @@ export default function ProductCatalog() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center">
                 <Star className="w-4 h-4 mr-2" />
-                Calificación de Reseñas
+                Calificación de tienda
               </label>
               <Select
-                value={searchFilters.reviews}
-                onValueChange={(value) => handleFilterChange("reviews", value)}
+                value={searchFilters.dealerRating}
+                onValueChange={(value) =>
+                  handleFilterChange("dealerRating", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar calificación" />

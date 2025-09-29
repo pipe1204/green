@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Vehicle } from "@/data/vehicles";
 import { Button } from "@/components/ui/button";
+import { TestDriveModal } from "./TestDriveModal";
 import {
   formatPrice,
   getAvailabilityColor,
@@ -31,6 +32,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -252,11 +254,22 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               "Ver Detalles"
             )}
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => setIsTestDriveModalOpen(true)}
+          >
             Agenda una prueba
           </Button>
         </div>
       </div>
+
+      {/* Test Drive Modal */}
+      <TestDriveModal
+        isOpen={isTestDriveModalOpen}
+        onClose={() => setIsTestDriveModalOpen(false)}
+        vehicle={vehicle}
+      />
     </div>
   );
 };
