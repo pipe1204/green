@@ -63,6 +63,7 @@ export interface SearchFilters {
   priceMax: number;
   location: string[];
   reviews: string[];
+  dealerRating: string[];
   availability: string[];
   passengerCapacity: string[];
   chargingTime: string[];

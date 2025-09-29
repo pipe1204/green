@@ -45,9 +45,10 @@ export default function SearchResultsPage() {
     batteryRange: [],
     warranty: [],
     priceMin: 0,
-    priceMax: 50000000,
+    priceMax: 0,
     location: [],
     reviews: [],
+    dealerRating: [],
     availability: [],
     passengerCapacity: [],
     chargingTime: [],
@@ -74,9 +75,10 @@ export default function SearchResultsPage() {
       batteryRange: searchParams.get("batteryRange")?.split(",") || [],
       warranty: searchParams.get("warranty")?.split(",") || [],
       priceMin: parseInt(searchParams.get("priceMin") || "0"),
-      priceMax: parseInt(searchParams.get("priceMax") || "50000000"),
+      priceMax: parseInt(searchParams.get("priceMax") || "0"),
       location: searchParams.get("location")?.split(",") || [],
       reviews: searchParams.get("reviews")?.split(",") || [],
+      dealerRating: searchParams.get("dealerRating")?.split(",") || [],
       availability: searchParams.get("availability")?.split(",") || [],
       passengerCapacity:
         searchParams.get("passengerCapacity")?.split(",") || [],
@@ -106,6 +108,15 @@ export default function SearchResultsPage() {
       });
     }
 
+    if (searchFilters.dealerRating.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        return searchFilters.dealerRating.some((rating) => {
+          const minRating = parseFloat(rating.replace("+", ""));
+          return v.dealer.rating >= minRating;
+        });
+      });
+    }
+
     if (searchFilters.location.length > 0) {
       filteredVehicles = filteredVehicles.filter((v) =>
         searchFilters.location.includes(v.location)
@@ -124,11 +135,20 @@ export default function SearchResultsPage() {
       );
     }
 
-    if (searchFilters.priceMin && searchFilters.priceMax) {
-      filteredVehicles = filteredVehicles.filter(
-        (v) =>
-          v.price >= searchFilters.priceMin && v.price <= searchFilters.priceMax
-      );
+    if (searchFilters.priceMin > 0 || searchFilters.priceMax > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        const price = v.price;
+        if (searchFilters.priceMin > 0 && searchFilters.priceMax > 0) {
+          return (
+            price >= searchFilters.priceMin && price <= searchFilters.priceMax
+          );
+        } else if (searchFilters.priceMin > 0) {
+          return price >= searchFilters.priceMin;
+        } else if (searchFilters.priceMax > 0) {
+          return price <= searchFilters.priceMax;
+        }
+        return true;
+      });
     }
 
     if (searchFilters.batteryRange.length > 0) {
@@ -149,6 +169,83 @@ export default function SearchResultsPage() {
 
     return () => clearTimeout(timer);
   }, [searchParams]);
+
+  // Re-filter when filters change
+  useEffect(() => {
+    let filteredVehicles = vehicles;
+
+    if (filters.vehicleType.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.vehicleType.includes(v.type)
+      );
+    }
+
+    if (filters.reviews.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        return filters.reviews.some((rating) => {
+          const minRating = parseFloat(rating.replace("+", ""));
+          return v.reviews.average >= minRating;
+        });
+      });
+    }
+
+    if (filters.dealerRating.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        return filters.dealerRating.some((rating) => {
+          const minRating = parseFloat(rating.replace("+", ""));
+          return v.dealer.rating >= minRating;
+        });
+      });
+    }
+
+    if (filters.location.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.location.includes(v.location)
+      );
+    }
+
+    if (filters.availability.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.availability.includes(v.availability)
+      );
+    }
+
+    if (filters.brands.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.brands.includes(v.brand)
+      );
+    }
+
+    if (filters.priceMin > 0 || filters.priceMax > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        const price = v.price;
+        if (filters.priceMin > 0 && filters.priceMax > 0) {
+          return price >= filters.priceMin && price <= filters.priceMax;
+        } else if (filters.priceMin > 0) {
+          return price >= filters.priceMin;
+        } else if (filters.priceMax > 0) {
+          return price <= filters.priceMax;
+        }
+        return true;
+      });
+    }
+
+    if (filters.batteryRange.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        const range = parseInt(v.specifications.range);
+        return filters.batteryRange.some((batteryRange) => {
+          const [minRange, maxRange] = batteryRange.split("-").map(Number);
+          if (maxRange) {
+            return range >= minRange && range <= maxRange;
+          } else {
+            return range >= minRange;
+          }
+        });
+      });
+    }
+
+    setResults(filteredVehicles);
+  }, [filters]);
 
   const handleFilterChange = (
     filterKey: string,
@@ -180,9 +277,10 @@ export default function SearchResultsPage() {
       batteryRange: [],
       warranty: [],
       priceMin: 0,
-      priceMax: 50000000,
+      priceMax: 0,
       location: [],
       reviews: [],
+      dealerRating: [],
       availability: [],
       passengerCapacity: [],
       chargingTime: [],
@@ -361,28 +459,37 @@ export default function SearchResultsPage() {
                             <Input
                               type="number"
                               placeholder="Min"
-                              value={filters.priceMin}
-                              onChange={(e) =>
+                              value={
+                                filters.priceMin === 0 ? "" : filters.priceMin
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
                                 setFilters((prev) => ({
                                   ...prev,
-                                  priceMin: parseInt(e.target.value) || 0,
-                                }))
-                              }
+                                  priceMin:
+                                    value === "" ? 0 : parseInt(value) || 0,
+                                }));
+                              }}
                               className="w-28"
+                              min="0"
                             />
                             <span className="text-gray-500">-</span>
                             <Input
                               type="number"
                               placeholder="Max"
-                              value={filters.priceMax}
-                              onChange={(e) =>
+                              value={
+                                filters.priceMax === 0 ? "" : filters.priceMax
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
                                 setFilters((prev) => ({
                                   ...prev,
                                   priceMax:
-                                    parseInt(e.target.value) || 50000000,
-                                }))
-                              }
+                                    value === "" ? 0 : parseInt(value) || 0,
+                                }));
+                              }}
                               className="w-28"
+                              min="0"
                             />
                           </div>
                           <div className="text-sm text-gray-600">

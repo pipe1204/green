@@ -104,7 +104,7 @@ export const filterSections: FilterSection[] = [
     ],
   },
   {
-    title: "Calificación",
+    title: "Calificación del Vehículo",
     filters: [
       {
         key: "reviews",
@@ -125,6 +125,33 @@ export const filterSections: FilterSection[] = [
             value: "3.5+",
             label: "3.5+ estrellas",
             count: vehicles.filter((v) => v.reviews.average >= 3.5).length,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Calificación del Vendedor",
+    filters: [
+      {
+        key: "dealerRating",
+        label: "Calificación mínima del vendedor",
+        type: "checkbox",
+        options: [
+          {
+            value: "4.5+",
+            label: "4.5+ estrellas",
+            count: vehicles.filter((v) => v.dealer.rating >= 4.5).length,
+          },
+          {
+            value: "4.0+",
+            label: "4.0+ estrellas",
+            count: vehicles.filter((v) => v.dealer.rating >= 4.0).length,
+          },
+          {
+            value: "3.5+",
+            label: "3.5+ estrellas",
+            count: vehicles.filter((v) => v.dealer.rating >= 3.5).length,
           },
         ],
       },

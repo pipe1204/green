@@ -63,7 +63,7 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         <div className="flex-1 p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
             <div className="flex-1 mb-2 sm:mb-0">
-              <h3 className="text-lg md:text-xl font-bold text-green-600 mb-1 group-hover:text-blue-600 transition-colors">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
                 {vehicle.name}
               </h3>
 
@@ -139,6 +139,7 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               <span>{vehicle.specifications.warranty}</span>
             </div>
             <div className="flex items-center space-x-1">
+              <span>Calificación del vendedor</span>
               <Star className="w-4 h-4 text-yellow-400 fill-current" />
               <span>{vehicle.dealer.rating}</span>
             </div>
