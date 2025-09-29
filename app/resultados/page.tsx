@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
@@ -29,7 +29,7 @@ const ElectricLoader = dynamic(() => import("@/components/ElectricLoader"), {
   ),
 });
 
-export default function SearchResultsPage() {
+function SearchResultsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(
@@ -652,5 +652,20 @@ export default function SearchResultsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// Wrap the page that calls useSearchParams in a Suspense boundary
+export default function SearchResultsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-10">
+          <div className="w-16 h-16 bg-blue-100 rounded-full animate-pulse" />
+        </div>
+      }
+    >
+      <SearchResultsPageInner />
+    </Suspense>
   );
 }
