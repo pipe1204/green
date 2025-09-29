@@ -1,16 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Leaf, Phone, Mail, MapPin, Bike } from "lucide-react";
+import { MessageCircle, Leaf, Phone, Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
-  const router = useRouter();
-
-  const handleTestRideClick = () => {
-    router.push("/test-ride");
-  };
-
   const handleQuestionClick = () => {
     // You can implement a simple contact modal or redirect to a contact page
     window.open(
