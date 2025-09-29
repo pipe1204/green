@@ -46,7 +46,18 @@ export const vehicles: Vehicle[] = [
     type: "motorbike",
     price: 18950000,
     images: [
-      { url: "/images/zero-srf.jpg", alt: "Zero SR/F Electric Motorcycle" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "Zero SR/F Electric Motorcycle",
+      },
+      {
+        url: "/hero-image-1.png",
+        alt: "Zero SR/F Electric Motorcycle - Side View",
+      },
+      {
+        url: "/hero-image-2.png",
+        alt: "Zero SR/F Electric Motorcycle - Front View",
+      },
     ],
     specifications: {
       range: "200",
@@ -74,9 +85,10 @@ export const vehicles: Vehicle[] = [
     type: "motorbike",
     price: 22500000,
     images: [
+      { url: "/hero-image-1.png", alt: "Energica Ego Electric Motorcycle" },
       {
-        url: "/images/energica-ego.jpg",
-        alt: "Energica Ego Electric Motorcycle",
+        url: "/hero-image-2.png",
+        alt: "Energica Ego Electric Motorcycle - Detail",
       },
     ],
     specifications: {
@@ -105,7 +117,11 @@ export const vehicles: Vehicle[] = [
     type: "motorbike",
     price: 32000000,
     images: [
-      { url: "/images/harley-livewire.jpg", alt: "Harley-Davidson LiveWire" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "Harley-Davidson LiveWire",
+      },
+      { url: "/hero-image-1.png", alt: "Harley-Davidson LiveWire - Profile" },
     ],
     specifications: {
       range: "235",
@@ -132,7 +148,13 @@ export const vehicles: Vehicle[] = [
     brand: "KTM",
     type: "motorbike",
     price: 12500000,
-    images: [{ url: "/images/ktm-freeride.jpg", alt: "KTM Freeride E-XC" }],
+    images: [
+      { url: "/hero-image-2.png", alt: "KTM Freeride E-XC" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "KTM Freeride E-XC - Action",
+      },
+    ],
     specifications: {
       range: "90",
       chargeTime: "1.5",
@@ -159,7 +181,15 @@ export const vehicles: Vehicle[] = [
     type: "motorbike",
     price: 18500000,
     images: [
-      { url: "/images/bmw-ce04.jpg", alt: "BMW CE 04 Electric Scooter" },
+      { url: "/hero-image-1.png", alt: "BMW CE 04 Electric Scooter" },
+      {
+        url: "/hero-image-2.png",
+        alt: "BMW CE 04 Electric Scooter - Interior",
+      },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "BMW CE 04 Electric Scooter - Detail",
+      },
     ],
     specifications: {
       range: "130",

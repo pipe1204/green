@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/data/vehicles";
 import {
@@ -17,6 +18,8 @@ import {
   Star,
   Users,
   Zap,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface VehicleCardProps {
@@ -24,13 +27,78 @@ interface VehicleCardProps {
 }
 
 export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === vehicle.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? vehicle.images.length - 1 : prev - 1
+    );
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row md:items-stretch">
         {/* Vehicle Image - Responsive Layout */}
-        <div className="relative w-full md:w-80 h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Car className="w-16 h-16 text-gray-400" />
+        <div className="relative w-full md:w-80 h-64 md:h-auto bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 overflow-hidden">
+          {/* Carousel Images */}
+          <div className="relative w-full h-full">
+            {vehicle.images.length > 0 ? (
+              <Image
+                src={vehicle.images[currentImageIndex].url}
+                alt={vehicle.images[currentImageIndex].alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 320px"
+                priority={currentImageIndex === 0}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Car className="w-16 h-16 text-gray-400" />
+              </div>
+            )}
+
+            {/* Carousel Navigation */}
+            {vehicle.images.length > 1 && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+
+                {/* Image Indicators */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                  {vehicle.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentImageIndex
+                          ? "bg-white"
+                          : "bg-white/50 hover:bg-white/75"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <div className="absolute top-4 right-4 flex space-x-2">
             <Button
