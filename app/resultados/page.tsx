@@ -40,6 +40,34 @@ export default function SearchResultsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("relevance");
+
+  // Sorting function
+  const sortVehicles = (vehicles: Vehicle[], sortBy: string): Vehicle[] => {
+    const sortedVehicles = [...vehicles];
+
+    switch (sortBy) {
+      case "price-low":
+        return sortedVehicles.sort((a, b) => a.price - b.price);
+      case "price-high":
+        return sortedVehicles.sort((a, b) => b.price - a.price);
+      case "rating":
+        return sortedVehicles.sort(
+          (a, b) => b.reviews.average - a.reviews.average
+        );
+      case "newest":
+        // Assuming newer vehicles have higher IDs (you might want to add a date field)
+        return sortedVehicles.sort((a, b) => b.id.localeCompare(a.id));
+      case "range":
+        return sortedVehicles.sort(
+          (a, b) =>
+            parseInt(b.specifications.range) - parseInt(a.specifications.range)
+        );
+      case "relevance":
+      default:
+        // Keep original order for relevance
+        return sortedVehicles;
+    }
+  };
   const [filters, setFilters] = useState<SearchFilters>({
     vehicleType: [],
     batteryRange: [],
@@ -165,10 +193,12 @@ export default function SearchResultsPage() {
       });
     }
 
-    setResults(filteredVehicles);
+    // Apply sorting to filtered results
+    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
+    setResults(sortedVehicles);
 
     return () => clearTimeout(timer);
-  }, [searchParams]);
+  }, [searchParams, sortBy]);
 
   // Re-filter when filters change
   useEffect(() => {
@@ -244,8 +274,91 @@ export default function SearchResultsPage() {
       });
     }
 
-    setResults(filteredVehicles);
-  }, [filters]);
+    // Apply sorting to filtered results
+    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
+    setResults(sortedVehicles);
+  }, [filters, sortBy]);
+
+  // Handle sorting changes
+  useEffect(() => {
+    // Get the current filtered results and apply sorting
+    let filteredVehicles = vehicles;
+
+    // Apply all current filters
+    if (filters.vehicleType.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.vehicleType.includes(v.type)
+      );
+    }
+
+    if (filters.reviews.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        return filters.reviews.some((rating) => {
+          const minRating = parseFloat(rating.replace("+", ""));
+          return v.reviews.average >= minRating;
+        });
+      });
+    }
+
+    if (filters.dealerRating.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        return filters.dealerRating.some((rating) => {
+          const minRating = parseFloat(rating.replace("+", ""));
+          return v.dealer.rating >= minRating;
+        });
+      });
+    }
+
+    if (filters.location.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.location.includes(v.location)
+      );
+    }
+
+    if (filters.availability.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.availability.includes(v.availability)
+      );
+    }
+
+    if (filters.brands.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) =>
+        filters.brands.includes(v.brand)
+      );
+    }
+
+    if (filters.priceMin > 0 || filters.priceMax > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        const price = v.price;
+        if (filters.priceMin > 0 && filters.priceMax > 0) {
+          return price >= filters.priceMin && price <= filters.priceMax;
+        } else if (filters.priceMin > 0) {
+          return price >= filters.priceMin;
+        } else if (filters.priceMax > 0) {
+          return price <= filters.priceMax;
+        }
+        return true;
+      });
+    }
+
+    if (filters.batteryRange.length > 0) {
+      filteredVehicles = filteredVehicles.filter((v) => {
+        const range = parseInt(v.specifications.range);
+        return filters.batteryRange.some((batteryRange) => {
+          const [minRange, maxRange] = batteryRange.split("-").map(Number);
+          if (maxRange) {
+            return range >= minRange && range <= maxRange;
+          } else {
+            return range >= minRange;
+          }
+        });
+      });
+    }
+
+    // Apply sorting to filtered results
+    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
+    setResults(sortedVehicles);
+  }, [sortBy]);
 
   const handleFilterChange = (
     filterKey: string,
