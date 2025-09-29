@@ -191,9 +191,6 @@ describe("SearchResultsPage", () => {
     it("should display vehicle information correctly", () => {
       const firstVehicle = vehicles[0];
       expect(screen.getByText(firstVehicle.name)).toBeInTheDocument();
-      // Check that brand appears in vehicle cards (not just filter labels)
-      const brandElements = screen.getAllByText(firstVehicle.brand);
-      expect(brandElements.length).toBeGreaterThan(0);
       // Check that location appears in vehicle cards (not just filter labels)
       const locationElements = screen.getAllByText(firstVehicle.location);
       expect(locationElements.length).toBeGreaterThan(0);
@@ -228,7 +225,7 @@ describe("SearchResultsPage", () => {
 
     it("should have action buttons for each vehicle", () => {
       const viewDetailsButtons = screen.getAllByText("Ver Detalles");
-      const compareButtons = screen.getAllByText("Comparar");
+      const compareButtons = screen.getAllByText("Agenda una prueba");
 
       expect(viewDetailsButtons).toHaveLength(vehicles.length);
       expect(compareButtons).toHaveLength(vehicles.length);

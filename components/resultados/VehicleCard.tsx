@@ -61,19 +61,19 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
       {/* Vehicle Info */}
       <div className="p-6">
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex flex-col items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-xl font-bold text-gray-600 mb-1 ">
               {vehicle.name}
             </h3>
-            <p className="text-gray-600 mb-2">{vehicle.brand}</p>
+
             <div className="flex items-center space-x-1 mb-2">
               <MapPin className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-gray-500">{vehicle.location}</span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="flex justify-between items-center gap-2">
+            <p className="text-2xl font-bold text-gray-900">
               {formatPrice(vehicle.price)}
             </p>
             <p className="text-sm text-gray-500">COP</p>
@@ -140,7 +140,6 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
         {/* Dealer Info */}
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <span>Vendido por {vehicle.dealer.name}</span>
           <div className="flex items-center space-x-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span>{vehicle.dealer.rating}</span>
@@ -148,12 +147,12 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-2">
-          <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+        <div className="flex flex-col gap-2">
+          <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
             Ver Detalles
           </Button>
           <Button variant="outline" className="flex-1">
-            Comparar
+            Agenda una prueba
           </Button>
         </div>
       </div>
