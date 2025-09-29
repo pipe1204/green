@@ -24,7 +24,7 @@ const HowItWorksSection = dynamic(
 );
 
 const ComparisonSection = dynamic(
-  () => import("@/components/ComparisonSection"),
+  () => import("@/components/ComparsionSection"),
   {
     ssr: false,
     loading: () => <div className="w-full py-16 bg-white" />,
