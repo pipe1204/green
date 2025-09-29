@@ -101,7 +101,7 @@ export default function ProductCatalog() {
   };
 
   return (
-    <section id="vehiculos" className="w-full">
+    <section id="vehiculos" className="w-full mt-10">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Search & Filter Interface */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-8 mb-12 max-w-7xl mx-auto">

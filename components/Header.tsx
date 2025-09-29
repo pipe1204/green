@@ -97,12 +97,6 @@ export default function Header() {
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-center space-x-4">
                   <Button variant="ghost" size="sm">
-                    ?
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    🌍
-                  </Button>
-                  <Button variant="ghost" size="sm">
                     👤
                   </Button>
                 </div>
