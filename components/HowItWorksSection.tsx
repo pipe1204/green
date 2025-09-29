@@ -2,7 +2,6 @@
 
 import { Users, Shield, Zap, Star } from "lucide-react";
 import DecryptedText from "./DecryptedText";
-import ElectricBorder from "./ElectricBorder";
 
 export default function HowItWorksSection() {
   return (
@@ -23,84 +22,54 @@ export default function HowItWorksSection() {
         <div className="py-16">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              <ElectricBorder
-                color="#00b4d8"
-                speed={1}
-                chaos={0.5}
-                thickness={2}
-                style={{ borderRadius: 16, padding: 18 }}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-orange-600">
-                      1
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    Explora y Filtra
-                  </h3>
-                  <DecryptedText
-                    text="Navega por nuestra base de datos de vehículos eléctricos y usa filtros para encontrar modelos que se ajusten a tu presupuesto, autonomía y ciudad."
-                    animateOn="view"
-                    revealDirection="center"
-                    speed={100}
-                    maxIterations={20}
-                  />
+              <div className="text-center border border-gray-200 rounded-lg p-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-orange-600">1</span>
                 </div>
-              </ElectricBorder>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Explora y Filtra
+                </h3>
+                <DecryptedText
+                  text="Navega por nuestra base de datos de vehículos eléctricos y usa filtros para encontrar modelos que se ajusten a tu presupuesto, autonomía y ciudad."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
+              </div>
 
-              <ElectricBorder
-                color="#00b4d8"
-                speed={1}
-                chaos={0.5}
-                thickness={2}
-                style={{ borderRadius: 16, padding: 18 }}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-orange-600">
-                      2
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    Solicita Información o Prueba
-                  </h3>
-                  <DecryptedText
-                    text="En cada resultado puedes ver detalles del modelo, contactar al vendedor o agendar una prueba de manejo con un solo clic."
-                    animateOn="view"
-                    revealDirection="center"
-                    speed={100}
-                    maxIterations={20}
-                  />
-                  <p className="text-gray-600 mb-6"></p>
+              <div className="text-center border border-gray-200 rounded-lg p-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-orange-600">2</span>
                 </div>
-              </ElectricBorder>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Solicita Información o Prueba
+                </h3>
+                <DecryptedText
+                  text="En cada resultado puedes ver detalles del modelo, contactar al vendedor o agendar una prueba de manejo con un solo clic."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
+                <p className="text-gray-600 mb-6"></p>
+              </div>
 
-              <ElectricBorder
-                color="#00b4d8"
-                speed={1}
-                chaos={0.5}
-                thickness={2}
-                style={{ borderRadius: 16, padding: 18 }}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="text-2xl font-bold text-orange-600">
-                      3
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    Te Conectamos con el Vendedor
-                  </h3>
-                  <DecryptedText
-                    text="Recibe atención de concesionarios verificados. Te ayudamos a coordinar la prueba y a obtener la mejor oferta sin compromiso."
-                    animateOn="view"
-                    revealDirection="center"
-                    speed={100}
-                    maxIterations={20}
-                  />
+              <div className="text-center border border-gray-200 rounded-lg p-4">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl font-bold text-orange-600">3</span>
                 </div>
-              </ElectricBorder>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Te Conectamos con el Vendedor
+                </h3>
+                <DecryptedText
+                  text="Recibe atención de concesionarios verificados. Te ayudamos a coordinar la prueba y a obtener la mejor oferta sin compromiso."
+                  animateOn="view"
+                  revealDirection="center"
+                  speed={100}
+                  maxIterations={20}
+                />
+              </div>
             </div>
           </div>
         </div>

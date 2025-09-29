@@ -11,19 +11,25 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col items-center justify-center text-center min-h-[50vh] md:min-h-[80vh]">
           {/* Main Content */}
-          <h1 className="text-4xl md:text-8xl font-bold text-gray-900 mb-6 leading-tight drop-shadow-lg">
+          <FuzzyText
+            fontSize="clamp(5rem, 12vw, 10rem)"
+            baseIntensity={0.2}
+            hoverIntensity={0.8}
+            enableHover={true}
+            color="#000"
+          >
             Descubre tu Próximo
-          </h1>
+          </FuzzyText>
+          <FuzzyText
+            fontSize="clamp(3rem, 12vw, 8rem)"
+            baseIntensity={0.2}
+            hoverIntensity={0.8}
+            enableHover={true}
+            color="#000"
+          >
+            Vehículo Eléctrico
+          </FuzzyText>
           <div className="max-w-4xl mx-auto">
-            <FuzzyText
-              fontSize="clamp(3rem, 12vw, 8rem)"
-              baseIntensity={0.2}
-              hoverIntensity={0.8}
-              enableHover={true}
-              color="#000"
-            >
-              Vehículo Eléctrico
-            </FuzzyText>
             <p className="text-xl md:text-2xl text-gray-600 leading-relaxed drop-shadow-md">
               Busca y compara{" "}
               <TextType

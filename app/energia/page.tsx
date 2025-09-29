@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import GlitchText from "@/components/GlitchText";
 import CTASection from "@/components/CTASection";
-import ElectricBorder from "@/components/ElectricBorder";
 import SplashCursor from "@/components/SplashCursor";
 
 export default function EnergiaPage() {
@@ -48,60 +47,38 @@ export default function EnergiaPage() {
             Fuentes de Energía Renovables
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ElectricBorder
-              color="#00b4d8"
-              speed={1}
-              chaos={0.5}
-              thickness={2}
-              style={{ borderRadius: 16, padding: 18 }}
-            >
-              <div className="text-center p-8 bg-gray-50 rounded-lg">
-                <Sun className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Energía Solar
-                </h3>
-                <p className="text-gray-600">
-                  Algunos centros de carga utilizan paneles solares para generar
-                  electricidad limpia directamente del sol.
-                </p>
-              </div>
-            </ElectricBorder>
-            <ElectricBorder
-              color="#00b4d8"
-              speed={1}
-              chaos={0.5}
-              thickness={2}
-              style={{ borderRadius: 16, padding: 18 }}
-            >
-              <div className="text-center p-8 bg-gray-50 rounded-lg">
-                <Wind className="w-16 h-16 text-blue-500 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Energía Eólica
-                </h3>
-                <p className="text-gray-600">
-                  Parques eólicos proporcionan energía renovable para cargar
-                  vehículos eléctricos de forma sostenible.
-                </p>
-              </div>
-            </ElectricBorder>
-            <ElectricBorder
-              color="#00b4d8"
-              speed={1}
-              chaos={0.5}
-              thickness={2}
-              style={{ borderRadius: 16, padding: 18 }}
-            >
-              <div className="text-center p-8 bg-gray-50 rounded-lg">
-                <Droplets className="w-16 h-16 text-cyan-500 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Energía Hidroeléctrica
-                </h3>
-                <p className="text-gray-600">
-                  Centrales hidroeléctricas generan energía limpia aprovechando
-                  la fuerza del agua en movimiento.
-                </p>
-              </div>
-            </ElectricBorder>
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
+              <Sun className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Energía Solar
+              </h3>
+              <p className="text-gray-600">
+                Algunos centros de carga utilizan paneles solares para generar
+                electricidad limpia directamente del sol.
+              </p>
+            </div>
+
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
+              <Wind className="w-16 h-16 text-blue-500 mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Energía Eólica
+              </h3>
+              <p className="text-gray-600">
+                Parques eólicos proporcionan energía renovable para cargar
+                vehículos eléctricos de forma sostenible.
+              </p>
+            </div>
+
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
+              <Droplets className="w-16 h-16 text-cyan-500 mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Energía Hidroeléctrica
+              </h3>
+              <p className="text-gray-600">
+                Centrales hidroeléctricas generan energía limpia aprovechando la
+                fuerza del agua en movimiento.
+              </p>
+            </div>
           </div>
         </div>
 
