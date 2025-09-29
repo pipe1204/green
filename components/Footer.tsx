@@ -15,7 +15,7 @@ export default function Footer() {
   return (
     <>
       {/* Main Footer Content */}
-      <footer className="bg-white border-t border-gray-200">
+      <footer className="bg-white border-t border-gray-200 pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
           {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -110,9 +110,6 @@ export default function Footer() {
           </Button>
         </div>
       </div>
-
-      {/* Add bottom padding to body to account for sticky buttons */}
-      <div className="h-20 md:h-16"></div>
     </>
   );
 }

@@ -9,12 +9,7 @@ export default function CTASection() {
   const router = useRouter();
 
   return (
-    <section
-      className="relative w-full py-16 bg-white overflow-hidden"
-      style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
-    >
-      {/* Lightning Background */}
-      {/* Desktop/Tablet background */}
+    <section className="relative w-full py-16 bg-white overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex justify-center">
         <Lightning
           hue={220}
@@ -27,9 +22,6 @@ export default function CTASection() {
 
       {/* Content Overlay */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Subtle gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 pointer-events-none"></div>
-
         <div className="text-center relative">
           {/* Main Heading */}
           <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 drop-shadow-lg">
