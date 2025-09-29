@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/data/vehicles";
+import { TestDriveModal } from "./TestDriveModal";
 import {
   formatPrice,
   getAvailabilityColor,
   getAvailabilityText,
+  getVehicleTypeText,
+  truncateText,
 } from "@/lib/utils";
 import {
   Battery,
@@ -17,6 +22,8 @@ import {
   Star,
   Users,
   Zap,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface VehicleCardProps {
@@ -24,13 +31,101 @@ interface VehicleCardProps {
 }
 
 export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
+  const router = useRouter();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === vehicle.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? vehicle.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleViewDetails = async () => {
+    setIsNavigating(true);
+    // Small delay to show the loading state
+    setTimeout(() => {
+      router.push(`/product/${vehicle.id}`);
+    }, 500);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row md:items-stretch">
         {/* Vehicle Image - Responsive Layout */}
-        <div className="relative w-full md:w-80 h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Car className="w-16 h-16 text-gray-400" />
+        <div className="relative w-full md:w-80 h-64 md:h-auto bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0 overflow-hidden">
+          {/* Carousel Images */}
+          <div className="relative w-full h-full">
+            {vehicle.images.length > 0 ? (
+              <Image
+                src={vehicle.images[currentImageIndex].url}
+                alt={vehicle.images[currentImageIndex].alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 320px"
+                priority={currentImageIndex === 0}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const placeholder = target.nextElementSibling as HTMLElement;
+                  if (placeholder) placeholder.style.display = "flex";
+                }}
+              />
+            ) : null}
+            {/* Placeholder for missing images */}
+            <div
+              className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
+              style={{ display: vehicle.images.length === 0 ? "flex" : "none" }}
+            >
+              <div className="text-center">
+                <Car className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Imagen no disponible</p>
+              </div>
+            </div>
+
+            {/* Carousel Navigation */}
+            {vehicle.images.length > 1 && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+
+                {/* Image Indicators */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                  {vehicle.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentImageIndex
+                          ? "bg-white"
+                          : "bg-white/50 hover:bg-white/75"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
           <div className="absolute top-4 right-4 flex space-x-2">
             <Button
@@ -63,9 +158,17 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         <div className="flex-1 p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
             <div className="flex-1 mb-2 sm:mb-0">
-              <h3 className="text-lg md:text-xl font-bold text-green-600 mb-1 group-hover:text-blue-600 transition-colors">
-                {vehicle.name}
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
+                  {truncateText(vehicle.name, 25)}
+                </h3>
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm text-gray-500">•</span>
+                  <span className="text-sm text-gray-500">
+                    {getVehicleTypeText(vehicle.type)}
+                  </span>
+                </div>
+              </div>
 
               <div className="flex items-center space-x-1 mb-2">
                 <MapPin className="w-4 h-4 text-gray-400" />
@@ -139,6 +242,7 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               <span>{vehicle.specifications.warranty}</span>
             </div>
             <div className="flex items-center space-x-1">
+              <span>Calificación del vendedor</span>
               <Star className="w-4 h-4 text-yellow-400 fill-current" />
               <span>{vehicle.dealer.rating}</span>
             </div>
@@ -146,15 +250,37 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-              Ver Detalles
+            <Button
+              onClick={handleViewDetails}
+              disabled={isNavigating}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isNavigating ? (
+                <>
+                  <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                  Cargando...
+                </>
+              ) : (
+                "Ver Detalles"
+              )}
             </Button>
-            <Button variant="outline" className="flex-1">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setIsTestDriveModalOpen(true)}
+            >
               Agenda una prueba
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Test Drive Modal */}
+      <TestDriveModal
+        isOpen={isTestDriveModalOpen}
+        onClose={() => setIsTestDriveModalOpen(false)}
+        vehicle={vehicle}
+      />
     </div>
   );
 };

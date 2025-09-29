@@ -39,3 +39,27 @@ export const getAvailabilityText = (availability: string) => {
       return "Consultar";
   }
 };
+
+export const getVehicleTypeText = (type: string) => {
+  switch (type) {
+    case "motocicleta":
+      return "Motocicleta";
+    case "scooter":
+      return "Scooter";
+    case "bicicleta":
+      return "Bicicleta";
+    case "carro":
+      return "Carro";
+    case "camion":
+      return "Camión";
+    default:
+      return type;
+  }
+};
+
+export const truncateText = (text: string, maxLength: number = 25): string => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.substring(0, maxLength).trim() + "...";
+};

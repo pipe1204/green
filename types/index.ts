@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   model: string;
-  type: "motorbike" | "scooter" | "bicycle" | "car" | "truck" | "other";
+  type: "motocicleta" | "scooter" | "bicicleta" | "carro" | "camion" | "other";
   price: number;
   description: string;
   features: string[];
@@ -63,6 +63,7 @@ export interface SearchFilters {
   priceMax: number;
   location: string[];
   reviews: string[];
+  dealerRating: string[];
   availability: string[];
   passengerCapacity: string[];
   chargingTime: string[];

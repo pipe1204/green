@@ -158,7 +158,8 @@ describe("SearchResultsPage", () => {
       expect(screen.getByText("Autonomía de Batería")).toBeInTheDocument();
       expect(screen.getByText("Ubicación")).toBeInTheDocument();
       expect(screen.getByText("Disponibilidad")).toBeInTheDocument();
-      expect(screen.getByText("Calificación")).toBeInTheDocument();
+      expect(screen.getByText("Calificación del Vehículo")).toBeInTheDocument();
+      expect(screen.getByText("Calificación del Vendedor")).toBeInTheDocument();
     });
 
     it("should have clear all filters button", () => {
@@ -169,7 +170,7 @@ describe("SearchResultsPage", () => {
     it("should show filter counts for each option", () => {
       // Check that filter options have counts
       const motorbikeCount = vehicles.filter(
-        (v) => v.type === "motorbike"
+        (v) => v.type === "motocicleta"
       ).length;
       expect(screen.getAllByText(motorbikeCount.toString())).toHaveLength(5);
     });

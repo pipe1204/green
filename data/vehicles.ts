@@ -4,7 +4,7 @@ export interface Vehicle {
   id: string;
   name: string;
   brand: string;
-  type: "motorbike" | "scooter" | "bicycle" | "car" | "truck";
+  type: "motocicleta" | "scooter" | "bicicleta" | "carro" | "camion";
   price: number;
   images: { url: string; alt: string }[];
   specifications: {
@@ -43,10 +43,21 @@ export const vehicles: Vehicle[] = [
     id: "moto-001",
     name: "Zero SR/F",
     brand: "Zero",
-    type: "motorbike",
+    type: "motocicleta",
     price: 18950000,
     images: [
-      { url: "/images/zero-srf.jpg", alt: "Zero SR/F Electric Motorcycle" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "Zero SR/F Electric Motorcycle",
+      },
+      {
+        url: "/hero-image-1.png",
+        alt: "Zero SR/F Electric Motorcycle - Side View",
+      },
+      {
+        url: "/hero-image-2.png",
+        alt: "Zero SR/F Electric Motorcycle - Front View",
+      },
     ],
     specifications: {
       range: "200",
@@ -71,12 +82,13 @@ export const vehicles: Vehicle[] = [
     id: "moto-002",
     name: "Energica Ego",
     brand: "Energica",
-    type: "motorbike",
+    type: "motocicleta",
     price: 22500000,
     images: [
+      { url: "/hero-image-1.png", alt: "Energica Ego Electric Motorcycle" },
       {
-        url: "/images/energica-ego.jpg",
-        alt: "Energica Ego Electric Motorcycle",
+        url: "/hero-image-2.png",
+        alt: "Energica Ego Electric Motorcycle - Detail",
       },
     ],
     specifications: {
@@ -102,10 +114,14 @@ export const vehicles: Vehicle[] = [
     id: "moto-003",
     name: "Harley-Davidson LiveWire",
     brand: "Harley-Davidson",
-    type: "motorbike",
+    type: "motocicleta",
     price: 32000000,
     images: [
-      { url: "/images/harley-livewire.jpg", alt: "Harley-Davidson LiveWire" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "Harley-Davidson LiveWire",
+      },
+      { url: "/hero-image-1.png", alt: "Harley-Davidson LiveWire - Profile" },
     ],
     specifications: {
       range: "235",
@@ -130,9 +146,15 @@ export const vehicles: Vehicle[] = [
     id: "moto-004",
     name: "KTM Freeride E-XC",
     brand: "KTM",
-    type: "motorbike",
+    type: "motocicleta",
     price: 12500000,
-    images: [{ url: "/images/ktm-freeride.jpg", alt: "KTM Freeride E-XC" }],
+    images: [
+      { url: "/hero-image-2.png", alt: "KTM Freeride E-XC" },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "KTM Freeride E-XC - Action",
+      },
+    ],
     specifications: {
       range: "90",
       chargeTime: "1.5",
@@ -156,10 +178,18 @@ export const vehicles: Vehicle[] = [
     id: "moto-005",
     name: "BMW CE 04",
     brand: "BMW",
-    type: "motorbike",
+    type: "motocicleta",
     price: 18500000,
     images: [
-      { url: "/images/bmw-ce04.jpg", alt: "BMW CE 04 Electric Scooter" },
+      { url: "/hero-image-1.png", alt: "BMW CE 04 Electric Scooter" },
+      {
+        url: "/hero-image-2.png",
+        alt: "BMW CE 04 Electric Scooter - Interior",
+      },
+      {
+        url: "/images/eco-rider-pro/eco-rider-2.png",
+        alt: "BMW CE 04 Electric Scooter - Detail",
+      },
     ],
     specifications: {
       range: "130",
@@ -334,7 +364,7 @@ export const vehicles: Vehicle[] = [
     id: "bike-001",
     name: "Specialized Turbo Vado SL",
     brand: "Specialized",
-    type: "bicycle",
+    type: "bicicleta",
     price: 12000000,
     images: [
       {
@@ -365,7 +395,7 @@ export const vehicles: Vehicle[] = [
     id: "bike-002",
     name: "Trek Powerfly 7",
     brand: "Trek",
-    type: "bicycle",
+    type: "bicicleta",
     price: 8500000,
     images: [
       {
@@ -396,7 +426,7 @@ export const vehicles: Vehicle[] = [
     id: "bike-003",
     name: "Giant Explore E+ 3",
     brand: "Giant",
-    type: "bicycle",
+    type: "bicicleta",
     price: 6500000,
     images: [{ url: "/images/giant-explore.jpg", alt: "Giant Explore E+ 3" }],
     specifications: {
@@ -422,7 +452,7 @@ export const vehicles: Vehicle[] = [
     id: "bike-004",
     name: "Cannondale Tesoro Neo X1",
     brand: "Cannondale",
-    type: "bicycle",
+    type: "bicicleta",
     price: 9500000,
     images: [
       { url: "/images/cannondale-tesoro.jpg", alt: "Cannondale Tesoro Neo X1" },
@@ -450,7 +480,7 @@ export const vehicles: Vehicle[] = [
     id: "bike-005",
     name: "Scott Addict eRide 20",
     brand: "Scott",
-    type: "bicycle",
+    type: "bicicleta",
     price: 15000000,
     images: [{ url: "/images/scott-addict.jpg", alt: "Scott Addict eRide 20" }],
     specifications: {
@@ -478,7 +508,7 @@ export const vehicles: Vehicle[] = [
     id: "car-001",
     name: "Tesla Model 3",
     brand: "Tesla",
-    type: "car",
+    type: "carro",
     price: 180000000,
     images: [
       { url: "/images/tesla-model3.jpg", alt: "Tesla Model 3 Electric Car" },
@@ -506,7 +536,7 @@ export const vehicles: Vehicle[] = [
     id: "car-002",
     name: "BMW i3",
     brand: "BMW",
-    type: "car",
+    type: "carro",
     price: 125000000,
     images: [{ url: "/images/bmw-i3.jpg", alt: "BMW i3 Electric Car" }],
     specifications: {
@@ -532,7 +562,7 @@ export const vehicles: Vehicle[] = [
     id: "car-003",
     name: "Nissan Leaf",
     brand: "Nissan",
-    type: "car",
+    type: "carro",
     price: 95000000,
     images: [
       { url: "/images/nissan-leaf.jpg", alt: "Nissan Leaf Electric Car" },
@@ -560,7 +590,7 @@ export const vehicles: Vehicle[] = [
     id: "car-004",
     name: "Hyundai IONIQ 5",
     brand: "Hyundai",
-    type: "car",
+    type: "carro",
     price: 140000000,
     images: [
       {
@@ -591,7 +621,7 @@ export const vehicles: Vehicle[] = [
     id: "car-005",
     name: "Volkswagen ID.4",
     brand: "Volkswagen",
-    type: "car",
+    type: "carro",
     price: 110000000,
     images: [
       { url: "/images/vw-id4.jpg", alt: "Volkswagen ID.4 Electric SUV" },
@@ -621,7 +651,7 @@ export const vehicles: Vehicle[] = [
     id: "truck-001",
     name: "Rivian R1T",
     brand: "Rivian",
-    type: "truck",
+    type: "camion",
     price: 250000000,
     images: [
       { url: "/images/rivian-r1t.jpg", alt: "Rivian R1T Electric Truck" },
@@ -649,7 +679,7 @@ export const vehicles: Vehicle[] = [
     id: "truck-002",
     name: "Ford F-150 Lightning",
     brand: "Ford",
-    type: "truck",
+    type: "camion",
     price: 180000000,
     images: [
       {
@@ -680,7 +710,7 @@ export const vehicles: Vehicle[] = [
     id: "truck-003",
     name: "Tesla Cybertruck",
     brand: "Tesla",
-    type: "truck",
+    type: "camion",
     price: 220000000,
     images: [
       {
@@ -711,11 +741,11 @@ export const vehicles: Vehicle[] = [
 
 // Filter options data
 export const vehicleTypes = [
-  { value: "motorbike", label: "Motocicletas", icon: Bike },
+  { value: "motocicleta", label: "Motocicletas", icon: Bike },
   { value: "scooter", label: "Scooters", icon: Zap },
-  { value: "bicycle", label: "Bicicletas", icon: Bike },
-  { value: "car", label: "Carros", icon: Car },
-  { value: "truck", label: "Camiones", icon: Truck },
+  { value: "bicicleta", label: "Bicicletas", icon: Bike },
+  { value: "carro", label: "Carros", icon: Car },
+  { value: "camion", label: "Camiones", icon: Truck },
 ];
 
 export const batteryRanges = [
