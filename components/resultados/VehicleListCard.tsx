@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/data/vehicles";
 import {
@@ -27,7 +28,9 @@ interface VehicleCardProps {
 }
 
 export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -39,6 +42,14 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
     setCurrentImageIndex((prev) =>
       prev === 0 ? vehicle.images.length - 1 : prev - 1
     );
+  };
+
+  const handleViewDetails = async () => {
+    setIsNavigating(true);
+    // Small delay to show the loading state
+    setTimeout(() => {
+      router.push(`/product/${vehicle.id}`);
+    }, 500);
   };
 
   return (
@@ -56,12 +67,24 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 320px"
                 priority={currentImageIndex === 0}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const placeholder = target.nextElementSibling as HTMLElement;
+                  if (placeholder) placeholder.style.display = "flex";
+                }}
               />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Car className="w-16 h-16 text-gray-400" />
+            ) : null}
+            {/* Placeholder for missing images */}
+            <div
+              className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
+              style={{ display: vehicle.images.length === 0 ? "flex" : "none" }}
+            >
+              <div className="text-center">
+                <Car className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Imagen no disponible</p>
               </div>
-            )}
+            </div>
 
             {/* Carousel Navigation */}
             {vehicle.images.length > 1 && (
@@ -215,8 +238,19 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-              Ver Detalles
+            <Button
+              onClick={handleViewDetails}
+              disabled={isNavigating}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isNavigating ? (
+                <>
+                  <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                  Cargando...
+                </>
+              ) : (
+                "Ver Detalles"
+              )}
             </Button>
             <Button variant="outline" className="flex-1">
               Agenda una prueba

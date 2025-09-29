@@ -24,7 +24,6 @@ import {
   Clock,
   Star,
   BatteryFull,
-  Loader2,
 } from "lucide-react";
 import {
   batteryRanges,
@@ -411,7 +410,7 @@ export default function ProductCatalog() {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Zap className="w-5 h-5 mr-2 animate-pulse" />
                   Buscando...
                 </>
               ) : (

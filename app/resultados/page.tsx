@@ -306,7 +306,6 @@ export default function SearchResultsPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <ElectricLoader size="lg" text="Buscando vehículos eléctricos..." />
         </div>
-        <Footer />
       </div>
     );
   }

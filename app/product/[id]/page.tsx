@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
-import { Product, ColorOption } from "@/types";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { vehicles } from "@/data/vehicles";
+import { Vehicle } from "@/data/vehicles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -16,35 +19,68 @@ import {
   Clock,
   MapPin,
   CheckCircle,
+  Phone,
+  Mail,
+  User,
+  MessageSquare,
+  Star,
+  Battery,
+  Users,
+  Car,
 } from "lucide-react";
 
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
 
   useEffect(() => {
-    const productId = params.id as string;
-    const foundProduct = products.find((p) => p.id === productId);
+    const vehicleId = params.id as string;
+    const foundVehicle = vehicles.find((v) => v.id === vehicleId);
 
-    if (foundProduct) {
-      setProduct(foundProduct);
-      if (foundProduct.colors && foundProduct.colors.length > 0) {
-        setSelectedColor(foundProduct.colors[0]);
-      }
+    if (foundVehicle) {
+      setVehicle(foundVehicle);
     }
   }, [params.id]);
 
-  const handleOrderProduct = () => {};
+  const handleContactVendor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  if (!product) {
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert("¡Gracias! El vendedor se pondrá en contacto contigo pronto.");
+    }, 1000);
+  };
+
+  const handleBookTestDrive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert(
+        "¡Prueba de manejo programada! Te contactaremos para confirmar la fecha."
+      );
+    }, 1000);
+  };
+
+  if (!vehicle) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Producto no encontrado
+            Vehículo no encontrado
           </h1>
           <Button onClick={() => router.push("/")} variant="outline">
             Volver al inicio
@@ -54,13 +90,7 @@ export default function ProductPage() {
     );
   }
 
-  const currentImage =
-    selectedColor && selectedColor.image
-      ? {
-          url: selectedColor.image,
-          alt: `${product.name} ${selectedColor.name}`,
-        }
-      : product.images[selectedImageIndex];
+  const currentImage = vehicle.images[selectedImageIndex];
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -79,31 +109,31 @@ export default function ProductPage() {
           </Button>
         </div>
 
-        {/* Product Header */}
+        {/* Vehicle Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {product.name}
+            {vehicle.name}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl">
-            {product.description}
+            {vehicle.description}
           </p>
           <div className="mt-6 flex items-center space-x-8">
             <div className="flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-blue-600" />
+              <Battery className="w-5 h-5 text-blue-600" />
               <span className="text-gray-700">
-                {product.specifications.battery} de batería
+                {vehicle.specifications.battery} de batería
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin className="w-5 h-5 text-blue-600" />
               <span className="text-gray-700">
-                {product.specifications.range} km de autonomía
+                {vehicle.specifications.range} km de autonomía
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-blue-600" />
               <span className="text-gray-700">
-                {product.specifications.chargeTime} horas de carga
+                {vehicle.specifications.chargeTime} horas de carga
               </span>
             </div>
           </div>
@@ -113,114 +143,254 @@ export default function ProductPage() {
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden">
-              <img
-                src={currentImage?.url || "/images/placeholder.jpg"}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden relative">
+              {vehicle.images.length > 0 ? (
+                <Image
+                  src={currentImage?.url || "/images/placeholder.jpg"}
+                  alt={vehicle.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                  priority={selectedImageIndex === 0}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const placeholder =
+                      target.nextElementSibling as HTMLElement;
+                    if (placeholder) placeholder.style.display = "flex";
+                  }}
+                />
+              ) : null}
+              {/* Placeholder for missing images */}
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
+                style={{
+                  display: vehicle.images.length === 0 ? "flex" : "none",
+                }}
+              >
+                <div className="text-center">
+                  <Car className="w-20 h-20 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Imagen no disponible</p>
+                </div>
+              </div>
             </div>
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-2">
-              {product.images.map((image, index) => (
+              {vehicle.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative ${
                     selectedImageIndex === index
                       ? "border-blue-600"
                       : "border-gray-200 hover:border-gray-400"
                   }`}
                 >
-                  <img
+                  <Image
                     src={image.url}
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    alt={`${vehicle.name} ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 25vw, (max-width: 1200px) 12.5vw, 10vw"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                      const placeholder =
+                        target.nextElementSibling as HTMLElement;
+                      if (placeholder) placeholder.style.display = "flex";
+                    }}
                   />
+                  {/* Placeholder for broken thumbnail images */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
+                    style={{ display: "none" }}
+                  >
+                    <Car className="w-8 h-8 text-gray-400" />
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Product Details */}
+          {/* Vehicle Details & Contact Forms */}
           <div className="space-y-8">
-            {/* Price */}
+            {/* Price & Rating */}
             <div>
-              <h2 className="text-3xl font-bold text-blue-600 mb-2">
-                ${product.price.toLocaleString("es-CO")} COP
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                ${vehicle.price.toLocaleString("es-CO")} COP
               </h2>
-              <p className="text-gray-600">
-                Pago en 4 cuotas de $
-                {(product.price / 4).toLocaleString("es-CO")} COP cada 2 semanas
-              </p>
-            </div>
-
-            {/* Color Selection */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Elige tu color
-              </h3>
-              <div className="flex space-x-4">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.id}
-                    onClick={() => {
-                      setSelectedColor(color);
-                      setSelectedImageIndex(0);
-                    }}
-                    className={`w-12 h-12 rounded-full border-2 transition-all ${
-                      selectedColor?.id === color.id
-                        ? "border-blue-600 scale-110"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                    title={color.name}
-                  />
-                ))}
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="flex items-center space-x-1">
+                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                  <span className="text-lg font-semibold">
+                    {vehicle.reviews.average}
+                  </span>
+                  <span className="text-gray-500">
+                    ({vehicle.reviews.count} reseñas)
+                  </span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm text-gray-600">Vendedor:</span>
+                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className="font-medium">{vehicle.dealer.rating}</span>
+                </div>
               </div>
-              {selectedColor && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Color seleccionado: {selectedColor.name}
-                </p>
-              )}
             </div>
 
-            {/* Order Button */}
-            <Button
-              onClick={handleOrderProduct}
-              size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"
-            >
-              Ordena este modelo
-            </Button>
-
-            {/* Environmental Benefits */}
+            {/* Contact Vendor Form */}
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Leaf className="w-5 h-5 text-blue-600 mr-2" />
-                Beneficios Ambientales
+                <MessageSquare className="w-5 h-5 text-blue-600 mr-2" />
+                Contactar Vendedor
               </h3>
-              <ul className="space-y-3">
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Cero emisiones contaminantes durante el uso
-                  </span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Reduce tu huella de carbono significativamente
-                  </span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    Contribuye a un futuro más sostenible
-                  </span>
-                </li>
-              </ul>
+              <form onSubmit={handleContactVendor} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre completo
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      placeholder="Tu nombre"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teléfono
+                    </label>
+                    <Input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
+                      placeholder="Tu teléfono"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    placeholder="tu@email.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Mensaje (opcional)
+                  </label>
+                  <Textarea
+                    value={formData.message}
+                    onChange={(e) =>
+                      setFormData({ ...formData, message: e.target.value })
+                    }
+                    placeholder="Cuéntanos qué te interesa saber sobre este vehículo..."
+                    rows={3}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4 mr-2" />
+                      Contactar Vendedor
+                    </>
+                  )}
+                </Button>
+              </form>
+            </div>
+
+            {/* Book Test Drive Form */}
+            <div className="bg-blue-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Calendar className="w-5 h-5 text-blue-600 mr-2" />
+                Programar Prueba de Manejo
+              </h3>
+              <form onSubmit={handleBookTestDrive} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre completo
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      placeholder="Tu nombre"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teléfono
+                    </label>
+                    <Input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
+                      placeholder="Tu teléfono"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    placeholder="tu@email.com"
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                      Programando...
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Programar Prueba
+                    </>
+                  )}
+                </Button>
+              </form>
             </div>
           </div>
         </div>
@@ -233,10 +403,10 @@ export default function ProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <div className="flex items-center mb-4">
-                <Zap className="w-6 h-6 text-blue-600 mr-3" />
+                <Battery className="w-6 h-6 text-blue-600 mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900">Batería</h3>
               </div>
-              <p className="text-gray-600">{product.specifications.battery}</p>
+              <p className="text-gray-600">{vehicle.specifications.battery}</p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -246,7 +416,7 @@ export default function ProductPage() {
                   Autonomía
                 </h3>
               </div>
-              <p className="text-gray-600">{product.specifications.range} km</p>
+              <p className="text-gray-600">{vehicle.specifications.range} km</p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -257,7 +427,7 @@ export default function ProductPage() {
                 </h3>
               </div>
               <p className="text-gray-600">
-                {product.specifications.chargeTime} horas
+                {vehicle.specifications.chargeTime} horas
               </p>
             </div>
 
@@ -268,26 +438,30 @@ export default function ProductPage() {
                   Garantía
                 </h3>
               </div>
-              <p className="text-gray-600">{product.specifications.warranty}</p>
+              <p className="text-gray-600">{vehicle.specifications.warranty}</p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <div className="flex items-center mb-4">
-                <Calendar className="w-6 h-6 text-blue-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Entrega</h3>
-              </div>
-              <p className="text-gray-600">{product.specifications.delivery}</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center mb-4">
-                <Leaf className="w-6 h-6 text-blue-600 mr-3" />
+                <Zap className="w-6 h-6 text-blue-600 mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Sostenibilidad
+                  Velocidad Máxima
                 </h3>
               </div>
               <p className="text-gray-600">
-                {product.specifications.environmental}
+                {vehicle.specifications.performance.maxSpeed} km/h
+              </p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-center mb-4">
+                <Users className="w-6 h-6 text-blue-600 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Capacidad
+                </h3>
+              </div>
+              <p className="text-gray-600">
+                {vehicle.passengerCapacity} pasajeros
               </p>
             </div>
           </div>
@@ -299,7 +473,7 @@ export default function ProductPage() {
             Características Principales
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {product.features.map((feature, index) => (
+            {vehicle.features.map((feature, index) => (
               <div key={index} className="flex items-start space-x-4">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -315,25 +489,36 @@ export default function ProductPage() {
         {/* Call to Action */}
         <div className="bg-gray-50 rounded-lg p-8 text-center mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            ¿Listo para hacer el cambio?
+            ¿Interesado en este vehículo?
           </h2>
           <p className="text-gray-600 mb-6">
-            Únete a la revolución eléctrica con {product.name}. Programa una
-            prueba gratuita y experimenta el futuro del transporte.
+            Contacta directamente con el vendedor de {vehicle.name} para obtener
+            más información, programar una prueba de manejo o resolver cualquier
+            duda que tengas.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={handleOrderProduct}
+              onClick={() =>
+                document
+                  .querySelector("form")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
-              Ordenar Ahora
+              <MessageSquare className="w-5 h-5 mr-2" />
+              Contactar Vendedor
             </Button>
             <Button
-              onClick={() => router.push("/test-ride")}
+              onClick={() =>
+                document
+                  .querySelector("form:last-of-type")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
               variant="outline"
               size="lg"
             >
+              <Calendar className="w-5 h-5 mr-2" />
               Programar Prueba
             </Button>
           </div>
