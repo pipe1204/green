@@ -15,23 +15,13 @@ export default function CTASection() {
     >
       {/* Lightning Background */}
       {/* Desktop/Tablet background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none hidden md:block">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex justify-center">
         <Lightning
           hue={220}
           xOffset={0}
           speed={0.8}
-          intensity={0.6}
+          intensity={0.4}
           size={1.2}
-        />
-      </div>
-      {/* Mobile background with lighter params */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none md:hidden">
-        <Lightning
-          hue={220}
-          xOffset={0}
-          speed={0.5}
-          intensity={0.3}
-          size={0.8}
         />
       </div>
 
