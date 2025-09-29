@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { vehicles, Vehicle } from "@/data/vehicles";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -358,7 +357,7 @@ export default function SearchResultsPage() {
     // Apply sorting to filtered results
     const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
     setResults(sortedVehicles);
-  }, [sortBy]);
+  }, [sortBy, filters]);
 
   const handleFilterChange = (
     filterKey: string,

@@ -8,6 +8,8 @@ import {
   formatPrice,
   getAvailabilityColor,
   getAvailabilityText,
+  getVehicleTypeText,
+  truncateText,
 } from "@/lib/utils";
 import {
   Battery,
@@ -156,9 +158,17 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         <div className="flex-1 p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
             <div className="flex-1 mb-2 sm:mb-0">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
-                {vehicle.name}
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
+                  {truncateText(vehicle.name, 25)}
+                </h3>
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm text-gray-500">•</span>
+                  <span className="text-sm text-gray-500">
+                    {getVehicleTypeText(vehicle.type)}
+                  </span>
+                </div>
+              </div>
 
               <div className="flex items-center space-x-1 mb-2">
                 <MapPin className="w-4 h-4 text-gray-400" />

@@ -170,7 +170,7 @@ describe("SearchResultsPage", () => {
     it("should show filter counts for each option", () => {
       // Check that filter options have counts
       const motorbikeCount = vehicles.filter(
-        (v) => v.type === "motorbike"
+        (v) => v.type === "motocicleta"
       ).length;
       expect(screen.getAllByText(motorbikeCount.toString())).toHaveLength(5);
     });
