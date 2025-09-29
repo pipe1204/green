@@ -38,13 +38,24 @@ export default function Home() {
       <main>
         <div className="relative w-full min-h-screen">
           {/* Lightning Background */}
-          <div className="absolute inset-0 z-0 overflow-hidden lightning-container">
+          {/* Desktop/Tablet: original settings */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none lightning-container hidden md:block">
             <Lightning
               hue={220}
               xOffset={0}
               speed={0.8}
               intensity={0.6}
               size={1.2}
+            />
+          </div>
+          {/* Mobile: lighter settings to avoid scroll jank */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none lightning-container md:hidden">
+            <Lightning
+              hue={220}
+              xOffset={0}
+              speed={0.5}
+              intensity={0.3}
+              size={0.8}
             />
           </div>
           {/* Hero Section Overlay */}

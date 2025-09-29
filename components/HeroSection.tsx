@@ -16,6 +16,7 @@ export default function HeroSection() {
           </h1>
           <div className="max-w-4xl mx-auto">
             <FuzzyText
+              fontSize="clamp(3rem, 12vw, 8rem)"
               baseIntensity={0.2}
               hoverIntensity={0.8}
               enableHover={true}
