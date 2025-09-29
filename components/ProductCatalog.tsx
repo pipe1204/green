@@ -105,8 +105,8 @@ export default function ProductCatalog() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Search & Filter Interface */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-8 mb-12 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <Search className="w-6 h-6 text-blue-600" />
               <h3 className="text-2xl font-bold text-gray-900">
                 Buscar y Filtrar

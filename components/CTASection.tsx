@@ -14,13 +14,24 @@ export default function CTASection() {
       style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
     >
       {/* Lightning Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* Desktop/Tablet background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none hidden md:block">
         <Lightning
           hue={220}
           xOffset={0}
           speed={0.8}
           intensity={0.6}
           size={1.2}
+        />
+      </div>
+      {/* Mobile background with lighter params */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none md:hidden">
+        <Lightning
+          hue={220}
+          xOffset={0}
+          speed={0.5}
+          intensity={0.3}
+          size={0.8}
         />
       </div>
 

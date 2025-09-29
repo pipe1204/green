@@ -40,9 +40,7 @@ export default function HowItWorksSection() {
                     Explora y Filtra
                   </h3>
                   <DecryptedText
-                    text="Navega por nuestra base de datos de vehículos eléctricos y usa
-                  filtros avanzados para encontrar opciones que se ajusten a tus
-                  necesidades específicas."
+                    text="Navega por nuestra base de datos de vehículos eléctricos y usa filtros para encontrar modelos que se ajusten a tu presupuesto, autonomía y ciudad."
                     animateOn="view"
                     revealDirection="center"
                     speed={100}
@@ -65,12 +63,10 @@ export default function HowItWorksSection() {
                     </span>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    Compara Modelos
+                    Solicita Información o Prueba
                   </h3>
                   <DecryptedText
-                    text="Selecciona hasta 3 vehículos para comparar lado a lado. Ve
-                  especificaciones, precios, garantías y características en una
-                  tabla clara y fácil de entender."
+                    text="En cada resultado puedes ver detalles del modelo, contactar al vendedor o agendar una prueba de manejo con un solo clic."
                     animateOn="view"
                     revealDirection="center"
                     speed={100}
@@ -94,12 +90,10 @@ export default function HowItWorksSection() {
                     </span>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    Toma tu Decisión
+                    Te Conectamos con el Vendedor
                   </h3>
                   <DecryptedText
-                    text="Con toda la información en tus manos, toma la decisión más
-                  informada. Conectamos contigo con concesionarios verificados
-                  para completar tu compra."
+                    text="Recibe atención de concesionarios verificados. Te ayudamos a coordinar la prueba y a obtener la mejor oferta sin compromiso."
                     animateOn="view"
                     revealDirection="center"
                     speed={100}
