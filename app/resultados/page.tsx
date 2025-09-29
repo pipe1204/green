@@ -150,10 +150,6 @@ export default function SearchResultsPage() {
     return () => clearTimeout(timer);
   }, [searchParams]);
 
-  const handleBackToSearch = () => {
-    router.push("/");
-  };
-
   const handleFilterChange = (
     filterKey: string,
     value: string,
@@ -225,7 +221,7 @@ export default function SearchResultsPage() {
           <div className="flex items-center justify-between mb-4">
             <Button
               variant="outline"
-              onClick={handleBackToSearch}
+              onClick={() => router.push("/")}
               className="flex items-center space-x-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -249,8 +245,8 @@ export default function SearchResultsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col md:flex-row items-center justify-between text-center md:text-left">
+            <div className="mb-4 md:mb-0">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Vehículos Eléctricos
               </h1>
@@ -273,7 +269,7 @@ export default function SearchResultsPage() {
                 </SelectContent>
               </Select>
 
-              <div className="flex border border-gray-300 rounded-lg">
+              <div className="hidden md:flex border border-gray-300 rounded-lg">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
@@ -372,7 +368,7 @@ export default function SearchResultsPage() {
                                   priceMin: parseInt(e.target.value) || 0,
                                 }))
                               }
-                              className="w-20"
+                              className="w-28"
                             />
                             <span className="text-gray-500">-</span>
                             <Input
@@ -386,7 +382,7 @@ export default function SearchResultsPage() {
                                     parseInt(e.target.value) || 50000000,
                                 }))
                               }
-                              className="w-20"
+                              className="w-28"
                             />
                           </div>
                           <div className="text-sm text-gray-600">
@@ -429,7 +425,9 @@ export default function SearchResultsPage() {
                 <p className="text-gray-600 mb-6">
                   Intenta ajustar tus filtros de búsqueda
                 </p>
-                <Button onClick={handleBackToSearch}>Volver a Búsqueda</Button>
+                <Button onClick={() => router.push("/")}>
+                  Volver a Búsqueda
+                </Button>
               </div>
             )}
           </div>
