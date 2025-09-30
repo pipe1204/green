@@ -185,7 +185,7 @@ export function VendorDashboard() {
         <div className="mb-6">
           <Button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 bg-green-600 text-white"
           >
             <Plus className="w-4 h-4" />
             <span>Agregar Vehículo</span>

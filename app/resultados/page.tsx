@@ -36,7 +36,9 @@ function SearchResultsPageInner() {
   const [loading, setLoading] = useState(
     process.env.NODE_ENV === "test" ? false : true
   );
-  const [results, setResults] = useState<Vehicle[]>(vehicles);
+  const [results, setResults] = useState<Vehicle[]>(
+    vehicles.map(staticVehicleToVehicle)
+  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("relevance");
@@ -202,7 +204,7 @@ function SearchResultsPageInner() {
 
   // Re-filter when filters change
   useEffect(() => {
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     if (filters.vehicleType.length > 0) {
       filteredVehicles = filteredVehicles.filter((v) =>
@@ -282,7 +284,7 @@ function SearchResultsPageInner() {
   // Handle sorting changes
   useEffect(() => {
     // Get the current filtered results and apply sorting
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     // Apply all current filters
     if (filters.vehicleType.length > 0) {

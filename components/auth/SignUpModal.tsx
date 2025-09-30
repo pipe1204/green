@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "./AuthProvider";
-import { supabase } from "@/lib/supabase";
 import { Loader2, Zap, Eye, EyeOff } from "lucide-react";
 import { colombianDepartments, departmentLabels } from "@/data";
 
@@ -85,38 +84,17 @@ export function SignUpModal({
     if (error) {
       setError(error.message);
     } else {
-      // If vendor signup is successful, create vendor profile
+      // If vendor signup is successful, store vendor data in localStorage for callback
       if (userType === "vendor" && businessName) {
-        try {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (user) {
-            // Get the main location (first one with isMain: true)
-            const mainLocation =
-              locations.find((loc) => loc.isMain) || locations[0];
-
-            await supabase.from("vendors").insert({
-              user_id: user.id,
-              business_name: businessName,
-              business_type: businessType,
-              nit: nit,
-              phone: phone,
-              website: website,
-              address: mainLocation.address,
-              city: mainLocation.city,
-              department: mainLocation.department,
-              country: "Colombia",
-              locations: locations, // Store all locations as JSON
-              is_verified: false,
-              rating: 0,
-              total_reviews: 0,
-            });
-          }
-        } catch (vendorError) {
-          console.error("Error creating vendor profile:", vendorError);
-          // Don't show error to user as account was created successfully
-        }
+        const vendorData = {
+          businessName,
+          businessType,
+          nit,
+          phone,
+          website,
+          locations,
+        };
+        localStorage.setItem("pendingVendorData", JSON.stringify(vendorData));
       }
       setSuccess(true);
     }
@@ -260,6 +238,7 @@ export function SignUpModal({
               onChange={(e) => setFullName(e.target.value)}
               required
               placeholder="Tu nombre completo"
+              className="bg-gray-50"
             />
           </div>
 
@@ -277,6 +256,7 @@ export function SignUpModal({
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="tu@email.com"
+              className="bg-gray-50"
             />
           </div>
 
@@ -296,7 +276,7 @@ export function SignUpModal({
                 required
                 placeholder="••••••••"
                 minLength={6}
-                className="pr-10"
+                className="pr-10 bg-gray-50"
               />
               <button
                 type="button"
@@ -325,7 +305,7 @@ export function SignUpModal({
                 required
                 placeholder="••••••••"
                 minLength={6}
-                className="pr-10"
+                className="pr-10 bg-gray-50"
               />
               <button
                 type="button"
@@ -360,6 +340,7 @@ export function SignUpModal({
                   onChange={(e) => setBusinessName(e.target.value)}
                   required={userType === "vendor"}
                   placeholder="Nombre de tu empresa o negocio"
+                  className="bg-gray-50"
                 />
               </div>
 
@@ -401,6 +382,7 @@ export function SignUpModal({
                   onChange={(e) => setNit(e.target.value)}
                   required={userType === "vendor"}
                   placeholder="12345678-9"
+                  className="bg-gray-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Número de Identificación Tributaria
@@ -420,6 +402,7 @@ export function SignUpModal({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+57 300 123 4567"
+                  className="bg-gray-50"
                 />
               </div>
 
@@ -436,6 +419,7 @@ export function SignUpModal({
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   placeholder="https://www.tu-empresa.com"
+                  className="bg-gray-50"
                 />
               </div>
 
