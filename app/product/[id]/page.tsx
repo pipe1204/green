@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
 import { vehicles } from "@/data/vehicles";
-import { Vehicle } from "@/data/vehicles";
+import { Vehicle } from "@/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {

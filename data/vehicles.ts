@@ -1,6 +1,8 @@
 import { Car, Bike, Truck, UtilityPole } from "lucide-react";
+import { Vehicle } from "@/types";
 
-export interface Vehicle {
+// Interface for static vehicle data (without database fields)
+export interface StaticVehicle {
   id: string;
   name: string;
   brand: string;
@@ -37,7 +39,17 @@ export interface Vehicle {
   };
 }
 
-export const vehicles: Vehicle[] = [
+// Convert StaticVehicle to Vehicle (adds database fields)
+export function staticVehicleToVehicle(staticVehicle: StaticVehicle): Vehicle {
+  return {
+    ...staticVehicle,
+    vendorId: "static-vendor", // Placeholder for static data
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export const vehicles: StaticVehicle[] = [
   // MOTORBIKES
   {
     id: "moto-001",

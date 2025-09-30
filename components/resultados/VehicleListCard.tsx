@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Vehicle } from "@/data/vehicles";
+import { Vehicle } from "@/types";
 import { TestDriveModal } from "./TestDriveModal";
 import { FavoritesButton } from "./FavoritesButton";
 import {

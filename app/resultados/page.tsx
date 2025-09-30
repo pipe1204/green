@@ -4,7 +4,8 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
-import { vehicles, Vehicle } from "@/data/vehicles";
+import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
+import { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -118,7 +119,7 @@ function SearchResultsPageInner() {
     setFilters(searchFilters);
 
     // Filter vehicles based on search criteria
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     if (searchFilters.vehicleType.length > 0) {
       filteredVehicles = filteredVehicles.filter((v) =>

@@ -1,8 +1,5 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
-
 -- Create custom types
-CREATE TYPE vehicle_type AS ENUM ('motocicleta', 'scooter', 'bicicleta', 'carro', 'camion');
+CREATE TYPE vehicle_type AS ENUM ('motocicleta', 'patineta', 'bicicleta', 'carro', 'camion');
 CREATE TYPE user_role AS ENUM ('customer', 'vendor', 'admin');
 
 -- Create users table (extends Supabase auth.users)
@@ -149,8 +146,7 @@ CREATE TABLE public.price_alerts (
 CREATE INDEX idx_vehicles_vendor_id ON public.vehicles(vendor_id);
 CREATE INDEX idx_vehicles_type ON public.vehicles(type);
 CREATE INDEX idx_vehicles_price ON public.vehicles(price);
-CREATE INDEX idx_vehicles_city ON public.vehicles(city);
-CREATE INDEX idx_vehicles_is_active ON public.vehicles(is_active);
+CREATE INDEX idx_vehicles_location ON public.vehicles(location);
 CREATE INDEX idx_test_drive_bookings_vehicle_id ON public.test_drive_bookings(vehicle_id);
 CREATE INDEX idx_test_drive_bookings_customer_id ON public.test_drive_bookings(customer_id);
 CREATE INDEX idx_contact_inquiries_vehicle_id ON public.contact_inquiries(vehicle_id);
@@ -190,8 +186,8 @@ CREATE POLICY "Users can create vendor profile" ON public.vendors
 -- Vehicles policies
 ALTER TABLE public.vehicles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Anyone can view active vehicles" ON public.vehicles
-  FOR SELECT USING (is_active = true);
+CREATE POLICY "Anyone can view vehicles" ON public.vehicles
+  FOR SELECT USING (true);
 
 CREATE POLICY "Vendors can manage own vehicles" ON public.vehicles
   FOR ALL USING (

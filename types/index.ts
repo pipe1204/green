@@ -1,52 +1,3 @@
-export interface Product {
-  id: string;
-  name: string;
-  model: string;
-  type: "motocicleta" | "patineta" | "bicicleta" | "carro" | "camion" | "other";
-  price: number;
-  description: string;
-  features: string[];
-
-  images: ProductImage[];
-  specifications: ProductSpecifications;
-  environmentalBenefits: string[];
-  availability: "in-stock" | "pre-order" | "coming-soon";
-  deliveryTime: string;
-}
-
-export interface ProductImage {
-  id: string;
-  url: string;
-  alt: string;
-  colorId?: string;
-  isHero?: boolean;
-}
-
-export interface ProductSpecifications {
-  battery: string;
-  range: string;
-  chargeTime: string;
-  warranty: string;
-  delivery: string;
-  environmental: string;
-  performance: {
-    maxSpeed: string;
-    power: string;
-    torque: string;
-  };
-  dimensions: {
-    weight: string;
-    length: string;
-    width: string;
-    height: string;
-  };
-  features: {
-    display: string;
-    connectivity: string[];
-    safety: string[];
-  };
-}
-
 export interface SearchFilters {
   vehicleType: string[];
   batteryRange: string[];
@@ -126,7 +77,7 @@ export interface VendorLocation {
 
 export interface Vehicle {
   id: string;
-  vendor_id: string;
+  vendorId: string;
   name: string;
   brand: string;
   type: "motocicleta" | "patineta" | "bicicleta" | "carro" | "camion";
@@ -142,11 +93,11 @@ export interface Vehicle {
       power: string;
     };
   };
-  delivery_time: string;
+  deliveryTime: string;
   availability: "in-stock" | "pre-order" | "coming-soon";
-  passenger_capacity: number;
-  charging_time: string;
-  max_speed: string;
+  passengerCapacity: number;
+  chargingTime: string;
+  maxSpeed: string;
   power: string;
   location: string;
   description: string;
@@ -160,8 +111,8 @@ export interface Vehicle {
     average: number;
     count: number;
   };
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TestDriveBooking {
