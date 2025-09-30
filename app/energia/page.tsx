@@ -217,19 +217,19 @@ export default function EnergiaPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">0</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">0</div>
               <p className="text-gray-600">Emisiones de CO2 por vehículo</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">100%</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">100%</div>
               <p className="text-gray-600">Energía renovable en estaciones</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">90%</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">90%</div>
               <p className="text-gray-600">Reducción de ruido</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">2.5M</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">2.5M</div>
               <p className="text-gray-600">COP ahorrados anualmente</p>
             </div>
           </div>

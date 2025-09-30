@@ -34,7 +34,7 @@ export default function Footer() {
               <h4 className="font-semibold mb-4 text-gray-900">Vehículos</h4>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li>Motocicletas</li>
-                <li>Scooters</li>
+                <li>Patinetas</li>
                 <li>Bicicletas</li>
                 <li>Carros</li>
                 <li>Camiones</li>

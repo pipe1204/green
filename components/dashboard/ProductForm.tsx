@@ -18,8 +18,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Vehicle } from "@/types";
-import { Zap, Upload, X } from "lucide-react";
+import { Zap, X } from "lucide-react";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 
 interface ProductFormProps {
   isOpen: boolean;
@@ -67,8 +68,9 @@ export function ProductForm({
     },
   });
 
-  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [newFeature, setNewFeature] = useState("");
+  const [validationError, setValidationError] = useState<string>("");
 
   // Reset form when modal opens/closes or editing vehicle changes
   React.useEffect(() => {
@@ -125,19 +127,61 @@ export function ProductForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError("");
+
+    // Basic validation for required fields
+    if (
+      !formData.name.trim() ||
+      !formData.brand.trim() ||
+      !formData.type.trim() ||
+      formData.price <= 0 ||
+      !formData.location.trim() ||
+      !formData.availability.trim() ||
+      !formData.specifications.range.trim() ||
+      !formData.specifications.chargeTime.trim() ||
+      !formData.specifications.warranty.trim() ||
+      !formData.specifications.battery.trim() ||
+      !formData.specifications.performance.maxSpeed.trim() ||
+      !formData.specifications.performance.power.trim() ||
+      formData.images.length === 0
+    ) {
+      setValidationError(
+        "Por favor completa todos los campos requeridos y sube al menos una imagen."
+      );
+      return;
+    }
     await onSubmit(formData as Partial<Vehicle>);
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
+  const handleImageFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingImages(true);
+    try {
+      const uploadedImages: { url: string; alt: string }[] = [];
+      for (const file of Array.from(files)) {
+        const path = `vehicles/${Date.now()}-${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("vehicle-images")
+          .upload(path, file, { upsert: false });
+        if (uploadError) throw uploadError;
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("vehicle-images")
+          .getPublicUrl(uploadData.path);
+        uploadedImages.push({ url: publicUrl, alt: `${formData.name} image` });
+      }
       setFormData({
         ...formData,
-        images: [
-          ...formData.images,
-          { url: newImageUrl.trim(), alt: `${formData.name} image` },
-        ],
+        images: [...formData.images, ...uploadedImages],
       });
-      setNewImageUrl("");
+    } catch (err) {
+      console.error("Error subiendo imágenes:", err);
+      setValidationError(
+        "No se pudieron subir algunas imágenes. Intenta de nuevo o cambia el archivo."
+      );
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -224,7 +268,7 @@ export function ProductForm({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="motocicleta">Motocicleta</SelectItem>
-                    <SelectItem value="scooter">Scooter</SelectItem>
+                    <SelectItem value="patineta">Patineta</SelectItem>
                     <SelectItem value="bicicleta">Bicicleta</SelectItem>
                     <SelectItem value="carro">Carro</SelectItem>
                     <SelectItem value="camion">Camión</SelectItem>
@@ -307,18 +351,19 @@ export function ProductForm({
               Imágenes del Vehículo
             </h3>
 
-            {/* Add Image */}
-            <div className="flex gap-2">
+            {/* Upload Images */}
+            <div className="flex items-center gap-3">
               <Input
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                placeholder="URL de la imagen"
-                className="flex-1"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => handleImageFiles(e.target.files)}
               />
-              <Button type="button" onClick={addImage} variant="outline">
-                <Upload className="w-4 h-4 mr-2" />
-                Agregar
-              </Button>
+              {uploadingImages && (
+                <span className="text-sm text-gray-500">
+                  Subiendo imágenes...
+                </span>
+              )}
             </div>
 
             {/* Display Images */}
@@ -358,8 +403,11 @@ export function ProductForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Autonomía (km)
+                  Autonomía (km) *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Distancia máxima con una sola carga.
+                </p>
                 <Input
                   value={formData.specifications.range}
                   onChange={(e) =>
@@ -372,13 +420,17 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 400"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tiempo de Carga (horas)
+                  Tiempo de Carga (horas) *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Horas necesarias para una carga completa.
+                </p>
                 <Input
                   value={formData.specifications.chargeTime}
                   onChange={(e) =>
@@ -391,13 +443,17 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 8"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Batería
+                  Batería *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Capacidad o tipo de batería (p. ej., 75 kWh).
+                </p>
                 <Input
                   value={formData.specifications.battery}
                   onChange={(e) =>
@@ -410,13 +466,17 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 75 kWh"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Garantía
+                  Garantía *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Cobertura del fabricante (p. ej., 8 años o 160.000 km).
+                </p>
                 <Input
                   value={formData.specifications.warranty}
                   onChange={(e) =>
@@ -429,13 +489,17 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 8 años"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Velocidad Máxima (km/h)
+                  Velocidad Máxima (km/h) *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Velocidad tope del vehículo.
+                </p>
                 <Input
                   value={formData.specifications.performance.maxSpeed}
                   onChange={(e) =>
@@ -451,13 +515,17 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 200"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Potencia (kW)
+                  Potencia (kW) *
                 </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Potencia nominal del motor eléctrico.
+                </p>
                 <Input
                   value={formData.specifications.performance.power}
                   onChange={(e) =>
@@ -473,6 +541,7 @@ export function ProductForm({
                     })
                   }
                   placeholder="Ej: 300"
+                  required
                 />
               </div>
             </div>
@@ -520,6 +589,9 @@ export function ProductForm({
           </div>
 
           {/* Form Actions */}
+          {validationError && (
+            <div className="text-red-600 text-sm">{validationError}</div>
+          )}
           <div className="flex justify-end space-x-4 pt-6 border-t">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar

@@ -17,7 +17,6 @@ import {
   Car,
   Clock,
   Eye,
-  Heart,
   MapPin,
   Shield,
   Star,

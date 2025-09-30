@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Green - Vehículos Eléctricos Sostenibles",
   description:
-    "Descubre nuestra línea completa de motocicletas, scooters y bicicletas eléctricas. Transporte sostenible para un futuro más limpio en Colombia.",
+    "Descubre nuestra línea completa de motocicletas, patinetas y bicicletas eléctricas. Transporte sostenible para un futuro más limpio en Colombia.",
 };
 
 export default function RootLayout({
