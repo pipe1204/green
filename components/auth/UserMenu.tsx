@@ -2,17 +2,12 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import { useAuth } from "./AuthProvider";
 import { LoginModal } from "./LoginModal";
 import { SignUpModal } from "./SignUpModal";
 import { useRouter } from "next/navigation";
-import { User, LogOut, Settings, Zap, LayoutDashboard } from "lucide-react";
+import { User, LogOut, Settings, LayoutDashboard } from "lucide-react";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
@@ -91,12 +86,20 @@ export function UserMenu() {
           <button
             onClick={() => {
               setShowUserMenu(false);
-              router.push("/dashboard");
+              // Check user role and redirect accordingly
+              const userRole = user?.user_metadata?.role || "customer";
+              if (userRole === "vendor") {
+                router.push("/dashboard");
+              } else {
+                router.push("/");
+              }
             }}
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <LayoutDashboard className="w-4 h-4 mr-3" />
-            Panel de Vendedor
+            {user?.user_metadata?.role === "vendor"
+              ? "Panel de Vendedor"
+              : "Mi Panel"}
           </button>
 
           <button

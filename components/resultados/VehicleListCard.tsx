@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/data/vehicles";
 import { TestDriveModal } from "./TestDriveModal";
+import { FavoritesButton } from "./FavoritesButton";
 import {
   formatPrice,
   getAvailabilityColor,
@@ -128,13 +129,10 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             )}
           </div>
           <div className="absolute top-4 right-4 flex space-x-2">
-            <Button
-              size="sm"
-              variant="outline"
+            <FavoritesButton
+              vehicleId={vehicle.id}
               className="bg-white/90 hover:bg-white"
-            >
-              <Heart className="w-4 h-4" />
-            </Button>
+            />
             <Button
               size="sm"
               variant="outline"

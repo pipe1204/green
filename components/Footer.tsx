@@ -41,15 +41,16 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* <div>
+            <div>
               <h4 className="font-semibold mb-4 text-gray-900">Soporte</h4>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li>Centro de Ayuda</li>
-                <li>Garantía</li>
-                <li>Mantenimiento</li>
+                <li>Publica tu vehículo</li>
+                <li>Energía</li>
+                <li>Carga</li>
+                <li>Descubrir</li>
                 <li>Financiación</li>
               </ul>
-            </div> */}
+            </div>
 
             <div>
               <h4 className="font-semibold mb-4 text-gray-900">Contacto</h4>

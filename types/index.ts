@@ -89,6 +89,7 @@ export interface User {
   role: "customer" | "vendor" | "admin";
   phone?: string;
   company_name?: string;
+  avatar_url?: string;
   created_at: string;
   updated_at: string;
 }
@@ -98,19 +99,29 @@ export interface Vendor {
   user_id: string;
   business_name: string;
   business_type?: string;
+  nit?: string;
   address?: string;
   city?: string;
+  department?: string;
   state?: string;
   country: string;
   phone?: string;
   email?: string;
   website?: string;
   description?: string;
+  locations?: VendorLocation[];
   is_verified: boolean;
   rating: number;
   total_reviews: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface VendorLocation {
+  address: string;
+  department: string;
+  city: string;
+  isMain: boolean;
 }
 
 export interface Vehicle {
@@ -192,6 +203,34 @@ export interface Review {
   title?: string;
   comment?: string;
   is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomerFavorite {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  created_at: string;
+}
+
+export interface CustomerInquiry {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  vendor_id: string;
+  message: string;
+  status: "pending" | "replied" | "closed";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PriceAlert {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  target_price: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
