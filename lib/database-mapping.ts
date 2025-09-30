@@ -1,5 +1,31 @@
 import { Vehicle } from "@/types";
 
+// Row shape returned from Supabase (snake_case) matching public.vehicles
+// This keeps DB types separate from app types (camelCase)
+export interface DbVehicleRow {
+  id: string;
+  vendor_id: string | null;
+  name: string;
+  brand: string;
+  type: Vehicle["type"]; // enum values align
+  price: number;
+  images: { url: string; alt: string }[];
+  specifications: Vehicle["specifications"];
+  delivery_time: string;
+  availability: Vehicle["availability"]; // 'in-stock' | 'pre-order' | 'coming-soon'
+  passenger_capacity: number;
+  charging_time: string;
+  max_speed: string;
+  power: string;
+  location: string;
+  description: string;
+  features: string[];
+  dealer: Vehicle["dealer"];
+  reviews: Vehicle["reviews"];
+  created_at: string;
+  updated_at: string;
+}
+
 // Convert frontend Vehicle (camelCase) to database format (snake_case)
 export function vehicleToDatabase(vehicle: Vehicle) {
   return {
@@ -28,10 +54,10 @@ export function vehicleToDatabase(vehicle: Vehicle) {
 }
 
 // Convert database format (snake_case) to frontend Vehicle (camelCase)
-export function databaseToVehicle(dbVehicle: any): Vehicle {
+export function databaseToVehicle(dbVehicle: DbVehicleRow): Vehicle {
   return {
     id: dbVehicle.id,
-    vendorId: dbVehicle.vendor_id,
+    vendorId: dbVehicle.vendor_id ?? "",
     name: dbVehicle.name,
     brand: dbVehicle.brand,
     type: dbVehicle.type,

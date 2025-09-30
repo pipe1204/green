@@ -28,7 +28,6 @@ export function CustomerDashboard() {
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [inquiryMessage, setInquiryMessage] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {

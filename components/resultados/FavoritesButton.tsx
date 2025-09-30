@@ -37,6 +37,7 @@ export function FavoritesButton({
       setIsFavorited(!!data);
     } catch (error) {
       // Not favorited
+      console.error("Error checking if favorited:", error);
       setIsFavorited(false);
     }
   };
