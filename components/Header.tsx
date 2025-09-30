@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X, Zap, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export default function Header() {
   const router = useRouter();
@@ -52,10 +53,7 @@ export default function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <span className="sr-only">Usuario</span>
-              👤
-            </Button>
+            <UserMenu />
           </div>
 
           {/* Mobile menu button */}
@@ -95,10 +93,8 @@ export default function Header() {
                 );
               })}
               <div className="pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-center space-x-4">
-                  <Button variant="ghost" size="sm">
-                    👤
-                  </Button>
+                <div className="flex items-center justify-center">
+                  <UserMenu />
                 </div>
               </div>
             </div>

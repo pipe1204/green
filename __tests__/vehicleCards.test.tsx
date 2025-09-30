@@ -29,7 +29,7 @@ describe("Vehicle cards", () => {
         ? "Carro"
         : sampleVehicle.type === "camion"
         ? "Camión"
-        : "Scooter";
+        : "Patineta";
     expect(screen.getAllByText(typeText)[0]).toBeInTheDocument();
 
     // Location
@@ -72,7 +72,7 @@ describe("Vehicle cards", () => {
         ? "Carro"
         : sampleVehicle.type === "camion"
         ? "Camión"
-        : "Scooter";
+        : "Patineta";
     expect(screen.getAllByText(typeText)[0]).toBeInTheDocument();
 
     // Location should be present as well
