@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Green - Vehículos Eléctricos Sostenibles",
   description:
-    "Descubre nuestra línea completa de motocicletas, scooters y bicicletas eléctricas. Transporte sostenible para un futuro más limpio en Colombia.",
+    "Descubre nuestra línea completa de motocicletas, patinetas y bicicletas eléctricas. Transporte sostenible para un futuro más limpio en Colombia.",
 };
 
 export default function RootLayout({
@@ -29,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

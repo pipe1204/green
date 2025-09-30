@@ -31,7 +31,7 @@ import {
   priceRanges,
   vehicleTypes,
   warrantyOptions,
-} from "@/data/products";
+} from "@/data/vehicles";
 
 export default function ProductCatalog() {
   const router = useRouter();

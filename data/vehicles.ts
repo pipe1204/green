@@ -1,10 +1,12 @@
-import { Car, Bike, Truck, Zap } from "lucide-react";
+import { Car, Bike, Truck, UtilityPole } from "lucide-react";
+import { Vehicle } from "@/types";
 
-export interface Vehicle {
+// Interface for static vehicle data (without database fields)
+export interface StaticVehicle {
   id: string;
   name: string;
   brand: string;
-  type: "motocicleta" | "scooter" | "bicicleta" | "carro" | "camion";
+  type: "motocicleta" | "patineta" | "bicicleta" | "carro" | "camion";
   price: number;
   images: { url: string; alt: string }[];
   specifications: {
@@ -37,7 +39,17 @@ export interface Vehicle {
   };
 }
 
-export const vehicles: Vehicle[] = [
+// Convert StaticVehicle to Vehicle (adds database fields)
+export function staticVehicleToVehicle(staticVehicle: StaticVehicle): Vehicle {
+  return {
+    ...staticVehicle,
+    vendorId: "static-vendor", // Placeholder for static data
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export const vehicles: StaticVehicle[] = [
   // MOTORBIKES
   {
     id: "moto-001",
@@ -181,14 +193,14 @@ export const vehicles: Vehicle[] = [
     type: "motocicleta",
     price: 18500000,
     images: [
-      { url: "/hero-image-1.png", alt: "BMW CE 04 Electric Scooter" },
+      { url: "/hero-image-1.png", alt: "BMW CE 04 Electric Patineta" },
       {
         url: "/hero-image-2.png",
-        alt: "BMW CE 04 Electric Scooter - Interior",
+        alt: "BMW CE 04 Electric Patineta - Interior",
       },
       {
         url: "/images/eco-rider-pro/eco-rider-2.png",
-        alt: "BMW CE 04 Electric Scooter - Detail",
+        alt: "BMW CE 04 Electric Patineta - Detail",
       },
     ],
     specifications: {
@@ -205,23 +217,23 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "120",
     power: "31",
     location: "Medellín",
-    description: "Scooter eléctrico premium de BMW",
+    description: "patineta eléctrico premium de BMW",
     features: ["Pantalla TFT", "Carga rápida", "Modo eco"],
     dealer: { name: "BMW Motorrad", location: "Medellín", rating: 4.8 },
     reviews: { average: 4.5, count: 134 },
   },
 
-  // SCOOTERS
+  // patinetaS
   {
-    id: "scooter-001",
+    id: "patineta-001",
     name: "Vespa Elettrica",
     brand: "Vespa",
-    type: "scooter",
+    type: "patineta",
     price: 8500000,
     images: [
       {
         url: "/images/vespa-elettrica.jpg",
-        alt: "Vespa Elettrica Electric Scooter",
+        alt: "Vespa Elettrica Electric Patineta",
       },
     ],
     specifications: {
@@ -238,19 +250,19 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "70",
     power: "4",
     location: "Bogotá",
-    description: "Scooter eléctrico con el clásico diseño Vespa",
+    description: "patineta eléctrico con el clásico diseño Vespa",
     features: ["Diseño clásico", "Silencioso", "Fácil manejo"],
     dealer: { name: "Vespa Colombia", location: "Bogotá", rating: 4.5 },
     reviews: { average: 4.3, count: 267 },
   },
   {
-    id: "scooter-002",
+    id: "patineta-002",
     name: "Niu NQi GT",
     brand: "Niu",
-    type: "scooter",
+    type: "patineta",
     price: 4200000,
     images: [
-      { url: "/images/niu-nqi-gt.jpg", alt: "Niu NQi GT Electric Scooter" },
+      { url: "/images/niu-nqi-gt.jpg", alt: "Niu NQi GT Electric Patineta" },
     ],
     specifications: {
       range: "80",
@@ -266,19 +278,19 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "60",
     power: "3",
     location: "Cali",
-    description: "Scooter urbano inteligente con conectividad",
+    description: "patineta urbana inteligente con conectividad",
     features: ["App conectada", "GPS", "Antirrobo"],
     dealer: { name: "Niu Colombia", location: "Cali", rating: 4.3 },
     reviews: { average: 4.2, count: 189 },
   },
   {
-    id: "scooter-003",
+    id: "patineta-003",
     name: "Gogoro S2",
     brand: "Gogoro",
-    type: "scooter",
+    type: "patineta",
     price: 6800000,
     images: [
-      { url: "/images/gogoro-s2.jpg", alt: "Gogoro S2 Electric Scooter" },
+      { url: "/images/gogoro-s2.jpg", alt: "Gogoro S2 Patineta Electrica" },
     ],
     specifications: {
       range: "110",
@@ -294,19 +306,19 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "90",
     power: "7.2",
     location: "Medellín",
-    description: "Scooter con sistema de baterías intercambiables",
+    description: "patineta con sistema de baterías intercambiables",
     features: ["Baterías intercambiables", "Red de carga", "Modo deportivo"],
     dealer: { name: "Gogoro Medellín", location: "Medellín", rating: 4.7 },
     reviews: { average: 4.6, count: 145 },
   },
   {
-    id: "scooter-004",
+    id: "patineta-004",
     name: "Silence S01",
     brand: "Silence",
-    type: "scooter",
+    type: "patineta",
     price: 5200000,
     images: [
-      { url: "/images/silence-s01.jpg", alt: "Silence S01 Electric Scooter" },
+      { url: "/images/silence-s01.jpg", alt: "Silence S01 Patineta Electrica" },
     ],
     specifications: {
       range: "85",
@@ -322,21 +334,21 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "45",
     power: "2.5",
     location: "Barranquilla",
-    description: "Scooter urbano silencioso y eficiente",
+    description: "patineta urbana silencioso y eficiente",
     features: ["Ultra silencioso", "Eficiente", "Mantenimiento mínimo"],
     dealer: { name: "Silence Colombia", location: "Barranquilla", rating: 4.4 },
     reviews: { average: 4.1, count: 98 },
   },
   {
-    id: "scooter-005",
-    name: "Xiaomi Mi Electric Scooter Pro 2",
+    id: "patineta-005",
+    name: "Xiaomi Mi Electric patineta Pro 2",
     brand: "Xiaomi",
-    type: "scooter",
+    type: "patineta",
     price: 1800000,
     images: [
       {
-        url: "/images/xiaomi-mi-scooter.jpg",
-        alt: "Xiaomi Mi Electric Scooter",
+        url: "/images/xiaomi-mi-patineta.jpg",
+        alt: "Xiaomi Mi Electric Patineta",
       },
     ],
     specifications: {
@@ -353,7 +365,7 @@ export const vehicles: Vehicle[] = [
     maxSpeed: "25",
     power: "0.6",
     location: "Bogotá",
-    description: "Scooter plegable para movilidad urbana",
+    description: "patineta plegable para movilidad urbana",
     features: ["Plegable", "Ligero", "Precio accesible"],
     dealer: { name: "Xiaomi Store", location: "Bogotá", rating: 4.2 },
     reviews: { average: 4.0, count: 312 },
@@ -742,7 +754,7 @@ export const vehicles: Vehicle[] = [
 // Filter options data
 export const vehicleTypes = [
   { value: "motocicleta", label: "Motocicletas", icon: Bike },
-  { value: "scooter", label: "Scooters", icon: Zap },
+  { value: "patineta", label: "patinetas", icon: UtilityPole },
   { value: "bicicleta", label: "Bicicletas", icon: Bike },
   { value: "carro", label: "Carros", icon: Car },
   { value: "camion", label: "Camiones", icon: Truck },

@@ -44,8 +44,8 @@ export const getVehicleTypeText = (type: string) => {
   switch (type) {
     case "motocicleta":
       return "Motocicleta";
-    case "scooter":
-      return "Scooter";
+    case "patineta":
+      return "Patineta";
     case "bicicleta":
       return "Bicicleta";
     case "carro":

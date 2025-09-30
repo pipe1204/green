@@ -4,7 +4,8 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
-import { vehicles, Vehicle } from "@/data/vehicles";
+import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
+import { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ import { SearchFilters } from "@/types";
 import { filterSections, sortOptions } from "@/data";
 import { VehicleListCard } from "@/components/resultados/VehicleListCard";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
+import FloatingAskButton from "@/components/FloatingAskButton";
 
 const ElectricLoader = dynamic(() => import("@/components/ElectricLoader"), {
   ssr: false,
@@ -35,7 +37,9 @@ function SearchResultsPageInner() {
   const [loading, setLoading] = useState(
     process.env.NODE_ENV === "test" ? false : true
   );
-  const [results, setResults] = useState<Vehicle[]>(vehicles);
+  const [results, setResults] = useState<Vehicle[]>(
+    vehicles.map(staticVehicleToVehicle)
+  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("relevance");
@@ -118,7 +122,7 @@ function SearchResultsPageInner() {
     setFilters(searchFilters);
 
     // Filter vehicles based on search criteria
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     if (searchFilters.vehicleType.length > 0) {
       filteredVehicles = filteredVehicles.filter((v) =>
@@ -201,7 +205,7 @@ function SearchResultsPageInner() {
 
   // Re-filter when filters change
   useEffect(() => {
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     if (filters.vehicleType.length > 0) {
       filteredVehicles = filteredVehicles.filter((v) =>
@@ -281,7 +285,7 @@ function SearchResultsPageInner() {
   // Handle sorting changes
   useEffect(() => {
     // Get the current filtered results and apply sorting
-    let filteredVehicles = vehicles;
+    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
 
     // Apply all current filters
     if (filters.vehicleType.length > 0) {
@@ -650,6 +654,7 @@ function SearchResultsPageInner() {
             )}
           </div>
         </div>
+        <FloatingAskButton />
       </main>
     </div>
   );

@@ -1,21 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { MessageCircle, Leaf, Phone, Mail, MapPin } from "lucide-react";
+import { Leaf, Phone, Mail, MapPin } from "lucide-react";
+import FloatingAskButton from "@/components/FloatingAskButton";
 
 export default function Footer() {
-  const handleQuestionClick = () => {
-    // You can implement a simple contact modal or redirect to a contact page
-    window.open(
-      "mailto:info@green.co?subject=Consulta sobre vehículos eléctricos",
-      "_blank"
-    );
-  };
-
   return (
     <>
       {/* Main Footer Content */}
-      <footer className="bg-white border-t border-gray-200">
+      <footer className="bg-white border-t border-gray-200 pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
           {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -34,7 +26,7 @@ export default function Footer() {
               <h4 className="font-semibold mb-4 text-gray-900">Vehículos</h4>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li>Motocicletas</li>
-                <li>Scooters</li>
+                <li>Patinetas</li>
                 <li>Bicicletas</li>
                 <li>Carros</li>
                 <li>Camiones</li>
@@ -44,9 +36,10 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-4 text-gray-900">Soporte</h4>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li>Centro de Ayuda</li>
-                <li>Garantía</li>
-                <li>Mantenimiento</li>
+                <li>Publica tu vehículo</li>
+                <li>Energía</li>
+                <li>Carga</li>
+                <li>Descubrir</li>
                 <li>Financiación</li>
               </ul>
             </div>
@@ -97,22 +90,6 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-
-      {/* Sticky Bottom Actions - Always visible */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-50">
-        <div className="max-w-md mx-auto flex space-x-3">
-          <Button
-            onClick={handleQuestionClick}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 h-12 md:h-10 text-sm font-normal"
-          >
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Preguntanos algo
-          </Button>
-        </div>
-      </div>
-
-      {/* Add bottom padding to body to account for sticky buttons */}
-      <div className="h-20 md:h-16"></div>
     </>
   );
 }

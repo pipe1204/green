@@ -5,11 +5,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import ProductCatalog from "@/components/ProductCatalog";
-
-const Lightning = dynamic(() => import("@/components/Lightning"), {
-  ssr: false,
-  loading: () => <div className="w-full h-full bg-white" />,
-});
+import FloatingAskButton from "@/components/FloatingAskButton";
 
 const CTASection = dynamic(() => import("@/components/CTASection"), {
   ssr: false,
@@ -45,6 +41,7 @@ export default function Home() {
       <CTASection />
 
       <Footer />
+      <FloatingAskButton />
     </div>
   );
 }

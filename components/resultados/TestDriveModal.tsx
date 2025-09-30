@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Vehicle } from "@/data/vehicles";
+import { Vehicle } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import {
   Calendar,
