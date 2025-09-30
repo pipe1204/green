@@ -596,7 +596,11 @@ export function ProductForm({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
               {loading ? (
                 <>
                   <Zap className="w-4 h-4 mr-2 animate-spin" />

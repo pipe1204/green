@@ -12,6 +12,7 @@ import { Vehicle } from "@/types";
 import { ProductForm } from "./ProductForm";
 import { ProductList } from "./ProductList";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
+import FloatingAskButton from "../FloatingAskButton";
 
 export function VendorDashboard() {
   const { user } = useAuth();
@@ -212,7 +213,7 @@ export function VendorDashboard() {
         />
       </main>
 
-      <Footer />
+      <FloatingAskButton />
     </div>
   );
 }

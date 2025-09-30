@@ -22,6 +22,7 @@ import { SearchFilters } from "@/types";
 import { filterSections, sortOptions } from "@/data";
 import { VehicleListCard } from "@/components/resultados/VehicleListCard";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
+import FloatingAskButton from "@/components/FloatingAskButton";
 
 const ElectricLoader = dynamic(() => import("@/components/ElectricLoader"), {
   ssr: false,
@@ -653,6 +654,7 @@ function SearchResultsPageInner() {
             )}
           </div>
         </div>
+        <FloatingAskButton />
       </main>
     </div>
   );
