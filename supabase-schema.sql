@@ -81,20 +81,8 @@ CREATE TABLE public.test_drive_bookings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create contact_inquiries table
-CREATE TABLE public.contact_inquiries (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  vehicle_id TEXT REFERENCES public.vehicles(id) ON DELETE CASCADE,
-  customer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  vendor_id UUID REFERENCES public.vendors(id) ON DELETE CASCADE,
-  customer_name TEXT NOT NULL,
-  customer_email TEXT NOT NULL,
-  customer_phone TEXT,
-  message TEXT,
-  status TEXT DEFAULT 'new', -- 'new', 'contacted', 'closed'
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- REMOVED: contact_inquiries table has been consolidated into customer_inquiries
+-- See migration: 001_consolidate_inquiries.sql
 
 -- Create reviews table
 CREATE TABLE public.reviews (
@@ -119,16 +107,24 @@ CREATE TABLE public.customer_favorites (
   UNIQUE(customer_id, vehicle_id)
 );
 
--- Create customer inquiries table
+-- Create customer inquiries table (supports both authenticated users and guests)
 CREATE TABLE public.customer_inquiries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  customer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  customer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE, -- NULL for guest inquiries
   vehicle_id TEXT REFERENCES public.vehicles(id) ON DELETE CASCADE,
   vendor_id UUID REFERENCES public.vendors(id) ON DELETE CASCADE,
   message TEXT NOT NULL,
   status TEXT DEFAULT 'pending', -- 'pending', 'replied', 'closed'
+  is_guest BOOLEAN DEFAULT FALSE, -- TRUE if inquiry is from a non-authenticated guest
+  guest_name TEXT, -- Required if is_guest = TRUE
+  guest_email TEXT, -- Required if is_guest = TRUE
+  guest_phone TEXT, -- Optional guest phone number
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT customer_or_guest_required CHECK (
+    (customer_id IS NOT NULL) OR 
+    (is_guest = TRUE AND guest_name IS NOT NULL AND guest_email IS NOT NULL)
+  )
 );
 
 -- Create price alerts table
@@ -149,7 +145,6 @@ CREATE INDEX idx_vehicles_price ON public.vehicles(price);
 CREATE INDEX idx_vehicles_location ON public.vehicles(location);
 CREATE INDEX idx_test_drive_bookings_vehicle_id ON public.test_drive_bookings(vehicle_id);
 CREATE INDEX idx_test_drive_bookings_customer_id ON public.test_drive_bookings(customer_id);
-CREATE INDEX idx_contact_inquiries_vehicle_id ON public.contact_inquiries(vehicle_id);
 CREATE INDEX idx_customer_favorites_customer_id ON public.customer_favorites(customer_id);
 CREATE INDEX idx_customer_favorites_vehicle_id ON public.customer_favorites(vehicle_id);
 CREATE INDEX idx_customer_inquiries_customer_id ON public.customer_inquiries(customer_id);
@@ -216,23 +211,8 @@ CREATE POLICY "Vendors can view bookings for their vehicles" ON public.test_driv
 CREATE POLICY "Users can create bookings" ON public.test_drive_bookings
   FOR INSERT WITH CHECK (auth.uid() = customer_id);
 
--- Contact inquiries policies
-ALTER TABLE public.contact_inquiries ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own inquiries" ON public.contact_inquiries
-  FOR SELECT USING (auth.uid() = customer_id);
-
-CREATE POLICY "Vendors can view inquiries for their vehicles" ON public.contact_inquiries
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.vendors 
-      WHERE vendors.id = contact_inquiries.vendor_id 
-      AND vendors.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can create inquiries" ON public.contact_inquiries
-  FOR INSERT WITH CHECK (auth.uid() = customer_id);
+-- REMOVED: contact_inquiries policies (table has been dropped)
+-- Policies moved to customer_inquiries table below
 
 -- Reviews policies
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
@@ -258,14 +238,13 @@ CREATE POLICY "Customers can add favorites" ON public.customer_favorites
 CREATE POLICY "Customers can remove own favorites" ON public.customer_favorites
   FOR DELETE USING (auth.uid() = customer_id);
 
--- Customer inquiries policies
+-- Customer inquiries policies (supports both authenticated users and guests)
 ALTER TABLE public.customer_inquiries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Customers can view own inquiries" ON public.customer_inquiries
-  FOR SELECT USING (auth.uid() = customer_id);
-
-CREATE POLICY "Vendors can view inquiries for their vehicles" ON public.customer_inquiries
   FOR SELECT USING (
+    auth.uid() = customer_id OR
+    -- Vendors can see inquiries for their vehicles
     EXISTS (
       SELECT 1 FROM public.vendors 
       WHERE vendors.id = customer_inquiries.vendor_id 
@@ -273,8 +252,13 @@ CREATE POLICY "Vendors can view inquiries for their vehicles" ON public.customer
     )
   );
 
-CREATE POLICY "Customers can create inquiries" ON public.customer_inquiries
-  FOR INSERT WITH CHECK (auth.uid() = customer_id);
+CREATE POLICY "Users and guests can create inquiries" ON public.customer_inquiries
+  FOR INSERT WITH CHECK (
+    -- Allow if authenticated user is creating their own inquiry
+    (auth.uid() = customer_id) OR 
+    -- Allow if it's a guest inquiry (customer_id is null and is_guest is true)
+    (customer_id IS NULL AND is_guest = TRUE)
+  );
 
 CREATE POLICY "Customers can update own inquiries" ON public.customer_inquiries
   FOR UPDATE USING (auth.uid() = customer_id);
@@ -335,9 +319,6 @@ CREATE TRIGGER update_vehicles_updated_at BEFORE UPDATE ON public.vehicles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 CREATE TRIGGER update_test_drive_bookings_updated_at BEFORE UPDATE ON public.test_drive_bookings
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-
-CREATE TRIGGER update_contact_inquiries_updated_at BEFORE UPDATE ON public.contact_inquiries
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON public.reviews
