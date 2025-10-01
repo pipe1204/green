@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -48,14 +48,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
     { discount: "20%", price: Math.floor(vehicle.price * 0.8) },
   ];
 
-  // Check if user already has an alert for this vehicle
-  useEffect(() => {
-    if (isOpen && user) {
-      checkExistingAlert();
-    }
-  }, [isOpen, user, vehicle.id]);
-
-  const checkExistingAlert = async () => {
+  const checkExistingAlert = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("price_alerts")
@@ -78,7 +71,14 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
     } catch (error) {
       console.error("Error checking existing alert:", error);
     }
-  };
+  }, [user?.id, vehicle.id]);
+
+  // Check if user already has an alert for this vehicle
+  useEffect(() => {
+    if (isOpen && user) {
+      checkExistingAlert();
+    }
+  }, [isOpen, user, checkExistingAlert]);
 
   // Reset states when modal opens/closes
   useEffect(() => {
@@ -221,8 +221,8 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center">
             <Bell className="w-6 h-6 text-purple-600 mr-2" />
             {hasExistingAlert
@@ -235,70 +235,71 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
-        )}
+        <div className="flex-1 overflow-y-auto px-1">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
 
-        {hasExistingAlert && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-blue-900">
-                  Ya tienes una alerta activa para este vehículo
-                </p>
-                <p className="text-xs text-blue-700 mt-1">
-                  Puedes actualizarla con un nuevo precio o eliminarla.
-                </p>
+          {hasExistingAlert && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-blue-900">
+                    Ya tienes una alerta activa para este vehículo
+                  </p>
+                  <p className="text-xs text-blue-700 mt-1">
+                    Puedes actualizarla con un nuevo precio o eliminarla.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Current Price Display */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600 mb-1">Precio actual</p>
-            <p className="text-3xl font-bold text-gray-900">
-              {formatPrice(vehicle.price)}
-            </p>
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Current Price Display */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Precio actual</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {formatPrice(vehicle.price)}
+              </p>
+            </div>
 
-          {/* Target Price Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <TrendingDown className="w-4 h-4 inline mr-1" />
-              Precio objetivo (COP) *
-            </label>
-            <Input
-              type="number"
-              value={targetPrice}
-              onChange={(e) => setTargetPrice(e.target.value)}
-              placeholder="Ej: 45000000"
-              required
-              min="1"
-              max={vehicle.price - 1}
-              className="text-lg"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Ingresa el precio al que te gustaría comprar este vehículo
-            </p>
-          </div>
+            {/* Target Price Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <TrendingDown className="w-4 h-4 inline mr-1" />
+                Precio objetivo (COP) *
+              </label>
+              <Input
+                type="number"
+                value={targetPrice}
+                onChange={(e) => setTargetPrice(e.target.value)}
+                placeholder="Ej: 45000000"
+                required
+                min="1"
+                max={vehicle.price - 1}
+                className="text-lg"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Ingresa el precio al que te gustaría comprar este vehículo
+              </p>
+            </div>
 
-          {/* Suggested Prices */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">
-              Precios sugeridos:
-            </p>
-            <div className="grid grid-cols-3 gap-3">
-              {suggestedPrices.map((suggestion) => (
-                <button
-                  key={suggestion.discount}
-                  type="button"
-                  onClick={() => setTargetPrice(suggestion.price.toString())}
-                  className={`
+            {/* Suggested Prices */}
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-3">
+                Precios sugeridos:
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {suggestedPrices.map((suggestion) => (
+                  <button
+                    key={suggestion.discount}
+                    type="button"
+                    onClick={() => setTargetPrice(suggestion.price.toString())}
+                    className={`
                     p-3 rounded-lg border-2 transition-all
                     ${
                       targetPrice === suggestion.price.toString()
@@ -306,53 +307,58 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
                         : "border-gray-200 hover:border-purple-300 hover:bg-gray-50"
                     }
                   `}
-                >
-                  <p className="text-xs text-gray-600 mb-1">
-                    {suggestion.discount} de descuento
-                  </p>
-                  <p className="text-sm font-semibold text-gray-900">
-                    ${suggestion.price.toLocaleString()}
-                  </p>
-                </button>
-              ))}
+                  >
+                    <p className="text-xs text-gray-600 mb-1">
+                      {suggestion.discount} de descuento
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      ${suggestion.price.toLocaleString()}
+                    </p>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Price Difference Display */}
-          {targetPrice && parseInt(targetPrice) > 0 && (
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <p className="text-sm text-purple-900">
-                <TrendingDown className="w-4 h-4 inline mr-1" />
-                Te ahorrarías{" "}
-                <span className="font-bold">
-                  {formatPrice(vehicle.price - parseInt(targetPrice))}
-                </span>{" "}
-                (
-                {((1 - parseInt(targetPrice) / vehicle.price) * 100).toFixed(1)}
-                % de descuento)
+            {/* Price Difference Display */}
+            {targetPrice && parseInt(targetPrice) > 0 && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-sm text-purple-900">
+                  <TrendingDown className="w-4 h-4 inline mr-1" />
+                  Te ahorrarías{" "}
+                  <span className="font-bold">
+                    {formatPrice(vehicle.price - parseInt(targetPrice))}
+                  </span>{" "}
+                  (
+                  {((1 - parseInt(targetPrice) / vehicle.price) * 100).toFixed(
+                    1
+                  )}
+                  % de descuento)
+                </p>
+              </div>
+            )}
+
+            {/* How It Works */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-sm font-medium text-gray-900 mb-2">
+                ¿Cómo funciona?
               </p>
+              <ul className="text-xs text-gray-600 space-y-1.5 ml-4 list-disc">
+                <li>
+                  Recibirás un email cuando el precio baje a tu precio objetivo
+                </li>
+                <li>
+                  Puedes modificar o eliminar la alerta en cualquier momento
+                </li>
+                <li>
+                  Solo se activa si el vendedor actualiza el precio manualmente
+                </li>
+              </ul>
             </div>
-          )}
+          </form>
+        </div>
 
-          {/* How It Works */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-900 mb-2">
-              ¿Cómo funciona?
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1.5 ml-4 list-disc">
-              <li>
-                Recibirás un email cuando el precio baje a tu precio objetivo
-              </li>
-              <li>
-                Puedes modificar o eliminar la alerta en cualquier momento
-              </li>
-              <li>
-                Solo se activa si el vendedor actualiza el precio manualmente
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        <div className="flex-shrink-0 border-t pt-4 mt-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             {hasExistingAlert && (
               <Button
                 type="button"
@@ -365,13 +371,14 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
               </Button>
             )}
             <Button
-              type="submit"
+              type="button"
               disabled={
                 isSubmitting ||
                 !targetPrice ||
                 parseInt(targetPrice) >= vehicle.price
               }
               className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={handleSubmit}
             >
               {isSubmitting ? (
                 <>
@@ -394,7 +401,7 @@ export const PriceAlertModal: React.FC<PriceAlertModalProps> = ({
               Cancelar
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Vehicle } from "@/types";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
 import { Button } from "@/components/ui/button";
-import { Heart, Car, ArrowRight } from "lucide-react";
+import { Car, ArrowRight, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { databaseToVehicle } from "@/lib/database-mapping";
 
@@ -73,26 +73,6 @@ export function FavoritesSection() {
       fetchFavorites();
     }
   }, [user, fetchFavorites]);
-
-  const handleRemoveFavorite = async (vehicleId: string) => {
-    try {
-      const { error } = await supabase
-        .from("customer_favorites")
-        .delete()
-        .eq("customer_id", user?.id)
-        .eq("vehicle_id", vehicleId);
-
-      if (error) throw error;
-
-      // Remove from local state
-      setFavorites((prev) =>
-        prev.filter((vehicle) => vehicle.id !== vehicleId)
-      );
-    } catch (err) {
-      console.error("Error removing favorite:", err);
-      setError("Error al eliminar de favoritos");
-    }
-  };
 
   if (loading) {
     return (
@@ -199,18 +179,7 @@ export function FavoritesSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {favorites.map((vehicle) => (
-          <div key={vehicle.id} className="relative">
-            <VehicleCard vehicle={vehicle} />
-            <Button
-              onClick={() => handleRemoveFavorite(vehicle.id)}
-              variant="outline"
-              size="sm"
-              className="absolute top-2 left-2 bg-white/90 hover:bg-white"
-              title="Eliminar de favoritos"
-            >
-              <Heart className="w-4 h-4 text-red-500 fill-current" />
-            </Button>
-          </div>
+          <VehicleCard key={vehicle.id} vehicle={vehicle} />
         ))}
       </div>
     </div>
