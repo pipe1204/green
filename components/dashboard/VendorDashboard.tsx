@@ -10,7 +10,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Vehicle } from "@/types";
 import { ProductForm } from "./ProductForm";
-import { ProductList } from "./ProductList";
+import { VehicleTable } from "./VehicleTable";
+import { VehicleViewModal } from "./VehicleViewModal";
+import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import FloatingAskButton from "../FloatingAskButton";
 
@@ -35,7 +37,10 @@ export function VendorDashboard() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [viewingVehicle, setViewingVehicle] = useState<Vehicle | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeSection, setActiveSection] =
+    useState<DashboardSection>("vehicles");
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -172,13 +177,98 @@ export function VendorDashboard() {
   };
 
   const handleView = (vehicle: Vehicle) => {
-    // Navigate to product page
-    router.push(`/product/${vehicle.id}`);
+    setViewingVehicle(vehicle);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewingVehicle(null);
+  };
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case "vehicles":
+        return (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Mis Vehículos
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  Gestiona tu inventario de vehículos eléctricos
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center space-x-2 bg-green-600 text-white mt-4 sm:mt-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Agregar Vehículo</span>
+              </Button>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600">{error}</p>
+                <Button
+                  onClick={fetchVehicles}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                >
+                  Reintentar
+                </Button>
+              </div>
+            )}
+
+            {/* Vehicle Table */}
+            <VehicleTable
+              vehicles={vehicles}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onView={handleView}
+              loading={loading}
+            />
+          </div>
+        );
+      case "analytics":
+        return (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Analítica en Desarrollo
+            </h3>
+            <p className="text-gray-600">
+              Próximamente podrás ver métricas detalladas de tus vehículos
+            </p>
+          </div>
+        );
+      case "messages":
+        return (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Mensajes en Desarrollo
+            </h3>
+            <p className="text-gray-600">
+              Próximamente podrás gestionar consultas de clientes
+            </p>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   if (loading && vehicles.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-64">
           <Zap className="w-8 h-8 animate-spin text-green-600" />
@@ -189,76 +279,109 @@ export function VendorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-16">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        {/* Back Button */}
-        <div className="py-6">
-          <Button
-            variant="outline"
-            onClick={() => router.push("/")}
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Volver al Inicio</span>
-          </Button>
+      <div className="flex h-screen pt-16">
+        {/* Sidebar - Hidden on mobile, visible on desktop */}
+        <div className="hidden lg:block">
+          <DashboardSidebar
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+            className="flex-shrink-0"
+          />
         </div>
 
-        {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Panel de Vendedor
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl">
-            Gestiona tus vehículos eléctricos y recibe consultas de clientes
-          </p>
-        </div>
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 lg:p-6">
+            {/* Mobile Navigation - Only visible on mobile */}
+            <div className="lg:hidden mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/")}
+                  className="flex items-center space-x-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Volver al Inicio</span>
+                </Button>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  Panel de Vendedor
+                </h1>
+              </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600">{error}</p>
-            <Button
-              onClick={fetchVehicles}
-              variant="outline"
-              size="sm"
-              className="mt-2"
-            >
-              Reintentar
-            </Button>
+              {/* Mobile Section Selector */}
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => setActiveSection("vehicles")}
+                  className={`p-3 rounded-lg text-sm font-medium transition-colors ${
+                    activeSection === "vehicles"
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  Vehículos
+                </button>
+                <button
+                  onClick={() => setActiveSection("analytics")}
+                  className={`p-3 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
+                    activeSection === "analytics"
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-white text-gray-600 border border-gray-200"
+                  }`}
+                  disabled
+                >
+                  Analítica
+                </button>
+                <button
+                  onClick={() => setActiveSection("messages")}
+                  className={`p-3 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
+                    activeSection === "messages"
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-white text-gray-600 border border-gray-200"
+                  }`}
+                  disabled
+                >
+                  Mensajes
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop Back Button - Hidden on mobile */}
+            <div className="hidden lg:block mb-6">
+              <Button
+                variant="outline"
+                onClick={() => router.push("/")}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Volver al Inicio</span>
+              </Button>
+            </div>
+
+            {renderContent()}
           </div>
-        )}
+        </main>
+      </div>
 
-        <div className="mb-6">
-          <Button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 bg-green-600 text-white"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Agregar Vehículo</span>
-          </Button>
-        </div>
+      {/* Modals */}
+      <ProductForm
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingVehicle(null);
+        }}
+        onSubmit={handleSubmit}
+        editingVehicle={editingVehicle}
+        loading={loading}
+      />
 
-        <ProductList
-          vehicles={vehicles}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onView={handleView}
-        />
-
-        {/* Product Form Modal */}
-        <ProductForm
-          isOpen={showAddModal}
-          onClose={() => {
-            setShowAddModal(false);
-            setEditingVehicle(null);
-          }}
-          onSubmit={handleSubmit}
-          editingVehicle={editingVehicle}
-          loading={loading}
-        />
-      </main>
+      <VehicleViewModal
+        vehicle={viewingVehicle}
+        isOpen={!!viewingVehicle}
+        onClose={handleCloseViewModal}
+      />
 
       <FloatingAskButton />
     </div>
