@@ -1,13 +1,12 @@
 "use client";
 
-import { Leaf, Phone, Mail, MapPin } from "lucide-react";
-import FloatingAskButton from "@/components/FloatingAskButton";
+import { Leaf } from "lucide-react";
 
 export default function Footer() {
   return (
     <>
       {/* Main Footer Content */}
-      <footer className="bg-white border-t border-gray-200 pb-10">
+      <footer className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
           {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -45,21 +44,13 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4 text-gray-900">Contacto</h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
-                  +57 1 234 5678
-                </div>
-                <div className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
-                  info@green.co
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Bogotá, Colombia
-                </div>
-              </div>
+              <h4 className="font-semibold mb-4 text-gray-900">Soporte</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>Privacidad</li>
+                <li>Términos</li>
+                <li>Contacto</li>
+                <li>Noticias</li>
+              </ul>
             </div>
           </div>
 
@@ -68,23 +59,6 @@ export default function Footer() {
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-sm text-gray-600 mb-4 md:mb-0">
                 © 2024 Green. Todos los derechos reservados.
-              </div>
-              <div className="flex space-x-6 text-sm text-gray-600">
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Privacidad
-                </a>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Términos
-                </a>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Contacto
-                </a>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Noticias
-                </a>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Ubicaciones
-                </a>
               </div>
             </div>
           </div>
