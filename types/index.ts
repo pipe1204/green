@@ -185,3 +185,9 @@ export interface PriceAlert {
   created_at: string;
   updated_at: string;
 }
+
+export type CustomerDashboardSection =
+  | "favorites"
+  | "testDrives"
+  | "priceAlerts"
+  | "inquiries";

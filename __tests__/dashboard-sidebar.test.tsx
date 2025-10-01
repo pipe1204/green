@@ -13,6 +13,9 @@ vi.mock("lucide-react", () => ({
   ChevronLeft: () => <div data-testid="chevron-left">Left</div>,
   ChevronRight: () => <div data-testid="chevron-right">Right</div>,
   Bike: () => <div data-testid="bike-icon">Bike</div>,
+  Heart: () => <div data-testid="heart-icon">Heart</div>,
+  Calendar: () => <div data-testid="calendar-icon">Calendar</div>,
+  Bell: () => <div data-testid="bell-icon">Bell</div>,
 }));
 
 describe("DashboardSidebar", () => {

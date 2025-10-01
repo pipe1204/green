@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
-import { databaseToVehicle, DbVehicleRow } from "@/lib/database-mapping";
+import { databaseToVehicle } from "@/lib/database-mapping";
 import { Vehicle, SearchFilters } from "@/types";
-import { PaginatedVehiclesResult } from "@/types/queries";
+import { DbVehicleRow, PaginatedVehiclesResult } from "@/types/queries";
 
 /**
  * Get all vehicles from the database (no filters, no pagination)
