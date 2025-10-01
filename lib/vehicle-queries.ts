@@ -241,12 +241,12 @@ function applyClientSideFilters(
   if (filters.warranty.length > 0) {
     filtered = filtered.filter((v) => {
       const warrantyStr = v.specifications.warranty;
-      
+
       return filters.warranty.some((warrantyFilter) => {
         // Format: "years:2+" or "km:50000+"
         const [unit, minValueStr] = warrantyFilter.split(":");
         const minValue = parseInt(minValueStr.replace("+", ""));
-        
+
         if (unit === "years") {
           // Extract years from warranty string like "2 años"
           const yearsMatch = warrantyStr.match(/(\d+)\s*año/);
@@ -260,7 +260,7 @@ function applyClientSideFilters(
             return parseInt(kmMatch[1]) >= minValue;
           }
         }
-        
+
         return false;
       });
     });
@@ -303,6 +303,8 @@ export async function getFilteredVehicles(
   pageSize: number = 20
 ): Promise<PaginatedVehiclesResult> {
   try {
+    console.log("getFilteredVehicles called with filters:", filters);
+
     // Step 1: Apply server-side filters and fetch data
     const query = buildVehicleQuery(filters, sortBy, 0, 1000); // Fetch more for client-side filtering
     const { data, error } = await query;
@@ -312,6 +314,8 @@ export async function getFilteredVehicles(
       throw new Error("No se pudieron cargar los vehículos");
     }
 
+    console.log("Server-side query returned:", data?.length, "vehicles");
+
     // Step 2: Convert to Vehicle objects (with proper type assertion for enum handling)
     let vehicles = (data || []).map((row) =>
       databaseToVehicle(row as unknown as DbVehicleRow)
@@ -319,6 +323,7 @@ export async function getFilteredVehicles(
 
     // Step 3: Apply client-side filters (complex JSONB queries)
     vehicles = applyClientSideFilters(vehicles, filters);
+    console.log("After client-side filters:", vehicles.length, "vehicles");
 
     // Step 4: Apply client-side sorting if needed (rating, range)
     if (sortBy === "rating" || sortBy === "range") {
@@ -330,6 +335,12 @@ export async function getFilteredVehicles(
     const startIndex = page * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedVehicles = vehicles.slice(startIndex, endIndex);
+    console.log(
+      "Returning paginated vehicles:",
+      paginatedVehicles.length,
+      "of",
+      totalFilteredCount
+    );
 
     return {
       vehicles: paginatedVehicles,

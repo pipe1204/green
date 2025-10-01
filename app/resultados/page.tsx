@@ -1,10 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { getFilteredVehicles, getAllVehicles } from "@/lib/vehicle-queries";
-import { handleVehicleError } from "@/lib/error-handler";
-import { Vehicle } from "@/types";
+import React, { useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -23,256 +20,31 @@ import { VehicleListCard } from "@/components/resultados/VehicleListCard";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
 import { VehicleSkeletonGrid } from "@/components/VehicleCardSkeleton";
 import FloatingAskButton from "@/components/FloatingAskButton";
+import { useVehicleSearch } from "@/hooks/useVehicleSearch";
 
 function SearchResultsPageInner() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [results, setResults] = useState<Vehicle[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [hasPrevPage, setHasPrevPage] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState("relevance");
-  const [filters, setFilters] = useState<SearchFilters>({
-    vehicleType: [],
-    batteryRange: [],
-    warranty: [],
-    priceMin: 0,
-    priceMax: 0,
-    location: [],
-    reviews: [],
-    dealerRating: [],
-    availability: [],
-    passengerCapacity: [],
-    chargingTime: [],
-    maxSpeed: [],
-    power: [],
-    brands: [],
-  });
-  const [allVehiclesForCounts, setAllVehiclesForCounts] = useState<Vehicle[]>(
-    []
-  );
-
-  const PAGE_SIZE = 20;
-
-  // Parse search parameters on mount
-  useEffect(() => {
-    const searchFilters: SearchFilters = {
-      vehicleType: searchParams.get("vehicleType")?.split(",") || [],
-      batteryRange: searchParams.get("batteryRange")?.split(",") || [],
-      warranty: searchParams.get("warranty")?.split(",") || [],
-      priceMin: parseInt(searchParams.get("priceMin") || "0"),
-      priceMax: parseInt(searchParams.get("priceMax") || "0"),
-      location: searchParams.get("location")?.split(",") || [],
-      reviews: searchParams.get("reviews")?.split(",") || [],
-      dealerRating: searchParams.get("dealerRating")?.split(",") || [],
-      availability: searchParams.get("availability")?.split(",") || [],
-      passengerCapacity:
-        searchParams.get("passengerCapacity")?.split(",") || [],
-      chargingTime: searchParams.get("chargingTime")?.split(",") || [],
-      maxSpeed: searchParams.get("maxSpeed")?.split(",") || [],
-      power: searchParams.get("power")?.split(",") || [],
-      brands: searchParams.get("brands")?.split(",") || [],
-    };
-
-    setFilters(searchFilters);
-  }, [searchParams]);
-
-  // Fetch vehicles from database
-  const fetchVehicles = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await getFilteredVehicles(
-        filters,
-        sortBy,
-        currentPage,
-        PAGE_SIZE
-      );
-
-      setResults(result.vehicles);
-      setTotalCount(result.totalCount);
-      setHasNextPage(result.hasNextPage);
-      setHasPrevPage(result.hasPrevPage);
-    } catch (err) {
-      setError(handleVehicleError(err));
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, sortBy, currentPage]);
-
-  useEffect(() => {
-    fetchVehicles();
-  }, [fetchVehicles]);
-
-  // Fetch all vehicles once for filter counts
-  useEffect(() => {
-    const fetchAllForCounts = async () => {
-      try {
-        const allVehicles = await getAllVehicles();
-        setAllVehiclesForCounts(allVehicles);
-      } catch (err) {
-        console.error("Error fetching vehicles for counts:", err);
-        // Don't show error to user, just use empty array
-        setAllVehiclesForCounts([]);
-      }
-    };
-    fetchAllForCounts();
-  }, []); // Run once on mount
-
-  // Calculate dynamic filter counts
-  const getFilterCount = (filterKey: string, filterValue: string): number => {
-    if (allVehiclesForCounts.length === 0) return 0;
-
-    switch (filterKey) {
-      case "vehicleType":
-        return allVehiclesForCounts.filter((v) => v.type === filterValue)
-          .length;
-
-      case "location":
-        return allVehiclesForCounts.filter((v) => v.location === filterValue)
-          .length;
-
-      case "availability":
-        return allVehiclesForCounts.filter(
-          (v) => v.availability === filterValue
-        ).length;
-
-      case "batteryRange": {
-        const [min, max] = filterValue.split("-").map(Number);
-        return allVehiclesForCounts.filter((v) => {
-          const range = parseInt(v.specifications.range);
-          return max ? range >= min && range <= max : range >= min;
-        }).length;
-      }
-
-      case "reviews": {
-        const minRating = parseFloat(filterValue.replace("+", ""));
-        return allVehiclesForCounts.filter(
-          (v) => v.reviews.average >= minRating
-        ).length;
-      }
-
-      case "dealerRating": {
-        const minRating = parseFloat(filterValue.replace("+", ""));
-        return allVehiclesForCounts.filter((v) => v.dealer.rating >= minRating)
-          .length;
-      }
-
-      case "chargingTime": {
-        if (filterValue === "8+") {
-          return allVehiclesForCounts.filter(
-            (v) => parseFloat(v.chargingTime || "0") >= 8
-          ).length;
-        }
-        const [min, max] = filterValue.split("-").map(Number);
-        return allVehiclesForCounts.filter((v) => {
-          const time = parseFloat(v.chargingTime || "0");
-          return time >= min && time <= max;
-        }).length;
-      }
-
-      case "maxSpeed": {
-        if (filterValue === "150+") {
-          return allVehiclesForCounts.filter(
-            (v) => parseInt(v.maxSpeed || "0") >= 150
-          ).length;
-        }
-        const [min, max] = filterValue.split("-").map(Number);
-        return allVehiclesForCounts.filter((v) => {
-          const speed = parseInt(v.maxSpeed || "0");
-          return speed >= min && speed <= max;
-        }).length;
-      }
-
-      case "warranty": {
-        // Format: "years:2+" or "km:50000+"
-        const [unit, minValueStr] = filterValue.split(":");
-        const minValue = parseInt(minValueStr.replace("+", ""));
-
-        return allVehiclesForCounts.filter((v) => {
-          const warrantyStr = v.specifications.warranty || "";
-
-          if (unit === "years") {
-            // Extract years from warranty string like "2 años" or "3 años"
-            const yearsMatch = warrantyStr.match(/(\d+)\s*año/);
-            if (yearsMatch) {
-              return parseInt(yearsMatch[1]) >= minValue;
-            }
-          } else if (unit === "km") {
-            // Extract km from warranty string like "50000 km" or "100000 km"
-            const kmMatch = warrantyStr.match(/(\d+)\s*km/);
-            if (kmMatch) {
-              return parseInt(kmMatch[1]) >= minValue;
-            }
-          }
-
-          return false;
-        }).length;
-      }
-
-      default:
-        return 0;
-    }
-  };
-
-  const handleFilterChange = (
-    filterKey: string,
-    value: string,
-    checked: boolean
-  ) => {
-    setFilters((prev) => {
-      const currentArray = prev[filterKey as keyof SearchFilters] as string[];
-      if (Array.isArray(currentArray)) {
-        if (checked) {
-          return {
-            ...prev,
-            [filterKey]: [...currentArray, value],
-          };
-        } else {
-          return {
-            ...prev,
-            [filterKey]: currentArray.filter((item) => item !== value),
-          };
-        }
-      }
-      return prev;
-    });
-  };
-
-  const clearAllFilters = () => {
-    setFilters({
-      vehicleType: [],
-      batteryRange: [],
-      warranty: [],
-      priceMin: 0,
-      priceMax: 0,
-      location: [],
-      reviews: [],
-      dealerRating: [],
-      availability: [],
-      passengerCapacity: [],
-      chargingTime: [],
-      maxSpeed: [],
-      power: [],
-      brands: [],
-    });
-  };
-
-  const getActiveFiltersCount = () => {
-    return Object.values(filters).reduce((count, filter) => {
-      if (Array.isArray(filter)) {
-        return count + filter.length;
-      }
-      return count;
-    }, 0);
-  };
+  const {
+    loading,
+    results,
+    totalCount,
+    currentPage,
+    hasNextPage,
+    hasPrevPage,
+    error,
+    sortBy,
+    filters,
+    setCurrentPage,
+    setSortBy,
+    setFilters,
+    handleFilterChange,
+    clearAllFilters,
+    fetchVehicles,
+    getFilterCount,
+    getActiveFiltersCount,
+  } = useVehicleSearch();
 
   return (
     <div className="min-h-screen bg-gray-50">
