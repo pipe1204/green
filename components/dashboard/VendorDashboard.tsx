@@ -16,6 +16,16 @@ import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import FloatingAskButton from "../FloatingAskButton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type VendorLocation = {
   address?: string;
@@ -42,6 +52,8 @@ export function VendorDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] =
     useState<DashboardSection>("vehicles");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -102,8 +114,9 @@ export function VendorDashboard() {
         return;
       }
 
-      // Ensure we have a primary key id for insert
-      const ensuredId = (formData as Vehicle).id ?? crypto.randomUUID();
+      // Use existing vehicle ID if editing, otherwise generate new one
+      const ensuredId =
+        editingVehicle?.id ?? (formData as Vehicle).id ?? crypto.randomUUID();
 
       // derive dealer defaults if empty
       const v: VendorRow = (vendorData || {
@@ -159,18 +172,30 @@ export function VendorDashboard() {
     setShowAddModal(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este vehículo?"))
-      return;
+  const handleDelete = (id: string) => {
+    setVehicleToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!vehicleToDelete) return;
 
     try {
-      const { error } = await supabase.from("vehicles").delete().eq("id", id);
+      const { error } = await supabase
+        .from("vehicles")
+        .delete()
+        .eq("id", vehicleToDelete);
 
       if (error) throw error;
+
+      setDeleteDialogOpen(false);
+      setVehicleToDelete(null);
       fetchVehicles();
     } catch (error) {
       console.error("Error deleting vehicle:", error);
       setError("Error al eliminar el vehículo. Intenta de nuevo.");
+      setDeleteDialogOpen(false);
+      setVehicleToDelete(null);
     }
   };
 
@@ -380,6 +405,30 @@ export function VendorDashboard() {
         isOpen={!!viewingVehicle}
         onClose={handleCloseViewModal}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. El vehículo será eliminado
+              permanentemente de tu inventario.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setVehicleToDelete(null)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <FloatingAskButton />
     </div>
