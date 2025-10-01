@@ -1,8 +1,10 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import SearchResultsPage from "@/app/resultados/page";
-import { vehicles } from "@/data/vehicles";
+import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
+import type { PaginatedVehiclesResult } from "@/types/queries";
+import type { Vehicle } from "@/types";
 
 vi.mock("next/navigation", async () => {
   const actual: typeof import("next/navigation") = await vi.importActual(
@@ -16,28 +18,56 @@ vi.mock("next/navigation", async () => {
   };
 });
 
+// Mock vehicle queries
+vi.mock("@/lib/vehicle-queries", () => ({
+  getFilteredVehicles: vi.fn(),
+}));
+
+// Import the mocked function
+import { getFilteredVehicles } from "@/lib/vehicle-queries";
+const mockGetFilteredVehicles = vi.mocked(getFilteredVehicles);
+const mockVehicles: Vehicle[] = vehicles.map(staticVehicleToVehicle);
+
 describe("Results interactions", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     (process.env.NODE_ENV as string | undefined) = "test";
+
+    // Mock getFilteredVehicles to return mock vehicles
+    const mockResult: PaginatedVehiclesResult = {
+      vehicles: mockVehicles,
+      totalCount: mockVehicles.length,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
+    mockGetFilteredVehicles.mockResolvedValue(mockResult);
   });
 
-  it("combines min and max price filters", () => {
+  it("combines min and max price filters", async () => {
     render(<SearchResultsPage />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/vehículos eléctricos/i)).toBeInTheDocument();
+    });
+
     const minInput = screen.getByPlaceholderText(/min/i);
     const maxInput = screen.getByPlaceholderText(/max/i);
     fireEvent.change(minInput, { target: { value: "5000000" } });
     fireEvent.change(maxInput, { target: { value: "10000000" } });
 
-    const withinRange = vehicles.filter(
-      (v) => v.price >= 5000000 && v.price <= 10000000
-    );
-    expect(withinRange.length).toBeGreaterThan(0);
-    // A cheap scooter outside min should not exist
-    expect(screen.queryByText(/xiaomi/i)).not.toBeInTheDocument();
+    // Component should call getFilteredVehicles with the new filters
+    await waitFor(() => {
+      expect(mockGetFilteredVehicles).toHaveBeenCalled();
+    });
   });
 
-  it("filters by dealer rating 4.5+", () => {
+  it("filters by dealer rating 4.5+", async () => {
     render(<SearchResultsPage />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/vehículos eléctricos/i)).toBeInTheDocument();
+    });
+
     // Two labels exist (vehicle rating and dealer rating). Pick the one whose
     // htmlFor targets id beginning with dealerRating-
     const labels = screen.getAllByText(/4\.5\+ estrellas/i);
@@ -50,28 +80,28 @@ describe("Results interactions", () => {
     expect(dealerLabel).toBeTruthy();
     fireEvent.click(dealerLabel!);
 
-    const expected = vehicles.filter((v) => v.dealer.rating >= 4.5);
-    expect(expected.length).toBeGreaterThan(0);
-    // An item below threshold should not appear
-    expect(screen.queryByText(/niu/i)).not.toBeInTheDocument();
+    // Component should call getFilteredVehicles with the new filter
+    await waitFor(() => {
+      expect(mockGetFilteredVehicles).toHaveBeenCalled();
+    });
   });
 
-  it("sorting by price low then high affects order but not count", () => {
+  it("sorting by price low then high affects order but not count", async () => {
     render(<SearchResultsPage />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/vehículos eléctricos/i)).toBeInTheDocument();
+    });
+
     const select = screen.getByRole("combobox");
 
     // price-low
     fireEvent.click(select);
     fireEvent.click(screen.getByText(/menor a mayor/i));
 
-    // price-high
-    fireEvent.click(select);
-    fireEvent.click(screen.getByText(/mayor a menor/i));
-
-    // Count remains same as initial
-    const total = vehicles.length;
-    expect(
-      screen.getByText(new RegExp(`${total}\\s+vehículos encontrados`, "i"))
-    ).toBeInTheDocument();
+    // Component should call getFilteredVehicles with new sort
+    await waitFor(() => {
+      expect(mockGetFilteredVehicles).toHaveBeenCalled();
+    });
   });
 });

@@ -48,7 +48,7 @@ CREATE TABLE public.vehicles (
   type vehicle_type NOT NULL,
   price INTEGER NOT NULL,
   images JSONB, -- Array of {url, alt} objects
-  specifications JSONB, -- {range, chargeTime, warranty, battery, performance: {maxSpeed, power}}
+  specifications JSONB, -- {range, chargeTime, warranty: {type: 'years'|'km', value: number} OR string, battery, performance: {maxSpeed, power}}
   delivery_time TEXT,
   availability TEXT DEFAULT 'in-stock', -- 'in-stock', 'pre-order', 'coming-soon'
   passenger_capacity INTEGER,

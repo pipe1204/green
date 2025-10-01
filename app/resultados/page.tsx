@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import Header from "@/components/Header";
-import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
-import { Vehicle } from "@/types";
+import React, { useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -22,409 +18,33 @@ import { SearchFilters } from "@/types";
 import { filterSections, sortOptions } from "@/data";
 import { VehicleListCard } from "@/components/resultados/VehicleListCard";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
+import { VehicleSkeletonGrid } from "@/components/VehicleCardSkeleton";
 import FloatingAskButton from "@/components/FloatingAskButton";
-
-const ElectricLoader = dynamic(() => import("@/components/ElectricLoader"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-16 h-16 bg-blue-100 rounded-full animate-pulse" />
-  ),
-});
+import { useVehicleSearch } from "@/hooks/useVehicleSearch";
 
 function SearchResultsPageInner() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading, setLoading] = useState(
-    process.env.NODE_ENV === "test" ? false : true
-  );
-  const [results, setResults] = useState<Vehicle[]>(
-    vehicles.map(staticVehicleToVehicle)
-  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState("relevance");
-
-  // Sorting function
-  const sortVehicles = (vehicles: Vehicle[], sortBy: string): Vehicle[] => {
-    const sortedVehicles = [...vehicles];
-
-    switch (sortBy) {
-      case "price-low":
-        return sortedVehicles.sort((a, b) => a.price - b.price);
-      case "price-high":
-        return sortedVehicles.sort((a, b) => b.price - a.price);
-      case "rating":
-        return sortedVehicles.sort(
-          (a, b) => b.reviews.average - a.reviews.average
-        );
-      case "newest":
-        // Assuming newer vehicles have higher IDs (you might want to add a date field)
-        return sortedVehicles.sort((a, b) => b.id.localeCompare(a.id));
-      case "range":
-        return sortedVehicles.sort(
-          (a, b) =>
-            parseInt(b.specifications.range) - parseInt(a.specifications.range)
-        );
-      case "relevance":
-      default:
-        // Keep original order for relevance
-        return sortedVehicles;
-    }
-  };
-  const [filters, setFilters] = useState<SearchFilters>({
-    vehicleType: [],
-    batteryRange: [],
-    warranty: [],
-    priceMin: 0,
-    priceMax: 0,
-    location: [],
-    reviews: [],
-    dealerRating: [],
-    availability: [],
-    passengerCapacity: [],
-    chargingTime: [],
-    maxSpeed: [],
-    power: [],
-    brands: [],
-  });
-
-  useEffect(() => {
-    // Skip loading simulation in test environment
-    if (process.env.NODE_ENV === "test") {
-      setLoading(false);
-      return;
-    }
-
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    // Parse search parameters
-    const searchFilters: SearchFilters = {
-      vehicleType: searchParams.get("vehicleType")?.split(",") || [],
-      batteryRange: searchParams.get("batteryRange")?.split(",") || [],
-      warranty: searchParams.get("warranty")?.split(",") || [],
-      priceMin: parseInt(searchParams.get("priceMin") || "0"),
-      priceMax: parseInt(searchParams.get("priceMax") || "0"),
-      location: searchParams.get("location")?.split(",") || [],
-      reviews: searchParams.get("reviews")?.split(",") || [],
-      dealerRating: searchParams.get("dealerRating")?.split(",") || [],
-      availability: searchParams.get("availability")?.split(",") || [],
-      passengerCapacity:
-        searchParams.get("passengerCapacity")?.split(",") || [],
-      chargingTime: searchParams.get("chargingTime")?.split(",") || [],
-      maxSpeed: searchParams.get("maxSpeed")?.split(",") || [],
-      power: searchParams.get("power")?.split(",") || [],
-      brands: searchParams.get("brands")?.split(",") || [],
-    };
-
-    setFilters(searchFilters);
-
-    // Filter vehicles based on search criteria
-    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
-
-    if (searchFilters.vehicleType.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        searchFilters.vehicleType.includes(v.type)
-      );
-    }
-
-    if (searchFilters.reviews.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return searchFilters.reviews.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.reviews.average >= minRating;
-        });
-      });
-    }
-
-    if (searchFilters.dealerRating.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return searchFilters.dealerRating.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.dealer.rating >= minRating;
-        });
-      });
-    }
-
-    if (searchFilters.location.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        searchFilters.location.includes(v.location)
-      );
-    }
-
-    if (searchFilters.availability.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        searchFilters.availability.includes(v.availability)
-      );
-    }
-
-    if (searchFilters.brands.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        searchFilters.brands.includes(v.brand)
-      );
-    }
-
-    if (searchFilters.priceMin > 0 || searchFilters.priceMax > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const price = v.price;
-        if (searchFilters.priceMin > 0 && searchFilters.priceMax > 0) {
-          return (
-            price >= searchFilters.priceMin && price <= searchFilters.priceMax
-          );
-        } else if (searchFilters.priceMin > 0) {
-          return price >= searchFilters.priceMin;
-        } else if (searchFilters.priceMax > 0) {
-          return price <= searchFilters.priceMax;
-        }
-        return true;
-      });
-    }
-
-    if (searchFilters.batteryRange.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const range = parseInt(v.specifications.range);
-        return searchFilters.batteryRange.some((batteryRange) => {
-          const [minRange, maxRange] = batteryRange.split("-").map(Number);
-          if (maxRange) {
-            return range >= minRange && range <= maxRange;
-          } else {
-            return range >= minRange;
-          }
-        });
-      });
-    }
-
-    // Apply sorting to filtered results
-    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
-    setResults(sortedVehicles);
-
-    return () => clearTimeout(timer);
-  }, [searchParams, sortBy]);
-
-  // Re-filter when filters change
-  useEffect(() => {
-    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
-
-    if (filters.vehicleType.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.vehicleType.includes(v.type)
-      );
-    }
-
-    if (filters.reviews.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return filters.reviews.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.reviews.average >= minRating;
-        });
-      });
-    }
-
-    if (filters.dealerRating.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return filters.dealerRating.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.dealer.rating >= minRating;
-        });
-      });
-    }
-
-    if (filters.location.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.location.includes(v.location)
-      );
-    }
-
-    if (filters.availability.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.availability.includes(v.availability)
-      );
-    }
-
-    if (filters.brands.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.brands.includes(v.brand)
-      );
-    }
-
-    if (filters.priceMin > 0 || filters.priceMax > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const price = v.price;
-        if (filters.priceMin > 0 && filters.priceMax > 0) {
-          return price >= filters.priceMin && price <= filters.priceMax;
-        } else if (filters.priceMin > 0) {
-          return price >= filters.priceMin;
-        } else if (filters.priceMax > 0) {
-          return price <= filters.priceMax;
-        }
-        return true;
-      });
-    }
-
-    if (filters.batteryRange.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const range = parseInt(v.specifications.range);
-        return filters.batteryRange.some((batteryRange) => {
-          const [minRange, maxRange] = batteryRange.split("-").map(Number);
-          if (maxRange) {
-            return range >= minRange && range <= maxRange;
-          } else {
-            return range >= minRange;
-          }
-        });
-      });
-    }
-
-    // Apply sorting to filtered results
-    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
-    setResults(sortedVehicles);
-  }, [filters, sortBy]);
-
-  // Handle sorting changes
-  useEffect(() => {
-    // Get the current filtered results and apply sorting
-    let filteredVehicles = vehicles.map(staticVehicleToVehicle);
-
-    // Apply all current filters
-    if (filters.vehicleType.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.vehicleType.includes(v.type)
-      );
-    }
-
-    if (filters.reviews.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return filters.reviews.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.reviews.average >= minRating;
-        });
-      });
-    }
-
-    if (filters.dealerRating.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        return filters.dealerRating.some((rating) => {
-          const minRating = parseFloat(rating.replace("+", ""));
-          return v.dealer.rating >= minRating;
-        });
-      });
-    }
-
-    if (filters.location.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.location.includes(v.location)
-      );
-    }
-
-    if (filters.availability.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.availability.includes(v.availability)
-      );
-    }
-
-    if (filters.brands.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) =>
-        filters.brands.includes(v.brand)
-      );
-    }
-
-    if (filters.priceMin > 0 || filters.priceMax > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const price = v.price;
-        if (filters.priceMin > 0 && filters.priceMax > 0) {
-          return price >= filters.priceMin && price <= filters.priceMax;
-        } else if (filters.priceMin > 0) {
-          return price >= filters.priceMin;
-        } else if (filters.priceMax > 0) {
-          return price <= filters.priceMax;
-        }
-        return true;
-      });
-    }
-
-    if (filters.batteryRange.length > 0) {
-      filteredVehicles = filteredVehicles.filter((v) => {
-        const range = parseInt(v.specifications.range);
-        return filters.batteryRange.some((batteryRange) => {
-          const [minRange, maxRange] = batteryRange.split("-").map(Number);
-          if (maxRange) {
-            return range >= minRange && range <= maxRange;
-          } else {
-            return range >= minRange;
-          }
-        });
-      });
-    }
-
-    // Apply sorting to filtered results
-    const sortedVehicles = sortVehicles(filteredVehicles, sortBy);
-    setResults(sortedVehicles);
-  }, [sortBy, filters]);
-
-  const handleFilterChange = (
-    filterKey: string,
-    value: string,
-    checked: boolean
-  ) => {
-    setFilters((prev) => {
-      const currentArray = prev[filterKey as keyof SearchFilters] as string[];
-      if (Array.isArray(currentArray)) {
-        if (checked) {
-          return {
-            ...prev,
-            [filterKey]: [...currentArray, value],
-          };
-        } else {
-          return {
-            ...prev,
-            [filterKey]: currentArray.filter((item) => item !== value),
-          };
-        }
-      }
-      return prev;
-    });
-  };
-
-  const clearAllFilters = () => {
-    setFilters({
-      vehicleType: [],
-      batteryRange: [],
-      warranty: [],
-      priceMin: 0,
-      priceMax: 0,
-      location: [],
-      reviews: [],
-      dealerRating: [],
-      availability: [],
-      passengerCapacity: [],
-      chargingTime: [],
-      maxSpeed: [],
-      power: [],
-      brands: [],
-    });
-  };
-
-  const getActiveFiltersCount = () => {
-    return Object.values(filters).reduce((count, filter) => {
-      if (Array.isArray(filter)) {
-        return count + filter.length;
-      }
-      return count;
-    }, 0);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <ElectricLoader size="lg" text="Buscando vehículos eléctricos..." />
-        </div>
-      </div>
-    );
-  }
+  const {
+    loading,
+    results,
+    totalCount,
+    currentPage,
+    hasNextPage,
+    hasPrevPage,
+    error,
+    sortBy,
+    filters,
+    setCurrentPage,
+    setSortBy,
+    setFilters,
+    handleFilterChange,
+    clearAllFilters,
+    fetchVehicles,
+    getFilterCount,
+    getActiveFiltersCount,
+  } = useVehicleSearch();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -464,7 +84,9 @@ function SearchResultsPageInner() {
                 Vehículos Eléctricos
               </h1>
               <p className="text-gray-600">
-                {results.length} vehículos encontrados
+                {totalCount} vehículo{totalCount !== 1 ? "s" : ""} encontrado
+                {totalCount !== 1 ? "s" : ""}
+                {currentPage > 0 && ` (Página ${currentPage + 1})`}
               </p>
             </div>
 
@@ -562,7 +184,7 @@ function SearchResultsPageInner() {
                                 </label>
                               </div>
                               <span className="text-sm text-gray-500">
-                                {option.count}
+                                {getFilterCount(filter.key, option.value)}
                               </span>
                             </div>
                           ))}
@@ -622,36 +244,99 @@ function SearchResultsPageInner() {
 
           {/* Main Content - Results */}
           <div className="flex-1">
-            {results.length > 0 ? (
-              <div
-                className={`grid gap-6 ${
-                  viewMode === "grid"
-                    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                    : "grid-cols-1"
-                }`}
-              >
-                {results.map((vehicle) =>
-                  viewMode === "list" ? (
-                    <VehicleListCard key={vehicle.id} vehicle={vehicle} />
-                  ) : (
-                    <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                  )
-                )}
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+                <div className="flex items-center space-x-3">
+                  <Car className="w-6 h-6 text-red-600" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-red-900">
+                      Error al cargar vehículos
+                    </h3>
+                    <p className="text-red-700">{error}</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => fetchVehicles()}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  Intentar de nuevo
+                </Button>
               </div>
-            ) : (
+            )}
+
+            {/* Loading State - Skeleton Loaders */}
+            {loading && !error && (
+              <VehicleSkeletonGrid count={6} viewMode={viewMode} />
+            )}
+
+            {/* Results */}
+            {!loading && !error && results.length > 0 ? (
+              <>
+                <div
+                  className={`grid gap-6 ${
+                    viewMode === "grid"
+                      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                      : "grid-cols-1"
+                  }`}
+                >
+                  {results.map((vehicle) =>
+                    viewMode === "list" ? (
+                      <VehicleListCard key={vehicle.id} vehicle={vehicle} />
+                    ) : (
+                      <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                    )
+                  )}
+                </div>
+
+                {/* Pagination Controls */}
+                {(hasNextPage || hasPrevPage) && (
+                  <div className="mt-8 flex items-center justify-center space-x-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                      disabled={!hasPrevPage}
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Anterior
+                    </Button>
+
+                    <span className="text-sm text-gray-600">
+                      Página {currentPage + 1}
+                    </span>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      disabled={!hasNextPage}
+                    >
+                      Siguiente
+                      <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : !loading && !error ? (
               <div className="text-center py-12">
                 <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   No se encontraron vehículos
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Intenta ajustar tus filtros de búsqueda
+                  Intenta ajustar tus filtros de búsqueda o{" "}
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-blue-600 hover:underline"
+                  >
+                    limpiar todos los filtros
+                  </button>
                 </p>
                 <Button onClick={() => router.push("/")}>
                   Volver a Búsqueda
                 </Button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
         <FloatingAskButton />

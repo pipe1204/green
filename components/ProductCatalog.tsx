@@ -67,7 +67,22 @@ export default function ProductCatalog() {
 
       Object.entries(searchFilters).forEach(([key, value]) => {
         if (value) {
-          queryParams.append(key, value);
+          // Transform warranty format from "X-year(s)" to "years:X+"
+          if (key === "warranty") {
+            if (value === "1-year") {
+              queryParams.append(key, "years:1+");
+            } else if (value === "2-years") {
+              queryParams.append(key, "years:2+");
+            } else if (value === "3-years") {
+              queryParams.append(key, "years:3+");
+            } else if (value === "5-years") {
+              queryParams.append(key, "years:5+");
+            } else if (value === "lifetime") {
+              queryParams.append(key, "years:10+");
+            }
+          } else {
+            queryParams.append(key, value);
+          }
         }
       });
 

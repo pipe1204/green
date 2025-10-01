@@ -80,6 +80,25 @@ export function ProductForm({
   React.useEffect(() => {
     if (isOpen) {
       if (editingVehicle) {
+        // Parse warranty from string back to unit and value for editing
+        const warrantyStr = editingVehicle.specifications.warranty;
+        let parsedUnit: "years" | "km" = "years";
+        let parsedValue = "";
+
+        // Parse warranty string like "2 años" or "50000 km"
+        if (warrantyStr) {
+          if (warrantyStr.includes("año")) {
+            parsedUnit = "years";
+            parsedValue = warrantyStr.match(/\d+/)?.[0] || "";
+          } else if (warrantyStr.includes("km")) {
+            parsedUnit = "km";
+            parsedValue = warrantyStr.match(/\d+/)?.[0] || "";
+          }
+        }
+
+        setWarrantyUnit(parsedUnit);
+        setWarrantyValue(parsedValue);
+
         setFormData({
           name: editingVehicle.name,
           brand: editingVehicle.brand,
