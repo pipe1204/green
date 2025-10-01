@@ -74,6 +74,7 @@ export function ProductForm({
   const [vendorCities, setVendorCities] = useState<string[]>([]);
   const [warrantyUnit, setWarrantyUnit] = useState<"years" | "km">("years");
   const [warrantyValue, setWarrantyValue] = useState<string>("");
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Reset form when modal opens/closes or editing vehicle changes
   React.useEffect(() => {
@@ -266,6 +267,10 @@ export function ProductForm({
       ...formData,
       images: formData.images.filter((_, i) => i !== index),
     });
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const addFeature = () => {
@@ -450,6 +455,7 @@ export function ProductForm({
             {/* Upload Images */}
             <div className="flex items-center gap-3">
               <Input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 multiple
@@ -464,24 +470,26 @@ export function ProductForm({
 
             {/* Display Images */}
             {formData.images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {formData.images.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <Image
-                      src={image.url}
-                      alt={image.alt}
-                      width={160}
-                      height={200}
-                      className="w-40 h-48 object-cover rounded-lg border"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/images/placeholder.jpg";
-                      }}
-                    />
+                  <div key={index} className="relative group aspect-[4/5]">
+                    <div className="relative w-full h-full rounded-lg overflow-hidden border border-gray-200">
+                      <Image
+                        src={image.url}
+                        alt={image.alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 33vw"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = "/images/placeholder.jpg";
+                        }}
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg"
                     >
                       <X className="w-4 h-4" />
                     </button>
