@@ -51,6 +51,7 @@ export function DashboardSidebar({
 
   return (
     <div
+      data-testid="dashboard-sidebar"
       className={cn(
         "bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-full",
         isCollapsed ? "w-16" : "w-64",
