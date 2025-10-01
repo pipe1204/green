@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
 import { ContactVendorModal } from "@/components/resultados/ContactVendorModal";
+import { PriceAlertModal } from "@/components/resultados/PriceAlertModal";
 import { FavoritesButton } from "@/components/resultados/FavoritesButton";
 import { getVehicleById } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
+import { formatPrice } from "@/lib/utils";
 import { Vehicle } from "@/types";
 import { useAuthActions } from "@/hooks/useAuthCheck";
+import { usePriceAlert } from "@/hooks/usePriceAlert";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -29,6 +32,7 @@ import {
   Battery,
   Users,
   Car,
+  Bell,
 } from "lucide-react";
 
 export default function ProductPage() {
@@ -40,13 +44,20 @@ export default function ProductPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isPriceAlertModalOpen, setIsPriceAlertModalOpen] = useState(false);
 
   const {
     requireAuthForTestDrive,
+    requireAuthForPriceAlert,
     authPrompt,
     closeAuthPrompt,
     handleAuthSuccess,
   } = useAuthActions();
+
+  // Check if user has a price alert for this vehicle
+  const { hasAlert, alertData, refreshAlert } = usePriceAlert(
+    vehicle?.id || ""
+  );
 
   useEffect(() => {
     const fetchVehicle = async () => {
@@ -142,7 +153,37 @@ export default function ProductPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex-1">
               {vehicle.name}
             </h1>
-            <FavoritesButton vehicleId={vehicle.id} className="ml-4" />
+            <div className="flex items-center gap-2 ml-4">
+              <FavoritesButton vehicleId={vehicle.id} />
+              <Button
+                variant={hasAlert ? "default" : "outline"}
+                size="sm"
+                onClick={() =>
+                  requireAuthForPriceAlert(() => setIsPriceAlertModalOpen(true))
+                }
+                title={
+                  hasAlert
+                    ? `Alerta activa: ${formatPrice(
+                        alertData?.target_price || 0
+                      )}`
+                    : "Crear alerta de precio"
+                }
+                className={
+                  hasAlert ? "bg-purple-600 hover:bg-purple-700 text-white" : ""
+                }
+              >
+                <Bell
+                  className={`w-4 h-4 ${
+                    hasAlert ? "text-white" : "text-purple-600"
+                  }`}
+                />
+                {hasAlert && (
+                  <span className="ml-1 text-xs font-medium">
+                    ${alertData?.target_price?.toLocaleString()}
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl">
             {vehicle.description}
@@ -247,9 +288,19 @@ export default function ProductPage() {
           <div className="space-y-8">
             {/* Price & Rating */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                ${vehicle.price.toLocaleString("es-CO")} COP
-              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-3xl font-bold text-gray-900">
+                  ${vehicle.price.toLocaleString("es-CO")} COP
+                </h2>
+                {hasAlert && (
+                  <div className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-medium">
+                    <Bell className="w-4 h-4" />
+                    <span>
+                      Alerta: ${alertData?.target_price?.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
                   <Star className="w-5 h-5 text-yellow-400 fill-current" />
@@ -446,6 +497,15 @@ export default function ProductPage() {
       <ContactVendorModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
+        vehicle={vehicle}
+      />
+
+      <PriceAlertModal
+        isOpen={isPriceAlertModalOpen}
+        onClose={() => {
+          setIsPriceAlertModalOpen(false);
+          refreshAlert(); // Refresh alert status when modal closes
+        }}
         vehicle={vehicle}
       />
 

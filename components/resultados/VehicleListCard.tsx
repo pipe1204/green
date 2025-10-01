@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/types";
 import { TestDriveModal } from "./TestDriveModal";
+import { PriceAlertModal } from "./PriceAlertModal";
 import { FavoritesButton } from "./FavoritesButton";
 import { useAuthActions } from "@/hooks/useAuthCheck";
+import { usePriceAlert } from "@/hooks/usePriceAlert";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import {
   formatPrice,
@@ -18,7 +20,7 @@ import {
   Battery,
   Car,
   Clock,
-  Eye,
+  Bell,
   MapPin,
   Shield,
   Star,
@@ -37,13 +39,18 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
+  const [isPriceAlertModalOpen, setIsPriceAlertModalOpen] = useState(false);
 
   const {
     requireAuthForTestDrive,
     authPrompt,
+    requireAuthForPriceAlert,
     closeAuthPrompt,
     handleAuthSuccess,
   } = useAuthActions();
+
+  // Check if user has a price alert for this vehicle
+  const { hasAlert, alertData, refreshAlert } = usePriceAlert(vehicle.id);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -142,11 +149,32 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               className="bg-white/90 hover:bg-white"
             />
             <Button
+              variant={hasAlert ? "default" : "outline"}
               size="sm"
-              variant="outline"
-              className="bg-white/90 hover:bg-white"
+              onClick={() =>
+                requireAuthForPriceAlert(() => setIsPriceAlertModalOpen(true))
+              }
+              title={
+                hasAlert
+                  ? `Alerta activa: ${formatPrice(
+                      alertData?.target_price || 0
+                    )}`
+                  : "Crear alerta de precio"
+              }
+              className={
+                hasAlert ? "bg-purple-600 hover:bg-purple-700 text-white" : ""
+              }
             >
-              <Eye className="w-4 h-4" />
+              <Bell
+                className={`w-4 h-4 ${
+                  hasAlert ? "text-white" : "text-purple-600"
+                }`}
+              />
+              {hasAlert && (
+                <span className="ml-1 text-xs font-medium">
+                  ${alertData?.target_price?.toLocaleString()}
+                </span>
+              )}
             </Button>
           </div>
           <div className="absolute top-4 left-4">
@@ -184,9 +212,17 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               </div>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-xl md:text-2xl font-bold text-gray-900">
-                {formatPrice(vehicle.price)}
-              </p>
+              <div className="flex items-center gap-2 justify-end">
+                <p className="text-xl md:text-2xl font-bold text-gray-900">
+                  {formatPrice(vehicle.price)}
+                </p>
+                {hasAlert && (
+                  <div className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
+                    <Bell className="w-3 h-3" />
+                    <span>${alertData?.target_price?.toLocaleString()}</span>
+                  </div>
+                )}
+              </div>
               <p className="text-sm text-gray-500">COP</p>
             </div>
           </div>
@@ -287,6 +323,15 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
       <TestDriveModal
         isOpen={isTestDriveModalOpen}
         onClose={() => setIsTestDriveModalOpen(false)}
+        vehicle={vehicle}
+      />
+
+      <PriceAlertModal
+        isOpen={isPriceAlertModalOpen}
+        onClose={() => {
+          setIsPriceAlertModalOpen(false);
+          refreshAlert(); // Refresh alert status when modal closes
+        }}
         vehicle={vehicle}
       />
 
