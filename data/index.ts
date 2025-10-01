@@ -157,6 +157,117 @@ export const filterSections: FilterSection[] = [
       },
     ],
   },
+  {
+    title: "Tiempo de Carga",
+    filters: [
+      {
+        key: "chargingTime",
+        label: "Tiempo de carga",
+        type: "checkbox",
+        options: [
+          {
+            value: "0-2",
+            label: "Menos de 2 horas",
+            count: 0,
+          },
+          {
+            value: "2-4",
+            label: "2-4 horas",
+            count: 0,
+          },
+          {
+            value: "4-8",
+            label: "4-8 horas",
+            count: 0,
+          },
+          {
+            value: "8+",
+            label: "Más de 8 horas",
+            count: 0,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Velocidad Máxima",
+    filters: [
+      {
+        key: "maxSpeed",
+        label: "Velocidad máxima",
+        type: "checkbox",
+        options: [
+          {
+            value: "0-50",
+            label: "0-50 km/h",
+            count: 0,
+          },
+          {
+            value: "50-100",
+            label: "50-100 km/h",
+            count: 0,
+          },
+          {
+            value: "100-150",
+            label: "100-150 km/h",
+            count: 0,
+          },
+          {
+            value: "150+",
+            label: "150+ km/h",
+            count: 0,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Garantía",
+    filters: [
+      {
+        key: "warranty",
+        label: "Garantía",
+        type: "checkbox",
+        options: [
+          {
+            value: "years:1+",
+            label: "1+ año",
+            count: 0,
+          },
+          {
+            value: "years:2+",
+            label: "2+ años",
+            count: 0,
+          },
+          {
+            value: "years:3+",
+            label: "3+ años",
+            count: 0,
+          },
+          {
+            value: "years:5+",
+            label: "5+ años",
+            count: 0,
+          },
+          {
+            value: "km:50000+",
+            label: "50,000+ km",
+            count: 0,
+          },
+          {
+            value: "km:100000+",
+            label: "100,000+ km",
+            count: 0,
+          },
+          {
+            value: "km:150000+",
+            label: "150,000+ km",
+            count: 0,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const timeSlots = [

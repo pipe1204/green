@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getFilteredVehicles } from "@/lib/vehicle-queries";
+import { getFilteredVehicles, getAllVehicles } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
 import { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,9 @@ function SearchResultsPageInner() {
     power: [],
     brands: [],
   });
+  const [allVehiclesForCounts, setAllVehiclesForCounts] = useState<Vehicle[]>(
+    []
+  );
 
   const PAGE_SIZE = 20;
 
@@ -107,6 +110,117 @@ function SearchResultsPageInner() {
   useEffect(() => {
     fetchVehicles();
   }, [fetchVehicles]);
+
+  // Fetch all vehicles once for filter counts
+  useEffect(() => {
+    const fetchAllForCounts = async () => {
+      try {
+        const allVehicles = await getAllVehicles();
+        setAllVehiclesForCounts(allVehicles);
+      } catch (err) {
+        console.error("Error fetching vehicles for counts:", err);
+        // Don't show error to user, just use empty array
+        setAllVehiclesForCounts([]);
+      }
+    };
+    fetchAllForCounts();
+  }, []); // Run once on mount
+
+  // Calculate dynamic filter counts
+  const getFilterCount = (filterKey: string, filterValue: string): number => {
+    if (allVehiclesForCounts.length === 0) return 0;
+
+    switch (filterKey) {
+      case "vehicleType":
+        return allVehiclesForCounts.filter((v) => v.type === filterValue)
+          .length;
+
+      case "location":
+        return allVehiclesForCounts.filter((v) => v.location === filterValue)
+          .length;
+
+      case "availability":
+        return allVehiclesForCounts.filter(
+          (v) => v.availability === filterValue
+        ).length;
+
+      case "batteryRange": {
+        const [min, max] = filterValue.split("-").map(Number);
+        return allVehiclesForCounts.filter((v) => {
+          const range = parseInt(v.specifications.range);
+          return max ? range >= min && range <= max : range >= min;
+        }).length;
+      }
+
+      case "reviews": {
+        const minRating = parseFloat(filterValue.replace("+", ""));
+        return allVehiclesForCounts.filter(
+          (v) => v.reviews.average >= minRating
+        ).length;
+      }
+
+      case "dealerRating": {
+        const minRating = parseFloat(filterValue.replace("+", ""));
+        return allVehiclesForCounts.filter((v) => v.dealer.rating >= minRating)
+          .length;
+      }
+
+      case "chargingTime": {
+        if (filterValue === "8+") {
+          return allVehiclesForCounts.filter(
+            (v) => parseFloat(v.chargingTime || "0") >= 8
+          ).length;
+        }
+        const [min, max] = filterValue.split("-").map(Number);
+        return allVehiclesForCounts.filter((v) => {
+          const time = parseFloat(v.chargingTime || "0");
+          return time >= min && time <= max;
+        }).length;
+      }
+
+      case "maxSpeed": {
+        if (filterValue === "150+") {
+          return allVehiclesForCounts.filter(
+            (v) => parseInt(v.maxSpeed || "0") >= 150
+          ).length;
+        }
+        const [min, max] = filterValue.split("-").map(Number);
+        return allVehiclesForCounts.filter((v) => {
+          const speed = parseInt(v.maxSpeed || "0");
+          return speed >= min && speed <= max;
+        }).length;
+      }
+
+      case "warranty": {
+        // Format: "years:2+" or "km:50000+"
+        const [unit, minValueStr] = filterValue.split(":");
+        const minValue = parseInt(minValueStr.replace("+", ""));
+
+        return allVehiclesForCounts.filter((v) => {
+          const warrantyStr = v.specifications.warranty || "";
+
+          if (unit === "years") {
+            // Extract years from warranty string like "2 años" or "3 años"
+            const yearsMatch = warrantyStr.match(/(\d+)\s*año/);
+            if (yearsMatch) {
+              return parseInt(yearsMatch[1]) >= minValue;
+            }
+          } else if (unit === "km") {
+            // Extract km from warranty string like "50000 km" or "100000 km"
+            const kmMatch = warrantyStr.match(/(\d+)\s*km/);
+            if (kmMatch) {
+              return parseInt(kmMatch[1]) >= minValue;
+            }
+          }
+
+          return false;
+        }).length;
+      }
+
+      default:
+        return 0;
+    }
+  };
 
   const handleFilterChange = (
     filterKey: string,
@@ -298,7 +412,7 @@ function SearchResultsPageInner() {
                                 </label>
                               </div>
                               <span className="text-sm text-gray-500">
-                                {option.count}
+                                {getFilterCount(filter.key, option.value)}
                               </span>
                             </div>
                           ))}

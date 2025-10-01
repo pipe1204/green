@@ -237,6 +237,35 @@ function applyClientSideFilters(
     });
   }
 
+  // Filter by warranty (years or km)
+  if (filters.warranty.length > 0) {
+    filtered = filtered.filter((v) => {
+      const warrantyStr = v.specifications.warranty;
+      
+      return filters.warranty.some((warrantyFilter) => {
+        // Format: "years:2+" or "km:50000+"
+        const [unit, minValueStr] = warrantyFilter.split(":");
+        const minValue = parseInt(minValueStr.replace("+", ""));
+        
+        if (unit === "years") {
+          // Extract years from warranty string like "2 años"
+          const yearsMatch = warrantyStr.match(/(\d+)\s*año/);
+          if (yearsMatch) {
+            return parseInt(yearsMatch[1]) >= minValue;
+          }
+        } else if (unit === "km") {
+          // Extract km from warranty string like "50000 km"
+          const kmMatch = warrantyStr.match(/(\d+)\s*km/);
+          if (kmMatch) {
+            return parseInt(kmMatch[1]) >= minValue;
+          }
+        }
+        
+        return false;
+      });
+    });
+  }
+
   return filtered;
 }
 
