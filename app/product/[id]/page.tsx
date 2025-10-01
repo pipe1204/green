@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
-import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
+import { getVehicleById } from "@/lib/vehicle-queries";
+import { handleVehicleError } from "@/lib/error-handler";
 import { Vehicle } from "@/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -31,6 +32,8 @@ export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
@@ -42,11 +45,28 @@ export default function ProductPage() {
   });
 
   useEffect(() => {
-    const vehicleId = params.id as string;
-    const foundVehicle = vehicles.find((v) => v.id === vehicleId);
+    const fetchVehicle = async () => {
+      setLoading(true);
+      setError(null);
 
-    if (foundVehicle) {
-      setVehicle(staticVehicleToVehicle(foundVehicle));
+      try {
+        const vehicleId = params.id as string;
+        const fetchedVehicle = await getVehicleById(vehicleId);
+
+        if (fetchedVehicle) {
+          setVehicle(fetchedVehicle);
+        } else {
+          setError("Vehículo no encontrado");
+        }
+      } catch (err) {
+        setError(handleVehicleError(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchVehicle();
     }
   }, [params.id]);
 
@@ -61,17 +81,45 @@ export default function ProductPage() {
     }, 1000);
   };
 
-  if (!vehicle) {
+  // Loading state
+  if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Vehículo no encontrado
-          </h1>
-          <Button onClick={() => router.push("/")} variant="outline">
-            Volver al inicio
-          </Button>
+      <div className="min-h-screen bg-white">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex items-center justify-center h-64">
+            <Zap className="w-8 h-8 animate-spin text-green-600" />
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !vehicle) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {error || "Vehículo no encontrado"}
+            </h1>
+            <p className="text-gray-600 mb-6">
+              El vehículo que buscas no existe o ha sido eliminado.
+            </p>
+            <div className="flex items-center justify-center space-x-4">
+              <Button onClick={() => router.push("/")} variant="outline">
+                Volver al inicio
+              </Button>
+              <Button onClick={() => router.push("/resultados")}>
+                Ver todos los vehículos
+              </Button>
+            </div>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }

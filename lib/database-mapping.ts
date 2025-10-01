@@ -53,29 +53,95 @@ export function vehicleToDatabase(vehicle: Vehicle) {
   };
 }
 
+// Coerce enum-like objects to strings
+// Supabase sometimes returns PostgreSQL ENUMs as {type: 'enum', value: 'string'}
+const coerceEnum = (val: unknown): string => {
+  if (typeof val === "string") return val;
+  if (
+    val !== null &&
+    typeof val === "object" &&
+    "value" in (val as Record<string, unknown>)
+  ) {
+    return String((val as { value: unknown }).value);
+  }
+  return String(val ?? "");
+};
+
 // Convert database format (snake_case) to frontend Vehicle (camelCase)
-export function databaseToVehicle(dbVehicle: DbVehicleRow): Vehicle {
+export function databaseToVehicle(dbVehicle: unknown): Vehicle {
+  // Cast to access properties safely
+  const raw = dbVehicle as Record<string, unknown>;
+
+  // Coerce enum fields that might come as objects
+  const vehicleType = coerceEnum(raw.type) as Vehicle["type"];
+  const availability = coerceEnum(raw.availability) as Vehicle["availability"];
+
+  // Handle specifications object with warranty that might be an object {type: 'years', value: 2}
+  const rawSpecs = (raw.specifications as Record<string, unknown>) || {};
+  const warranty = rawSpecs.warranty;
+
+  let warrantyStr = "";
+  if (
+    typeof warranty === "object" &&
+    warranty !== null &&
+    "value" in warranty
+  ) {
+    const warrantyObj = warranty as { value: unknown; type?: unknown };
+    const value = warrantyObj.value;
+    const type = warrantyObj.type;
+
+    // Handle different warranty types: 'years' or 'kms'
+    if (type === "years") {
+      warrantyStr = `${value} año${Number(value) !== 1 ? "s" : ""}`;
+    } else if (type === "kms" || type === "km") {
+      warrantyStr = `${value} km`;
+    } else {
+      warrantyStr = `${value} ${type || ""}`.trim();
+    }
+  } else {
+    warrantyStr = String(warranty ?? "");
+  }
+
+  const specifications: Vehicle["specifications"] = {
+    range: String(rawSpecs.range ?? ""),
+    chargeTime: String(rawSpecs.chargeTime ?? ""),
+    warranty: warrantyStr,
+    battery: String(rawSpecs.battery ?? ""),
+    performance:
+      (rawSpecs.performance as Vehicle["specifications"]["performance"]) ?? {
+        maxSpeed: "",
+        power: "",
+      },
+  };
+
   return {
-    id: dbVehicle.id,
-    vendorId: dbVehicle.vendor_id ?? "",
-    name: dbVehicle.name,
-    brand: dbVehicle.brand,
-    type: dbVehicle.type,
-    price: dbVehicle.price,
-    images: dbVehicle.images,
-    specifications: dbVehicle.specifications,
-    deliveryTime: dbVehicle.delivery_time,
-    availability: dbVehicle.availability,
-    passengerCapacity: dbVehicle.passenger_capacity,
-    chargingTime: dbVehicle.charging_time,
-    maxSpeed: dbVehicle.max_speed,
-    power: dbVehicle.power,
-    location: dbVehicle.location,
-    description: dbVehicle.description,
-    features: dbVehicle.features,
-    dealer: dbVehicle.dealer,
-    reviews: dbVehicle.reviews,
-    createdAt: dbVehicle.created_at,
-    updatedAt: dbVehicle.updated_at,
+    id: String(raw.id ?? ""),
+    vendorId: String(raw.vendor_id ?? ""),
+    name: String(raw.name ?? ""),
+    brand: String(raw.brand ?? ""),
+    type: vehicleType,
+    price: Number(raw.price ?? 0),
+    images: (raw.images as { url: string; alt: string }[]) ?? [],
+    specifications: specifications,
+    deliveryTime: String(raw.delivery_time ?? ""),
+    availability: availability,
+    passengerCapacity: Number(raw.passenger_capacity ?? 0),
+    chargingTime: String(raw.charging_time ?? ""),
+    maxSpeed: String(raw.max_speed ?? ""),
+    power: String(raw.power ?? ""),
+    location: String(raw.location ?? ""),
+    description: String(raw.description ?? ""),
+    features: (raw.features as string[]) ?? [],
+    dealer: (raw.dealer as Vehicle["dealer"]) ?? {
+      name: "",
+      location: "",
+      rating: 0,
+    },
+    reviews: (raw.reviews as Vehicle["reviews"]) ?? {
+      average: 0,
+      count: 0,
+    },
+    createdAt: String(raw.created_at ?? new Date().toISOString()),
+    updatedAt: String(raw.updated_at ?? new Date().toISOString()),
   };
 }

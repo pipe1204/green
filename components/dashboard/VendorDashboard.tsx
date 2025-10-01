@@ -14,6 +14,7 @@ import { VehicleTable } from "./VehicleTable";
 import { VehicleViewModal } from "./VehicleViewModal";
 import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
+import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import FloatingAskButton from "../FloatingAskButton";
 
 type VendorLocation = {
@@ -54,8 +55,7 @@ export function VendorDashboard() {
         .single();
 
       if (vendorError) {
-        console.error("Vendor not found:", vendorError);
-        setError("No se encontró tu perfil de vendedor. Contacta soporte.");
+        setError(handleVendorError(vendorError));
         return;
       }
 
@@ -66,15 +66,13 @@ export function VendorDashboard() {
         .eq("vendor_id", vendorData.id);
 
       if (error) {
-        console.error("Supabase error:", error);
-        setError("Error al cargar los vehículos. Intenta de nuevo.");
+        setError(handleVehicleError(error));
         return;
       }
 
       setVehicles((data || []).map(databaseToVehicle));
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
-      setError("Error de conexión. Verifica tu conexión a internet.");
+      setError(handleVehicleError(error));
     } finally {
       setLoading(false);
     }
