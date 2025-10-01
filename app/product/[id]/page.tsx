@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
+import { ContactVendorModal } from "@/components/resultados/ContactVendorModal";
 import { FavoritesButton } from "@/components/resultados/FavoritesButton";
 import { getVehicleById } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
@@ -38,14 +38,8 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const {
     requireAuthForTestDrive,
@@ -79,17 +73,6 @@ export default function ProductPage() {
       fetchVehicle();
     }
   }, [params.id]);
-
-  const handleContactVendor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("¡Gracias! El vendedor se pondrá en contacto contigo pronto.");
-    }, 1000);
-  };
 
   // Loading state
   if (loading) {
@@ -285,88 +268,23 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Contact Vendor Form */}
+            {/* Contact Vendor Section */}
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <MessageSquare className="w-5 h-5 text-blue-600 mr-2" />
                 Contactar Vendedor
               </h3>
-              <form onSubmit={handleContactVendor} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Tu nombre"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <Input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      placeholder="Tu teléfono"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="tu@email.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Mensaje (opcional)
-                  </label>
-                  <Textarea
-                    value={formData.message}
-                    onChange={(e) =>
-                      setFormData({ ...formData, message: e.target.value })
-                    }
-                    placeholder="Cuéntanos qué te interesa saber sobre este vehículo..."
-                    rows={3}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Zap className="w-4 h-4 mr-2 animate-pulse" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-4 h-4 mr-2" />
-                      Contactar Vendedor
-                    </>
-                  )}
-                </Button>
-              </form>
+              <p className="text-gray-600 mb-4">
+                ¿Tienes preguntas sobre {vehicle.name}? Envía un mensaje al
+                vendedor y te responderán pronto.
+              </p>
+              <Button
+                onClick={() => setIsContactModalOpen(true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Enviar Mensaje
+              </Button>
             </div>
 
             {/* Book Test Drive Button */}
@@ -495,11 +413,7 @@ export default function ProductPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() =>
-                document
-                  .querySelector("form")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={() => setIsContactModalOpen(true)}
               size="lg"
               className="bg-green-600 hover:bg-green-700 text-white"
             >
@@ -522,10 +436,16 @@ export default function ProductPage() {
 
       <Footer />
 
-      {/* Test Drive Modal */}
+      {/* Modals */}
       <TestDriveModal
         isOpen={isTestDriveModalOpen}
         onClose={() => setIsTestDriveModalOpen(false)}
+        vehicle={vehicle}
+      />
+
+      <ContactVendorModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
         vehicle={vehicle}
       />
 
