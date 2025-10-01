@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/types";
 import { TestDriveModal } from "./TestDriveModal";
 import { FavoritesButton } from "./FavoritesButton";
+import { useAuthActions } from "@/hooks/useAuthCheck";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import {
   formatPrice,
   getAvailabilityColor,
@@ -35,6 +37,13 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
+
+  const {
+    requireAuthForTestDrive,
+    authPrompt,
+    closeAuthPrompt,
+    handleAuthSuccess,
+  } = useAuthActions();
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -264,7 +273,9 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => setIsTestDriveModalOpen(true)}
+              onClick={() =>
+                requireAuthForTestDrive(() => setIsTestDriveModalOpen(true))
+              }
             >
               Agenda una prueba
             </Button>
@@ -277,6 +288,14 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         isOpen={isTestDriveModalOpen}
         onClose={() => setIsTestDriveModalOpen(false)}
         vehicle={vehicle}
+      />
+
+      {/* Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={authPrompt.isOpen}
+        onClose={closeAuthPrompt}
+        action={authPrompt.action}
+        onAuthSuccess={handleAuthSuccess}
       />
     </div>
   );

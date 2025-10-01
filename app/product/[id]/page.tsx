@@ -11,6 +11,8 @@ import { FavoritesButton } from "@/components/resultados/FavoritesButton";
 import { getVehicleById } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
 import { Vehicle } from "@/types";
+import { useAuthActions } from "@/hooks/useAuthCheck";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -44,6 +46,13 @@ export default function ProductPage() {
     phone: "",
     message: "",
   });
+
+  const {
+    requireAuthForTestDrive,
+    authPrompt,
+    closeAuthPrompt,
+    handleAuthSuccess,
+  } = useAuthActions();
 
   useEffect(() => {
     const fetchVehicle = async () => {
@@ -371,7 +380,9 @@ export default function ProductPage() {
                 persona.
               </p>
               <Button
-                onClick={() => setIsTestDriveModalOpen(true)}
+                onClick={() =>
+                  requireAuthForTestDrive(() => setIsTestDriveModalOpen(true))
+                }
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Calendar className="w-4 h-4 mr-2" />
@@ -496,7 +507,9 @@ export default function ProductPage() {
               Contactar Vendedor
             </Button>
             <Button
-              onClick={() => setIsTestDriveModalOpen(true)}
+              onClick={() =>
+                requireAuthForTestDrive(() => setIsTestDriveModalOpen(true))
+              }
               variant="outline"
               size="lg"
             >
@@ -514,6 +527,14 @@ export default function ProductPage() {
         isOpen={isTestDriveModalOpen}
         onClose={() => setIsTestDriveModalOpen(false)}
         vehicle={vehicle}
+      />
+
+      {/* Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={authPrompt.isOpen}
+        onClose={closeAuthPrompt}
+        action={authPrompt.action}
+        onAuthSuccess={handleAuthSuccess}
       />
     </div>
   );
