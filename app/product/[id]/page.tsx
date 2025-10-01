@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
+import { FavoritesButton } from "@/components/resultados/FavoritesButton";
 import { getVehicleById } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
 import { Vehicle } from "@/types";
@@ -145,9 +146,12 @@ export default function ProductPage() {
 
         {/* Vehicle Header */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {vehicle.name}
-          </h1>
+          <div className="flex items-start justify-between mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex-1">
+              {vehicle.name}
+            </h1>
+            <FavoritesButton vehicleId={vehicle.id} className="ml-4" />
+          </div>
           <p className="text-xl text-gray-600 max-w-3xl">
             {vehicle.description}
           </p>
