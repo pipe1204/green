@@ -14,6 +14,20 @@ import { ProductList } from "./ProductList";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import FloatingAskButton from "../FloatingAskButton";
 
+type VendorLocation = {
+  address?: string;
+  department?: string;
+  city?: string;
+  isMain?: boolean;
+};
+
+type VendorRow = {
+  id: string;
+  business_name: string;
+  rating: number;
+  locations: VendorLocation[] | null;
+};
+
 export function VendorDashboard() {
   const { user } = useAuth();
   const router = useRouter();
@@ -30,7 +44,7 @@ export function VendorDashboard() {
       // First, get the vendor record for this user
       const { data: vendorData, error: vendorError } = await supabase
         .from("vendors")
-        .select("id")
+        .select("id,business_name,rating,locations")
         .eq("user_id", user?.id)
         .single();
 
@@ -85,8 +99,41 @@ export function VendorDashboard() {
         return;
       }
 
+      // Ensure we have a primary key id for insert
+      const ensuredId = (formData as Vehicle).id ?? crypto.randomUUID();
+
+      // derive dealer defaults if empty
+      const v: VendorRow = (vendorData || {
+        id: "",
+        business_name: "",
+        rating: 0,
+        locations: [],
+      }) as VendorRow;
+      const mainLocation = Array.isArray(v.locations)
+        ? v.locations.find((l) => l?.isMain) || v.locations[0]
+        : undefined;
+      const dealerName =
+        (formData as Vehicle).dealer?.name?.trim() || v.business_name || "";
+      const dealerLocation =
+        (formData as Vehicle).dealer?.location?.trim() ||
+        mainLocation?.city ||
+        "";
+      const dealerRating =
+        (formData as Vehicle).dealer?.rating ?? v.rating ?? 0;
+
+      const defaulted = {
+        ...(formData as Vehicle),
+        id: ensuredId,
+        dealer: {
+          name: dealerName,
+          location: dealerLocation,
+          rating: dealerRating,
+        },
+        location: (formData as Vehicle).location?.trim() || dealerLocation,
+      } as Vehicle;
+
       const { error } = await supabase.from("vehicles").upsert({
-        ...vehicleToDatabase(formData as Vehicle),
+        ...vehicleToDatabase(defaulted),
         vendor_id: vendorData.id,
         updated_at: new Date().toISOString(),
       });

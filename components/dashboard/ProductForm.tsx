@@ -71,6 +71,9 @@ export function ProductForm({
   const [uploadingImages, setUploadingImages] = useState(false);
   const [newFeature, setNewFeature] = useState("");
   const [validationError, setValidationError] = useState<string>("");
+  const [vendorCities, setVendorCities] = useState<string[]>([]);
+  const [warrantyUnit, setWarrantyUnit] = useState<"years" | "km">("years");
+  const [warrantyValue, setWarrantyValue] = useState<string>("");
 
   // Reset form when modal opens/closes or editing vehicle changes
   React.useEffect(() => {
@@ -125,6 +128,29 @@ export function ProductForm({
     }
   }, [isOpen, editingVehicle]);
 
+  // Load vendor cities from vendors.locations for the current user
+  React.useEffect(() => {
+    const loadVendorCities = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id;
+      if (!userId) return;
+      const { data: vendor } = await supabase
+        .from("vendors")
+        .select("locations")
+        .eq("user_id", userId)
+        .single();
+      if (vendor?.locations && Array.isArray(vendor.locations)) {
+        const cities = vendor.locations
+          .map((loc: { city?: string }) => loc?.city)
+          .filter((c: string | undefined): c is string => Boolean(c));
+        setVendorCities(Array.from(new Set(cities)));
+      }
+    };
+    if (isOpen) {
+      loadVendorCities();
+    }
+  }, [isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError("");
@@ -139,37 +165,87 @@ export function ProductForm({
       !formData.availability.trim() ||
       !formData.specifications.range.trim() ||
       !formData.specifications.chargeTime.trim() ||
-      !formData.specifications.warranty.trim() ||
+      // warranty required through unit+value UI
+      warrantyValue.trim().length === 0 ||
       !formData.specifications.battery.trim() ||
       !formData.specifications.performance.maxSpeed.trim() ||
-      !formData.specifications.performance.power.trim() ||
-      formData.images.length === 0
+      !formData.specifications.performance.power.trim()
     ) {
-      setValidationError(
-        "Por favor completa todos los campos requeridos y sube al menos una imagen."
-      );
+      setValidationError("Por favor completa todos los campos requeridos.");
       return;
     }
-    await onSubmit(formData as Partial<Vehicle>);
+    // Attach structured warranty
+    const payload = {
+      ...formData,
+      specifications: {
+        ...formData.specifications,
+        warranty:
+          warrantyValue.trim().length > 0
+            ? { type: warrantyUnit, value: Number(warrantyValue) }
+            : formData.specifications.warranty,
+      },
+    };
+    await onSubmit(payload as Partial<Vehicle>);
   };
 
   const handleImageFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setUploadingImages(true);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id ?? "anonymous";
+      const accessToken = sessionData.session?.access_token ?? null;
+      const anonKey =
+        (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string) || "";
+      const projectUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL as string) || "";
       const uploadedImages: { url: string; alt: string }[] = [];
       for (const file of Array.from(files)) {
-        const path = `vehicles/${Date.now()}-${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("vehicle-images")
-          .upload(path, file, { upsert: false });
-        if (uploadError) throw uploadError;
-        const {
-          data: { publicUrl },
-        } = supabase.storage
-          .from("vehicle-images")
-          .getPublicUrl(uploadData.path);
-        uploadedImages.push({ url: publicUrl, alt: `${formData.name} image` });
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const path = `vehicles/${userId}/${Date.now()}-${safeName}`;
+        try {
+          const { data: uploadData, error: uploadError } =
+            await supabase.storage.from("vehicle-images").upload(path, file, {
+              upsert: true,
+              contentType: file.type || undefined,
+            });
+          if (uploadError) throw uploadError;
+          const {
+            data: { publicUrl },
+          } = supabase.storage
+            .from("vehicle-images")
+            .getPublicUrl(uploadData.path);
+          uploadedImages.push({
+            url: publicUrl,
+            alt: `${formData.name} image`,
+          });
+        } catch (sdkErr) {
+          // Fallback to direct fetch when RLS path constraints are tricky
+          if (!accessToken || !anonKey || !projectUrl) throw sdkErr;
+          const form = new FormData();
+          form.append("cacheControl", "3600");
+          form.append("upsert", "true");
+          form.append("file", file, safeName);
+          const resp = await fetch(
+            `${projectUrl}/storage/v1/object/vehicle-images/${path}`,
+            {
+              method: "POST",
+              headers: {
+                apikey: anonKey,
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: form,
+            }
+          );
+          if (!resp.ok) {
+            const t = await resp.text();
+            throw new Error(`Storage upload failed: ${resp.status} ${t}`);
+          }
+          const publicUrl = `${projectUrl}/storage/v1/object/public/vehicle-images/${path}`;
+          uploadedImages.push({
+            url: publicUrl,
+            alt: `${formData.name} image`,
+          });
+        }
       }
       setFormData({
         ...formData,
@@ -298,14 +374,34 @@ export function ProductForm({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Ubicación *
                 </label>
-                <Input
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  required
-                  placeholder="Ej: Bogotá, Colombia"
-                />
+                {vendorCities.length > 0 ? (
+                  <Select
+                    value={formData.location}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, location: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona ciudad" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vendorCities.map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                    required
+                    placeholder="Ej: Bogotá, Colombia"
+                  />
+                )}
               </div>
 
               <div>
@@ -368,15 +464,15 @@ export function ProductForm({
 
             {/* Display Images */}
             {formData.images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {formData.images.map((image, index) => (
                   <div key={index} className="relative group">
                     <Image
                       src={image.url}
                       alt={image.alt}
-                      width={128}
-                      height={128}
-                      className="w-full h-32 object-cover rounded-lg border"
+                      width={160}
+                      height={200}
+                      className="w-40 h-48 object-cover rounded-lg border"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "/images/placeholder.jpg";
@@ -475,20 +571,35 @@ export function ProductForm({
                   Garantía *
                 </label>
                 <p className="text-xs text-gray-500 mb-2">
-                  Cobertura del fabricante (p. ej., 8 años o 160.000 km).
+                  Selecciona unidad y valor. Se guardará como dato estructurado.
                 </p>
+                <div className="flex items-center gap-3 mb-2">
+                  <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <input
+                      type="radio"
+                      name="warrantyUnit"
+                      checked={warrantyUnit === "years"}
+                      onChange={() => setWarrantyUnit("years")}
+                    />
+                    Años
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <input
+                      type="radio"
+                      name="warrantyUnit"
+                      checked={warrantyUnit === "km"}
+                      onChange={() => setWarrantyUnit("km")}
+                    />
+                    Km
+                  </label>
+                </div>
                 <Input
-                  value={formData.specifications.warranty}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      specifications: {
-                        ...formData.specifications,
-                        warranty: e.target.value,
-                      },
-                    })
+                  type="number"
+                  value={warrantyValue}
+                  onChange={(e) => setWarrantyValue(e.target.value)}
+                  placeholder={
+                    warrantyUnit === "years" ? "Ej: 8" : "Ej: 160000"
                   }
-                  placeholder="Ej: 8 años"
                   required
                 />
               </div>
