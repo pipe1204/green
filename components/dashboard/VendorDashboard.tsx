@@ -15,8 +15,8 @@ import { VehicleViewModal } from "./VehicleViewModal";
 import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
-import FloatingAskButton from "../FloatingAskButton";
 import { VendorMessagesSection } from "./VendorMessagesSection";
+import { VendorInquiriesSection } from "./VendorInquiriesSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -258,6 +258,8 @@ export function VendorDashboard() {
           </div>
         );
 
+      case "inquiries":
+        return <VendorInquiriesSection />;
       case "messages":
         return <VendorMessagesSection />;
       case "analytics":

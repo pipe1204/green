@@ -172,8 +172,50 @@ export interface CustomerInquiry {
   vendor_id: string;
   message: string;
   status: "pending" | "replied" | "closed";
+  is_guest: boolean;
+  guest_name?: string;
+  guest_email?: string;
+  guest_phone?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CustomerInquiryWithDetails {
+  id: string;
+  message: string;
+  status: "pending" | "replied" | "closed";
+  isGuest: boolean;
+  guestName?: string;
+  guestEmail?: string;
+  guestPhone?: string;
+  createdAt: string;
+  updatedAt: string;
+  vehicle: {
+    id: string;
+    name: string;
+    brand: string;
+    images: Array<{ url: string; alt: string }>;
+  };
+  customer: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+}
+
+export interface VendorInquiriesResponse {
+  inquiries: CustomerInquiryWithDetails[];
+  count: number;
+  error?: string;
+}
+
+export interface UpdateInquiryStatusRequest {
+  status: "pending" | "replied" | "closed";
+}
+
+export interface UpdateInquiryStatusResponse {
+  success: boolean;
+  inquiry: CustomerInquiry;
 }
 
 export interface PriceAlert {

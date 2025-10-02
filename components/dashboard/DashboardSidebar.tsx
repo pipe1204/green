@@ -14,7 +14,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type DashboardSection = "vehicles" | "analytics" | "messages";
+export type DashboardSection =
+  | "vehicles"
+  | "inquiries"
+  | "analytics"
+  | "messages";
 export type CustomerDashboardSection =
   | "favorites"
   | "testDrives"
@@ -36,6 +40,13 @@ const vendorNavigationItems = [
     label: "Mis Vehículos",
     icon: Bike,
     description: "Gestiona tu inventario de vehículos",
+    disabled: false,
+  },
+  {
+    id: "inquiries" as DashboardSection,
+    label: "Consultas",
+    icon: MessageSquare,
+    description: "Mensajes de clientes",
     disabled: false,
   },
   {
