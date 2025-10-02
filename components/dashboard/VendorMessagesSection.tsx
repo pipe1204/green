@@ -7,7 +7,7 @@ import { MessagingInterface } from "@/components/messaging/MessagingInterface";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare } from "lucide-react";
 
-export function InquiriesSection() {
+export function VendorMessagesSection() {
   const { user } = useAuth();
   const { conversations } = useConversations();
 
@@ -38,7 +38,7 @@ export function InquiriesSection() {
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white flex-shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mis Consultas</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Mensajes</h1>
           <p className="text-sm text-gray-600 mt-1">
             {conversations.length === 0
               ? "No tienes conversaciones aún"

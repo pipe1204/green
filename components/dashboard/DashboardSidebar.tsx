@@ -42,8 +42,8 @@ const vendorNavigationItems = [
     id: "messages" as DashboardSection,
     label: "Mensajes",
     icon: MessageSquare,
-    description: "Consulta con clientes (Próximamente)",
-    disabled: true,
+    description: "Conversaciones con clientes",
+    disabled: false,
   },
   {
     id: "analytics" as DashboardSection,

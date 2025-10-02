@@ -16,6 +16,7 @@ import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import FloatingAskButton from "../FloatingAskButton";
+import { VendorMessagesSection } from "./VendorMessagesSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -258,19 +259,7 @@ export function VendorDashboard() {
         );
 
       case "messages":
-        return (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Mensajes en Desarrollo
-            </h3>
-            <p className="text-gray-600">
-              Próximamente podrás gestionar consultas de clientes
-            </p>
-          </div>
-        );
+        return <VendorMessagesSection />;
       case "analytics":
         return (
           <div className="text-center py-12">
@@ -432,8 +421,6 @@ export function VendorDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <FloatingAskButton />
     </div>
   );
 }
