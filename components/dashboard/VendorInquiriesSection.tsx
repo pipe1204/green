@@ -5,7 +5,11 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, User, Mail, Phone, Calendar, Car } from "lucide-react";
-import { CustomerInquiryWithDetails, VendorInquiriesResponse } from "@/types";
+import {
+  CustomerInquiryWithDetails,
+  VendorInquiriesResponse,
+  CreateConversationResponse,
+} from "@/types";
 
 export function VendorInquiriesSection() {
   const { user, session } = useAuth();
@@ -26,6 +30,7 @@ export function VendorInquiriesSection() {
             Authorization: `Bearer ${session?.access_token}`,
           },
         });
+
         const data: VendorInquiriesResponse = await response.json();
 
         if (!response.ok) {
@@ -65,13 +70,63 @@ export function VendorInquiriesSection() {
       setInquiries((prev) =>
         prev.map((inquiry) =>
           inquiry.id === inquiryId
-            ? { ...inquiry, status: status as "pending" | "replied" | "closed" }
+            ? {
+                ...inquiry,
+                status: status as
+                  | "pending"
+                  | "replied"
+                  | "closed"
+                  | "converted",
+              }
             : inquiry
         )
       );
     } catch (err) {
       console.error("Error updating inquiry status:", err);
       setError("Error updating inquiry status");
+    }
+  };
+
+  const createConversation = async (
+    inquiryId: string,
+    initialMessage: string
+  ) => {
+    try {
+      const response = await fetch(
+        `/api/vendor/inquiries/${inquiryId}/conversation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ initialMessage }),
+        }
+      );
+
+      const data: CreateConversationResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error creating conversation");
+      }
+
+      // Update local state to mark inquiry as converted
+      setInquiries((prev) =>
+        prev.map((inquiry) =>
+          inquiry.id === inquiryId
+            ? { ...inquiry, status: "converted" }
+            : inquiry
+        )
+      );
+
+      // Show success message or redirect to messages
+      alert("Conversación creada exitosamente");
+
+      return data;
+    } catch (err) {
+      console.error("Error creating conversation:", err);
+      setError("Error creating conversation");
+      throw err;
     }
   };
 
@@ -102,6 +157,15 @@ export function VendorInquiriesSection() {
             className="bg-gray-50 text-gray-700 border-gray-200"
           >
             Cerrado
+          </Badge>
+        );
+      case "converted":
+        return (
+          <Badge
+            variant="outline"
+            className="bg-blue-50 text-blue-700 border-blue-200"
+          >
+            Convertido
           </Badge>
         );
       default:
@@ -321,12 +385,36 @@ export function VendorInquiriesSection() {
                         Reabrir
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      Iniciar Conversación
-                    </Button>
+                    {inquiry.status !== "converted" && (
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          const initialMessage = prompt(
+                            "Escribe tu mensaje inicial para el cliente:",
+                            `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
+                          );
+                          if (initialMessage && initialMessage.trim()) {
+                            createConversation(
+                              inquiry.id,
+                              initialMessage.trim()
+                            );
+                          }
+                        }}
+                      >
+                        Iniciar Conversación
+                      </Button>
+                    )}
+                    {inquiry.status === "converted" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-blue-50 text-blue-700 border-blue-200"
+                        disabled
+                      >
+                        Conversación Creada
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -171,7 +171,7 @@ export interface CustomerInquiry {
   vehicle_id: string;
   vendor_id: string;
   message: string;
-  status: "pending" | "replied" | "closed";
+  status: "pending" | "replied" | "closed" | "converted";
   is_guest: boolean;
   guest_name?: string;
   guest_email?: string;
@@ -183,7 +183,7 @@ export interface CustomerInquiry {
 export interface CustomerInquiryWithDetails {
   id: string;
   message: string;
-  status: "pending" | "replied" | "closed";
+  status: "pending" | "replied" | "closed" | "converted";
   isGuest: boolean;
   guestName?: string;
   guestEmail?: string;
@@ -216,6 +216,29 @@ export interface UpdateInquiryStatusRequest {
 export interface UpdateInquiryStatusResponse {
   success: boolean;
   inquiry: CustomerInquiry;
+}
+
+export interface CreateConversationRequest {
+  initialMessage: string;
+}
+
+export interface CreateConversationResponse {
+  success: boolean;
+  conversation: {
+    id: string;
+    customer_id: string;
+    vendor_id: string;
+    vehicle_id: string;
+    subject: string;
+    last_message_at: string;
+  };
+  message: {
+    id: string;
+    content: string;
+    sender_id: string;
+    created_at: string;
+  };
+  error?: string;
 }
 
 export interface PriceAlert {

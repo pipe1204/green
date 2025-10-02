@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import {
   CustomerInquiryWithDetails,
   VendorInquiriesResponse,
@@ -50,7 +51,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Get inquiries for this vendor's vehicles
-    const { data: inquiries, error: inquiriesError } = await supabase
+
+    // First, let's check ALL inquiries in the database using service role
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: inquiries, error: inquiriesError } = await serviceSupabase
       .from("customer_inquiries")
       .select(
         `
