@@ -130,6 +130,32 @@ export function VendorInquiriesSection() {
     }
   };
 
+  const sendEmailToCustomer = async (inquiryId: string, message: string) => {
+    try {
+      const response = await fetch(`/api/vendor/inquiries/${inquiryId}/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error sending email");
+      }
+
+      alert("Email enviado exitosamente");
+      return data;
+    } catch (err) {
+      console.error("Error sending email:", err);
+      setError("Error sending email");
+      throw err;
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -283,7 +309,17 @@ export function VendorInquiriesSection() {
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <div className="flex items-center space-x-1">
                           <Mail className="h-4 w-4" />
-                          <span>{inquiry.customer.email}</span>
+                          <span className="text-gray-400">
+                            {inquiry.customer.email.replace(
+                              /(.{2}).*(@.*)/,
+                              "$1***$2"
+                            )}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {inquiry.isGuest
+                              ? "(Usuario invitado)"
+                              : "(Usuario registrado)"}
+                          </span>
                         </div>
                         {inquiry.customer.phone && (
                           <div className="flex items-center space-x-1">
@@ -386,24 +422,47 @@ export function VendorInquiriesSection() {
                       </Button>
                     )}
                     {inquiry.status !== "converted" && (
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        onClick={() => {
-                          const initialMessage = prompt(
-                            "Escribe tu mensaje inicial para el cliente:",
-                            `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
-                          );
-                          if (initialMessage && initialMessage.trim()) {
-                            createConversation(
-                              inquiry.id,
-                              initialMessage.trim()
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            const initialMessage = prompt(
+                              "Escribe tu mensaje inicial para el cliente:",
+                              `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
                             );
-                          }
-                        }}
-                      >
-                        Iniciar Conversación
-                      </Button>
+                            if (initialMessage && initialMessage.trim()) {
+                              createConversation(
+                                inquiry.id,
+                                initialMessage.trim()
+                              );
+                            }
+                          }}
+                        >
+                          Iniciar Conversación
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                          onClick={() => {
+                            const emailMessage = prompt(
+                              inquiry.isGuest
+                                ? "Escribe tu mensaje para enviar por email:"
+                                : "Escribe tu mensaje para el cliente:",
+                              `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
+                            );
+                            if (emailMessage && emailMessage.trim()) {
+                              sendEmailToCustomer(
+                                inquiry.id,
+                                emailMessage.trim()
+                              );
+                            }
+                          }}
+                        >
+                          {inquiry.isGuest ? "Enviar Email" : "Enviar Mensaje"}
+                        </Button>
+                      </>
                     )}
                     {inquiry.status === "converted" && (
                       <Button
