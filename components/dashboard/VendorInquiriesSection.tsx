@@ -10,12 +10,20 @@ import {
   VendorInquiriesResponse,
   CreateConversationResponse,
 } from "@/types";
+import { StartConversationModal } from "./StartConversationModal";
+import { SendMessageModal } from "./SendMessageModal";
 
 export function VendorInquiriesSection() {
   const { user, session } = useAuth();
   const [inquiries, setInquiries] = useState<CustomerInquiryWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showStartConversationModal, setShowStartConversationModal] =
+    useState(false);
+  const [showSendMessageModal, setShowSendMessageModal] = useState(false);
+  const [selectedInquiry, setSelectedInquiry] =
+    useState<CustomerInquiryWithDetails | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     if (!user || !session) return;
@@ -87,13 +95,13 @@ export function VendorInquiriesSection() {
     }
   };
 
-  const createConversation = async (
-    inquiryId: string,
-    initialMessage: string
-  ) => {
+  const createConversation = async (initialMessage: string) => {
+    if (!selectedInquiry) return;
+
     try {
+      setActionLoading(true);
       const response = await fetch(
-        `/api/vendor/inquiries/${inquiryId}/conversation`,
+        `/api/vendor/inquiries/${selectedInquiry.id}/conversation`,
         {
           method: "POST",
           headers: {
@@ -113,13 +121,14 @@ export function VendorInquiriesSection() {
       // Update local state to mark inquiry as converted
       setInquiries((prev) =>
         prev.map((inquiry) =>
-          inquiry.id === inquiryId
+          inquiry.id === selectedInquiry.id
             ? { ...inquiry, status: "converted" }
             : inquiry
         )
       );
 
-      // Show success message or redirect to messages
+      setShowStartConversationModal(false);
+      setSelectedInquiry(null);
       alert("Conversación creada exitosamente");
 
       return data;
@@ -127,19 +136,27 @@ export function VendorInquiriesSection() {
       console.error("Error creating conversation:", err);
       setError("Error creating conversation");
       throw err;
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const sendEmailToCustomer = async (inquiryId: string, message: string) => {
+  const sendEmailToCustomer = async (message: string) => {
+    if (!selectedInquiry) return;
+
     try {
-      const response = await fetch(`/api/vendor/inquiries/${inquiryId}/email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({ message }),
-      });
+      setActionLoading(true);
+      const response = await fetch(
+        `/api/vendor/inquiries/${selectedInquiry.id}/email`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ message }),
+        }
+      );
 
       const data = await response.json();
 
@@ -147,12 +164,20 @@ export function VendorInquiriesSection() {
         throw new Error(data.error || "Error sending email");
       }
 
-      alert("Email enviado exitosamente");
+      setShowSendMessageModal(false);
+      setSelectedInquiry(null);
+      alert(
+        selectedInquiry.isGuest
+          ? "Email enviado exitosamente"
+          : "Notificación enviada exitosamente"
+      );
       return data;
     } catch (err) {
       console.error("Error sending email:", err);
       setError("Error sending email");
       throw err;
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -395,7 +420,7 @@ export function VendorInquiriesSection() {
                             updateInquiryStatus(inquiry.id, "closed")
                           }
                         >
-                          Cerrar
+                          Cerrar conversación
                         </Button>
                       </>
                     )}
@@ -407,7 +432,7 @@ export function VendorInquiriesSection() {
                           updateInquiryStatus(inquiry.id, "closed")
                         }
                       >
-                        Cerrar
+                        Cerrar conversación
                       </Button>
                     )}
                     {inquiry.status === "closed" && (
@@ -418,50 +443,37 @@ export function VendorInquiriesSection() {
                           updateInquiryStatus(inquiry.id, "pending")
                         }
                       >
-                        Reabrir
+                        Reabrir conversación
                       </Button>
                     )}
                     {inquiry.status !== "converted" && (
                       <>
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            const initialMessage = prompt(
-                              "Escribe tu mensaje inicial para el cliente:",
-                              `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
-                            );
-                            if (initialMessage && initialMessage.trim()) {
-                              createConversation(
-                                inquiry.id,
-                                initialMessage.trim()
-                              );
-                            }
-                          }}
-                        >
-                          Iniciar Conversación
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                          onClick={() => {
-                            const emailMessage = prompt(
-                              inquiry.isGuest
-                                ? "Escribe tu mensaje para enviar por email:"
-                                : "Escribe tu mensaje para el cliente:",
-                              `Hola ${inquiry.customer.name}, gracias por tu interés en nuestro vehículo. ¿En qué puedo ayudarte?`
-                            );
-                            if (emailMessage && emailMessage.trim()) {
-                              sendEmailToCustomer(
-                                inquiry.id,
-                                emailMessage.trim()
-                              );
-                            }
-                          }}
-                        >
-                          {inquiry.isGuest ? "Enviar Email" : "Enviar Mensaje"}
-                        </Button>
+                        {inquiry.isGuest ? (
+                          // Guest users: Only email option
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                            onClick={() => {
+                              setSelectedInquiry(inquiry);
+                              setShowSendMessageModal(true);
+                            }}
+                          >
+                            Enviar Email
+                          </Button>
+                        ) : (
+                          // Registered users: Only conversation option
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => {
+                              setSelectedInquiry(inquiry);
+                              setShowStartConversationModal(true);
+                            }}
+                          >
+                            Iniciar Conversación
+                          </Button>
+                        )}
                       </>
                     )}
                     {inquiry.status === "converted" && (
@@ -481,6 +493,33 @@ export function VendorInquiriesSection() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <StartConversationModal
+        isOpen={showStartConversationModal}
+        onClose={() => {
+          setShowStartConversationModal(false);
+          setSelectedInquiry(null);
+        }}
+        onSubmit={createConversation}
+        customerName={selectedInquiry?.customer.name || ""}
+        vehicleName={selectedInquiry?.vehicle.name || ""}
+        loading={actionLoading}
+      />
+
+      {selectedInquiry?.isGuest && (
+        <SendMessageModal
+          isOpen={showSendMessageModal}
+          onClose={() => {
+            setShowSendMessageModal(false);
+            setSelectedInquiry(null);
+          }}
+          onSubmit={sendEmailToCustomer}
+          customerName={selectedInquiry?.customer.name || ""}
+          vehicleName={selectedInquiry?.vehicle.name || ""}
+          loading={actionLoading}
+        />
+      )}
     </div>
   );
 }
