@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { useConversations, useConversation } from "@/hooks/useMessaging";
+import { useRealtimeConversations } from "@/hooks/useRealtimeConversations";
+import { useRealtimeConversation } from "@/hooks/useRealtimeConversation";
+import { useTypingIndicator } from "@/hooks/useTypingIndicator";
+import { TypingIndicator } from "./TypingIndicator";
 import { ConversationList } from "./ConversationList";
 import { MessageList } from "./MessageList";
 import { MessageComposer } from "./MessageComposer";
@@ -25,14 +28,14 @@ export function MessagingInterface({
   >(initialConversationId || null);
   const [showMobileList, setShowMobileList] = useState(true);
 
-  // Fetch conversations
+  // Fetch conversations with real-time updates
   const {
     conversations,
     loading: conversationsLoading,
     error: conversationsError,
-  } = useConversations();
+  } = useRealtimeConversations();
 
-  // Fetch selected conversation
+  // Fetch selected conversation with real-time updates
   const {
     conversation,
     messages,
@@ -40,7 +43,12 @@ export function MessagingInterface({
     error: messagesError,
     sendMessage,
     markAsRead,
-  } = useConversation(selectedConversationId);
+  } = useRealtimeConversation(selectedConversationId);
+
+  // Typing indicator
+  const { typingUsers, startTyping, stopTyping } = useTypingIndicator(
+    selectedConversationId
+  );
 
   // Auto-select first conversation if none selected
   useEffect(() => {
@@ -139,11 +147,16 @@ export function MessagingInterface({
               onMessageRead={handleMessageRead}
             />
 
+            {/* Typing Indicator */}
+            <TypingIndicator typingUsers={typingUsers} />
+
             {/* Message Composer */}
             <MessageComposer
               onSubmit={handleSendMessage}
               disabled={messagesLoading}
               placeholder="Escribe tu mensaje..."
+              onTyping={startTyping}
+              onStopTyping={stopTyping}
             />
           </>
         ) : (

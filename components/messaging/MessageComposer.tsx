@@ -13,7 +13,8 @@ interface MessageComposerProps {
     content: string;
     attachments?: MessageAttachment[];
   }) => Promise<void>;
-  onTyping?: (isTyping: boolean) => void;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
   disabled?: boolean;
   placeholder?: string;
   maxLength?: number;
@@ -22,6 +23,7 @@ interface MessageComposerProps {
 export function MessageComposer({
   onSubmit,
   onTyping,
+  onStopTyping,
   disabled = false,
   placeholder = "Escribe tu mensaje...",
   maxLength = 1000,
@@ -39,8 +41,8 @@ export function MessageComposer({
     setContent(value);
 
     // Handle typing indicators
-    if (onTyping) {
-      onTyping(true);
+    if (onTyping && value.trim()) {
+      onTyping();
 
       // Clear existing timeout
       if (typingTimeoutRef.current) {
@@ -49,8 +51,12 @@ export function MessageComposer({
 
       // Set new timeout to stop typing indicator
       typingTimeoutRef.current = setTimeout(() => {
-        onTyping(false);
-      }, 1000);
+        if (onStopTyping) {
+          onStopTyping();
+        }
+      }, 2000);
+    } else if (onStopTyping && !value.trim()) {
+      onStopTyping();
     }
   };
 
@@ -71,8 +77,8 @@ export function MessageComposer({
       setAttachments([]);
 
       // Stop typing indicator
-      if (onTyping) {
-        onTyping(false);
+      if (onStopTyping) {
+        onStopTyping();
       }
 
       // Focus back to textarea

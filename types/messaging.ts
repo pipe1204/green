@@ -254,3 +254,9 @@ export interface TypingEvent {
   isTyping: boolean;
   timestamp: string;
 }
+
+export interface TypingUser {
+  id: string;
+  name: string;
+  isTyping: boolean;
+}
