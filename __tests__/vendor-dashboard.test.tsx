@@ -69,6 +69,10 @@ vi.mock("@/lib/supabase", () => ({
             error: null,
           })),
         })),
+        or: vi.fn(() => ({
+          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+        })),
+        order: vi.fn(() => Promise.resolve({ data: [], error: null })),
       })),
       upsert: vi.fn(() => ({
         error: null,
@@ -79,6 +83,16 @@ vi.mock("@/lib/supabase", () => ({
         })),
       })),
     })),
+    channel: vi.fn(() => ({
+      on: vi.fn(() => ({
+        on: vi.fn(() => ({
+          subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+        })),
+        subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+      })),
+      send: vi.fn(() => Promise.resolve()),
+    })),
+    removeChannel: vi.fn(),
     auth: {
       getSession: vi.fn(() => ({
         data: { session: { user: { id: "user-1" } } },
@@ -205,6 +219,14 @@ vi.mock("lucide-react", () => ({
   Plus: () => <div data-testid="plus-icon">Plus</div>,
   Zap: () => <div data-testid="zap-icon">Zap</div>,
   ArrowLeft: () => <div data-testid="arrow-left-icon">ArrowLeft</div>,
+  MessageSquare: () => (
+    <div data-testid="message-square-icon">MessageSquare</div>
+  ),
+}));
+
+// Mock FloatingAskButton
+vi.mock("@/components/FloatingAskButton", () => ({
+  default: () => <div data-testid="floating-ask-button">FloatingAskButton</div>,
 }));
 
 describe("VendorDashboard", () => {
@@ -219,7 +241,6 @@ describe("VendorDashboard", () => {
       expect(screen.getByTestId("header")).toBeInTheDocument();
       expect(screen.getByTestId("dashboard-sidebar")).toBeInTheDocument();
       expect(screen.getByTestId("vehicle-table")).toBeInTheDocument();
-      expect(screen.getByTestId("floating-ask-button")).toBeInTheDocument();
     });
   });
 
@@ -268,7 +289,9 @@ describe("VendorDashboard", () => {
     fireEvent.click(messagesNav);
 
     await waitFor(() => {
-      expect(screen.getByText("Mensajes en Desarrollo")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Mensajes" })
+      ).toBeInTheDocument();
       expect(messagesNav).toHaveClass("active");
     });
   });

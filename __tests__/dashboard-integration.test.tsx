@@ -66,6 +66,10 @@ vi.mock("@/lib/supabase", () => ({
             error: null,
           }),
         }),
+        or: vi.fn().mockReturnValue({
+          order: vi.fn().mockResolvedValue({ data: [], error: null }),
+        }),
+        order: vi.fn().mockResolvedValue({ data: [], error: null }),
       }),
       upsert: vi.fn().mockReturnValue({
         error: null,
@@ -76,6 +80,16 @@ vi.mock("@/lib/supabase", () => ({
         }),
       }),
     }),
+    channel: vi.fn().mockReturnValue({
+      on: vi.fn().mockReturnValue({
+        on: vi.fn().mockReturnValue({
+          subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+        }),
+        subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+      }),
+      send: vi.fn().mockResolvedValue(undefined),
+    }),
+    removeChannel: vi.fn(),
     auth: {
       getSession: vi.fn().mockResolvedValue({
         data: { session: { user: { id: "user-1" } } },
@@ -259,6 +273,16 @@ vi.mock("@/lib/database-mapping", () => ({
   vehicleToDatabase: (vehicle: Vehicle) => vehicle,
 }));
 
+// Mock Lucide icons
+vi.mock("lucide-react", () => ({
+  Plus: () => <div data-testid="plus-icon">Plus</div>,
+  Zap: () => <div data-testid="zap-icon">Zap</div>,
+  ArrowLeft: () => <div data-testid="arrow-left-icon">ArrowLeft</div>,
+  MessageSquare: () => (
+    <div data-testid="message-square-icon">MessageSquare</div>
+  ),
+}));
+
 describe("Dashboard Integration Tests", () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mockVehicles: Vehicle[] = [
@@ -415,7 +439,9 @@ describe("Dashboard Integration Tests", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("messages-nav")).toHaveClass("active");
-      expect(screen.getByText("Mensajes en Desarrollo")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Mensajes" })
+      ).toBeInTheDocument();
     });
 
     // Back to vehicles
