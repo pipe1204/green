@@ -12,7 +12,8 @@ import { Vehicle } from "@/types";
 import { ProductForm } from "./ProductForm";
 import { VehicleTable } from "./VehicleTable";
 import { VehicleViewModal } from "./VehicleViewModal";
-import { DashboardSidebar, DashboardSection } from "./DashboardSidebar";
+import { ResponsiveDashboardSidebar } from "./ResponsiveDashboardSidebar";
+import { DashboardSection } from "./DashboardSidebar";
 import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import { VendorMessagesSection } from "./VendorMessagesSection";
@@ -298,75 +299,20 @@ export function VendorDashboard() {
       <Header />
 
       <div className="flex h-screen pt-16">
-        {/* Sidebar - Hidden on mobile, visible on desktop */}
-        <div className="hidden lg:block">
-          <DashboardSidebar
-            activeSection={activeSection}
-            onSectionChange={(section) =>
-              setActiveSection(section as DashboardSection)
-            }
-            className="flex-shrink-0"
-          />
-        </div>
+        {/* Responsive Sidebar */}
+        <ResponsiveDashboardSidebar
+          activeSection={activeSection}
+          onSectionChange={(section) =>
+            setActiveSection(section as DashboardSection)
+          }
+          className="flex-shrink-0"
+        />
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 lg:p-6">
-            {/* Mobile Navigation - Only visible on mobile */}
-            <div className="lg:hidden mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/")}
-                  className="flex items-center space-x-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Volver al Inicio</span>
-                </Button>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  Panel de Vendedor
-                </h1>
-              </div>
-
-              {/* Mobile Section Selector */}
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setActiveSection("vehicles")}
-                  className={`p-3 rounded-lg text-sm font-medium transition-colors ${
-                    activeSection === "vehicles"
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                  }`}
-                >
-                  Vehículos
-                </button>
-                <button
-                  onClick={() => setActiveSection("analytics")}
-                  className={`p-3 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
-                    activeSection === "analytics"
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-white text-gray-600 border border-gray-200"
-                  }`}
-                  disabled
-                >
-                  Analítica
-                </button>
-                <button
-                  onClick={() => setActiveSection("messages")}
-                  className={`p-3 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
-                    activeSection === "messages"
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-white text-gray-600 border border-gray-200"
-                  }`}
-                  disabled
-                >
-                  Mensajes
-                </button>
-              </div>
-            </div>
-
-            {/* Desktop Back Button - Hidden on mobile */}
-            <div className="hidden lg:block mb-6">
+            {/* Back Button */}
+            <div className="mb-6">
               <Button
                 variant="outline"
                 onClick={() => router.push("/")}
