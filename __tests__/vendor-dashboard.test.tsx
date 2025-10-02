@@ -177,13 +177,13 @@ vi.mock("@/components/dashboard/VehicleTable", () => ({
   ),
 }));
 
-// Mock DashboardSidebar
-vi.mock("@/components/dashboard/DashboardSidebar", () => ({
-  DashboardSidebar: ({
+// Mock ResponsiveDashboardSidebar
+vi.mock("@/components/dashboard/ResponsiveDashboardSidebar", () => ({
+  ResponsiveDashboardSidebar: ({
     activeSection,
     onSectionChange,
   }: DashboardSidebarProps) => (
-    <div data-testid="dashboard-sidebar">
+    <div data-testid="responsive-dashboard-sidebar">
       <button
         onClick={() => onSectionChange("vehicles")}
         data-testid="vehicles-nav"
@@ -192,11 +192,11 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
         Mis Vehículos
       </button>
       <button
-        onClick={() => onSectionChange("analytics")}
-        data-testid="analytics-nav"
-        className={activeSection === "analytics" ? "active" : ""}
+        onClick={() => onSectionChange("inquiries")}
+        data-testid="inquiries-nav"
+        className={activeSection === "inquiries" ? "active" : ""}
       >
-        Analítica
+        Consultas
       </button>
       <button
         onClick={() => onSectionChange("messages")}
@@ -204,6 +204,13 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
         className={activeSection === "messages" ? "active" : ""}
       >
         Mensajes
+      </button>
+      <button
+        onClick={() => onSectionChange("analytics")}
+        data-testid="analytics-nav"
+        className={activeSection === "analytics" ? "active" : ""}
+      >
+        Analítica
       </button>
     </div>
   ),
@@ -241,7 +248,9 @@ describe("VendorDashboard", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("header")).toBeInTheDocument();
-      expect(screen.getByTestId("dashboard-sidebar")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("responsive-dashboard-sidebar")
+      ).toBeInTheDocument();
       expect(screen.getByTestId("vehicle-table")).toBeInTheDocument();
     });
   });
@@ -264,11 +273,32 @@ describe("VendorDashboard", () => {
     });
   });
 
+  it("switches to inquiries section when clicked", async () => {
+    render(<VendorDashboard />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("responsive-dashboard-sidebar")
+      ).toBeInTheDocument();
+    });
+
+    const inquiriesNav = screen.getByTestId("inquiries-nav");
+    fireEvent.click(inquiriesNav);
+
+    await waitFor(() => {
+      // The inquiries section shows a loading state initially
+      expect(screen.getByText("Cargando consultas...")).toBeInTheDocument();
+      expect(inquiriesNav).toHaveClass("active");
+    });
+  });
+
   it("switches to analytics section when clicked", async () => {
     render(<VendorDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("dashboard-sidebar")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("responsive-dashboard-sidebar")
+      ).toBeInTheDocument();
     });
 
     const analyticsNav = screen.getByTestId("analytics-nav");
@@ -284,7 +314,9 @@ describe("VendorDashboard", () => {
     render(<VendorDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("dashboard-sidebar")).toBeInTheDocument();
+      expect(
+        screen.getByTestId("responsive-dashboard-sidebar")
+      ).toBeInTheDocument();
     });
 
     const messagesNav = screen.getByTestId("messages-nav");
@@ -400,8 +432,15 @@ describe("VendorDashboard", () => {
     render(<VendorDashboard />);
 
     await waitFor(() => {
-      // Should show mobile navigation
-      expect(screen.getByText("Panel de Vendedor")).toBeInTheDocument();
+      // Should show the responsive sidebar
+      expect(
+        screen.getByTestId("responsive-dashboard-sidebar")
+      ).toBeInTheDocument();
+      // Should show the navigation buttons
+      expect(screen.getByTestId("vehicles-nav")).toBeInTheDocument();
+      expect(screen.getByTestId("inquiries-nav")).toBeInTheDocument();
+      expect(screen.getByTestId("messages-nav")).toBeInTheDocument();
+      expect(screen.getByTestId("analytics-nav")).toBeInTheDocument();
     });
   });
 

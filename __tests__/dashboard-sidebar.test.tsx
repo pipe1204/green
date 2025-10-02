@@ -117,7 +117,8 @@ describe("DashboardSidebar", () => {
 
     expect(screen.getByTestId("bike-icon")).toBeInTheDocument();
     expect(screen.getByTestId("analytics-icon")).toBeInTheDocument();
-    expect(screen.getByTestId("messages-icon")).toBeInTheDocument();
+    // Both Consultas and Mensajes use MessageSquare icon, so we expect 2 instances
+    expect(screen.getAllByTestId("messages-icon")).toHaveLength(2);
   });
 
   it("displays footer when not collapsed", () => {

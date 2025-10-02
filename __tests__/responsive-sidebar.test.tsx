@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ResponsiveDashboardSidebar } from "@/components/dashboard/ResponsiveDashboardSidebar";
@@ -13,6 +14,22 @@ vi.mock("next/navigation", () => ({
 // Mock the cn utility
 vi.mock("@/lib/utils", () => ({
   cn: (...classes: (string | undefined)[]) => classes.filter(Boolean).join(" "),
+}));
+
+// Mock lucide-react icons
+vi.mock("lucide-react", () => ({
+  Bike: () => <svg data-testid="bike-icon">Bike</svg>,
+  MessageSquare: () => (
+    <svg data-testid="message-square-icon">MessageSquare</svg>
+  ),
+  BarChart3: () => <svg data-testid="bar-chart-3-icon">BarChart3</svg>,
+  ChevronLeft: () => <svg data-testid="chevron-left-icon">ChevronLeft</svg>,
+  ChevronRight: () => <svg data-testid="chevron-right-icon">ChevronRight</svg>,
+  Heart: () => <svg data-testid="heart-icon">Heart</svg>,
+  Calendar: () => <svg data-testid="calendar-icon">Calendar</svg>,
+  Bell: () => <svg data-testid="bell-icon">Bell</svg>,
+  Menu: () => <svg data-testid="menu-icon">Menu</svg>,
+  X: () => <svg data-testid="x-icon">X</svg>,
 }));
 
 describe("ResponsiveDashboardSidebar", () => {
@@ -32,12 +49,19 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      expect(screen.getByText("Panel de Vendedor")).toBeInTheDocument();
-      expect(screen.getByText("Gestión de inventario")).toBeInTheDocument();
-      expect(screen.getByText("Mis Vehículos")).toBeInTheDocument();
-      expect(screen.getByText("Consultas")).toBeInTheDocument();
-      expect(screen.getByText("Mensajes")).toBeInTheDocument();
-      expect(screen.getByText("Analítica")).toBeInTheDocument();
+      // There are multiple "Panel de Vendedor" elements (desktop and mobile), so we use getAllByText
+      expect(screen.getAllByText("Panel de Vendedor").length).toBeGreaterThan(
+        0
+      );
+      expect(
+        screen.getAllByText("Gestión de inventario").length
+      ).toBeGreaterThan(0);
+      // There are multiple navigation items (desktop and mobile), so we use getAllByText
+      expect(screen.getAllByText("Mis Vehículos").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Consultas").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Mensajes").length).toBeGreaterThan(0);
+      // There are multiple "Analítica" elements (desktop and mobile), so we use getAllByText
+      expect(screen.getAllByText("Analítica").length).toBeGreaterThan(0);
     });
 
     it("calls onSectionChange when navigation item is clicked", () => {
@@ -49,8 +73,10 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const consultasButton = screen.getByText("Consultas");
-      fireEvent.click(consultasButton);
+      // There are multiple "Consultas" elements (desktop and mobile), so we use getAllByText and click the first one
+      const consultasButtons = screen.getAllByText("Consultas");
+      expect(consultasButtons.length).toBeGreaterThan(0);
+      fireEvent.click(consultasButtons[0]);
 
       expect(mockOnSectionChange).toHaveBeenCalledWith("inquiries");
     });
@@ -64,8 +90,14 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const vehiclesButton = screen.getByText("Mis Vehículos");
-      expect(vehiclesButton.closest("button")).toHaveClass("bg-green-50");
+      // There are multiple "Mis Vehículos" elements (desktop and mobile), so we use getAllByText
+      const vehiclesButtons = screen.getAllByText("Mis Vehículos");
+      expect(vehiclesButtons.length).toBeGreaterThan(0);
+      // Check that at least one has the active styling
+      const activeButtons = vehiclesButtons.filter((button) =>
+        button.closest("button")?.classList.contains("bg-green-50")
+      );
+      expect(activeButtons.length).toBeGreaterThan(0);
     });
 
     it("disables analytics section", () => {
@@ -77,8 +109,14 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const analyticsButton = screen.getByText("Analítica");
-      expect(analyticsButton.closest("button")).toBeDisabled();
+      // There are multiple "Analítica" elements (desktop and mobile), so we use getAllByText
+      const analyticsButtons = screen.getAllByText("Analítica");
+      expect(analyticsButtons.length).toBeGreaterThan(0);
+      // Check that at least one is disabled
+      const disabledButtons = analyticsButtons.filter((button) =>
+        button.closest("button")?.hasAttribute("disabled")
+      );
+      expect(disabledButtons.length).toBeGreaterThan(0);
     });
   });
 
@@ -92,14 +130,20 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      expect(screen.getByText("Panel de Cliente")).toBeInTheDocument();
+      // There are multiple "Panel de Cliente" elements (desktop and mobile), so we use getAllByText
+      expect(screen.getAllByText("Panel de Cliente").length).toBeGreaterThan(0);
       expect(
-        screen.getByText("Gestión de favoritos y alertas")
-      ).toBeInTheDocument();
-      expect(screen.getByText("Favoritos")).toBeInTheDocument();
-      expect(screen.getByText("Pruebas de Manejo")).toBeInTheDocument();
-      expect(screen.getByText("Alertas de Precio")).toBeInTheDocument();
-      expect(screen.getByText("Mis Consultas")).toBeInTheDocument();
+        screen.getAllByText("Gestión de favoritos y alertas").length
+      ).toBeGreaterThan(0);
+      // There are multiple navigation items (desktop and mobile), so we use getAllByText
+      expect(screen.getAllByText("Favoritos").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Pruebas de Manejo").length).toBeGreaterThan(
+        0
+      );
+      expect(screen.getAllByText("Alertas de Precio").length).toBeGreaterThan(
+        0
+      );
+      expect(screen.getAllByText("Mis Consultas").length).toBeGreaterThan(0);
     });
 
     it("calls onSectionChange when customer navigation item is clicked", () => {
@@ -111,8 +155,10 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const testDrivesButton = screen.getByText("Pruebas de Manejo");
-      fireEvent.click(testDrivesButton);
+      // There are multiple "Pruebas de Manejo" elements (desktop and mobile), so we use getAllByText
+      const testDrivesButtons = screen.getAllByText("Pruebas de Manejo");
+      expect(testDrivesButtons.length).toBeGreaterThan(0);
+      fireEvent.click(testDrivesButtons[0]);
 
       expect(mockOnSectionChange).toHaveBeenCalledWith("testDrives");
     });
@@ -128,7 +174,7 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const menuButton = screen.getByRole("button", { name: /menu/i });
+      const menuButton = screen.getByTestId("menu-icon");
       expect(menuButton).toBeInTheDocument();
     });
 
@@ -141,11 +187,11 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      fireEvent.click(menuButton);
+      const menuButton = screen.getByTestId("menu-icon").closest("button");
+      fireEvent.click(menuButton!);
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /x/i })).toBeInTheDocument();
+        expect(screen.getByTestId("x-icon")).toBeInTheDocument();
       });
     });
 
@@ -159,26 +205,21 @@ describe("ResponsiveDashboardSidebar", () => {
       );
 
       // Open mobile menu
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      fireEvent.click(menuButton);
+      const menuButton = screen.getByTestId("menu-icon").closest("button");
+      fireEvent.click(menuButton!);
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /x/i })).toBeInTheDocument();
+        expect(screen.getByTestId("x-icon")).toBeInTheDocument();
       });
 
       // Click overlay to close
-      const overlay = screen
-        .getByRole("button", { name: /x/i })
-        .closest("div")
-        ?.parentElement?.querySelector("div");
+      const overlay = document.querySelector('[class*="bg-black"]');
       if (overlay) {
         fireEvent.click(overlay);
       }
 
       await waitFor(() => {
-        expect(
-          screen.getByRole("button", { name: /menu/i })
-        ).toBeInTheDocument();
+        expect(screen.getByTestId("menu-icon")).toBeInTheDocument();
       });
     });
 
@@ -192,24 +233,23 @@ describe("ResponsiveDashboardSidebar", () => {
       );
 
       // Open mobile menu
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      fireEvent.click(menuButton);
+      const menuButton = screen.getByTestId("menu-icon").closest("button");
+      fireEvent.click(menuButton!);
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: /x/i })).toBeInTheDocument();
+        expect(screen.getByTestId("x-icon")).toBeInTheDocument();
       });
 
-      // Click on a navigation item
-      const consultasButton = screen.getByText("Consultas");
-      fireEvent.click(consultasButton);
+      // Click on any navigation item (both desktop and mobile will trigger the callback)
+      const consultasButtons = screen.getAllByText("Consultas");
+      expect(consultasButtons.length).toBeGreaterThan(0);
+      fireEvent.click(consultasButtons[0]);
 
       expect(mockOnSectionChange).toHaveBeenCalledWith("inquiries");
 
       // Menu should close automatically
       await waitFor(() => {
-        expect(
-          screen.getByRole("button", { name: /menu/i })
-        ).toBeInTheDocument();
+        expect(screen.getByTestId("menu-icon")).toBeInTheDocument();
       });
     });
   });
@@ -224,7 +264,7 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const collapseButton = screen.getByRole("button", { name: /chevron/i });
+      const collapseButton = screen.getByTestId("chevron-left-icon");
       expect(collapseButton).toBeInTheDocument();
     });
 
@@ -237,13 +277,13 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const collapseButton = screen.getByRole("button", { name: /chevron/i });
-      fireEvent.click(collapseButton);
+      const collapseButton = screen
+        .getByTestId("chevron-left-icon")
+        .closest("button");
+      fireEvent.click(collapseButton!);
 
       // After clicking, the button should show the opposite chevron
-      expect(
-        screen.getByRole("button", { name: /chevron/i })
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("chevron-right-icon")).toBeInTheDocument();
     });
   });
 
@@ -260,8 +300,9 @@ describe("ResponsiveDashboardSidebar", () => {
       const sidebar = screen.getByTestId("responsive-dashboard-sidebar");
       expect(sidebar).toBeInTheDocument();
 
-      const navigation = screen.getByRole("navigation");
-      expect(navigation).toBeInTheDocument();
+      // There are multiple navigation elements (desktop and mobile), so we use getAllByRole
+      const navigations = screen.getAllByRole("navigation");
+      expect(navigations.length).toBeGreaterThan(0);
     });
 
     it("disables navigation items when they are disabled", () => {
@@ -273,8 +314,14 @@ describe("ResponsiveDashboardSidebar", () => {
         />
       );
 
-      const analyticsButton = screen.getByText("Analítica");
-      expect(analyticsButton.closest("button")).toBeDisabled();
+      // There are multiple "Analítica" elements (desktop and mobile), so we use getAllByText
+      const analyticsButtons = screen.getAllByText("Analítica");
+      expect(analyticsButtons.length).toBeGreaterThan(0);
+      // Check that at least one is disabled
+      const disabledButtons = analyticsButtons.filter((button) =>
+        button.closest("button")?.hasAttribute("disabled")
+      );
+      expect(disabledButtons.length).toBeGreaterThan(0);
     });
   });
 
@@ -289,7 +336,7 @@ describe("ResponsiveDashboardSidebar", () => {
       );
 
       const sidebar = screen.getByTestId("responsive-dashboard-sidebar");
-      expect(sidebar).toHaveClass("hidden", "lg:block");
+      expect(sidebar).toHaveClass("hidden", "lg:flex");
     });
   });
 });

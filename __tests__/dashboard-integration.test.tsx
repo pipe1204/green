@@ -116,12 +116,12 @@ vi.mock("@/components/FloatingAskButton", () => ({
 }));
 
 // Mock dashboard components with proper typing
-vi.mock("@/components/dashboard/DashboardSidebar", () => ({
-  DashboardSidebar: ({
+vi.mock("@/components/dashboard/ResponsiveDashboardSidebar", () => ({
+  ResponsiveDashboardSidebar: ({
     activeSection,
     onSectionChange,
   }: DashboardSidebarProps) => (
-    <div data-testid="dashboard-sidebar">
+    <div data-testid="responsive-dashboard-sidebar">
       <nav>
         <button
           onClick={() => onSectionChange("vehicles")}
@@ -131,11 +131,11 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
           Mis Vehículos
         </button>
         <button
-          onClick={() => onSectionChange("analytics")}
-          data-testid="analytics-nav"
-          className={activeSection === "analytics" ? "active" : ""}
+          onClick={() => onSectionChange("inquiries")}
+          data-testid="inquiries-nav"
+          className={activeSection === "inquiries" ? "active" : ""}
         >
-          Analítica
+          Consultas
         </button>
         <button
           onClick={() => onSectionChange("messages")}
@@ -143,6 +143,13 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
           className={activeSection === "messages" ? "active" : ""}
         >
           Mensajes
+        </button>
+        <button
+          onClick={() => onSectionChange("analytics")}
+          data-testid="analytics-nav"
+          className={activeSection === "analytics" ? "active" : ""}
+        >
+          Analítica
         </button>
       </nav>
     </div>
@@ -429,12 +436,13 @@ describe("Dashboard Integration Tests", () => {
       expect(screen.getByText("Tabla de Vehículos")).toBeInTheDocument();
     });
 
-    // Switch to analytics
-    fireEvent.click(screen.getByTestId("analytics-nav"));
+    // Switch to inquiries
+    fireEvent.click(screen.getByTestId("inquiries-nav"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("analytics-nav")).toHaveClass("active");
-      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
+      expect(screen.getByTestId("inquiries-nav")).toHaveClass("active");
+      // The inquiries section shows a loading state initially
+      expect(screen.getByText("Cargando consultas...")).toBeInTheDocument();
     });
 
     // Switch to messages
@@ -445,6 +453,14 @@ describe("Dashboard Integration Tests", () => {
       expect(
         screen.getByRole("heading", { name: "Mensajes" })
       ).toBeInTheDocument();
+    });
+
+    // Switch to analytics
+    fireEvent.click(screen.getByTestId("analytics-nav"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("analytics-nav")).toHaveClass("active");
+      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
     });
 
     // Back to vehicles
