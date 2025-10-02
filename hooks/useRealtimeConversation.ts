@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { ConversationDetails, Message } from "@/types/messaging";
 
 export function useRealtimeConversation(conversationId: string | null) {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [conversation, setConversation] = useState<ConversationDetails | null>(
     null
   );
@@ -207,6 +207,78 @@ export function useRealtimeConversation(conversationId: string | null) {
     };
   }, [conversationId, user]);
 
+  // Lightweight polling fallback to ensure near real-time updates across clients
+  useEffect(() => {
+    if (!conversationId || !user) return;
+
+    let isCancelled = false;
+
+    const fetchLatestMessages = async () => {
+      try {
+        const { data: messagesData, error: messagesError } = await supabase
+          .from("messages")
+          .select(
+            `
+            *,
+            message_attachments(file_url, file_name, file_type, file_size)
+          `
+          )
+          .eq("conversation_id", conversationId)
+          .order("created_at", { ascending: true });
+
+        if (messagesError) throw messagesError;
+
+        if (isCancelled) return;
+
+        // Map to our Message shape
+        const latest: Message[] =
+          messagesData?.map((msg: Record<string, unknown>) => ({
+            id: msg.id as string,
+            content: msg.content as string,
+            senderId: msg.sender_id as string,
+            senderType:
+              (msg.sender_type as "customer" | "vendor") ||
+              (msg.sender_id === user.id ? "customer" : "vendor"),
+            messageType:
+              (msg.message_type as "image" | "text" | "file" | "mixed") ||
+              "text",
+            createdAt: msg.created_at as string,
+            isRead: msg.is_read as boolean,
+            attachments:
+              (msg.message_attachments as Record<string, unknown>[])?.map(
+                (att: Record<string, unknown>) => ({
+                  id: att.id as string,
+                  url: att.file_url as string,
+                  fileName: att.file_name as string,
+                  fileType: att.file_type as string,
+                  fileSize: att.file_size as number,
+                })
+              ) || [],
+          })) || [];
+
+        // Only update if there's a difference (cheap length/id check)
+        const existingIds = new Set(messages.map((m) => m.id));
+        const latestIds = new Set(latest.map((m) => m.id));
+        if (
+          latest.length !== messages.length ||
+          [...latestIds].some((id) => !existingIds.has(id))
+        ) {
+          setMessages(latest);
+        }
+      } catch {
+        // Silent; realtime should handle most updates. Polling is a fallback.
+      }
+    };
+
+    const interval = setInterval(fetchLatestMessages, 4000);
+    fetchLatestMessages();
+
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, [conversationId, user, messages]);
+
   const markAsRead = async (messageId: string) => {
     if (!user) return;
 
@@ -230,36 +302,36 @@ export function useRealtimeConversation(conversationId: string | null) {
       fileSize: number;
     }>;
   }) => {
-    if (!conversationId || !user) return;
+    if (!conversationId || !user || !session?.access_token) return;
 
     try {
-      const { data: message, error } = await supabase
-        .from("messages")
-        .insert({
-          conversation_id: conversationId,
-          sender_id: user.id,
-          content: data.content,
-          message_type: "text",
-        })
-        .select()
-        .single();
+      const response = await fetch(
+        `/api/messages/conversations/${conversationId}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            content: data.content,
+            messageType: "text",
+            attachments: data.attachments ?? [],
+          }),
+        }
+      );
 
-      if (error) throw error;
-
-      // Handle attachments if any
-      if (data.attachments && data.attachments.length > 0) {
-        const attachmentInserts = data.attachments.map((att) => ({
-          message_id: message.id,
-          file_url: att.url,
-          file_name: att.fileName,
-          file_type: att.fileType,
-          file_size: att.fileSize,
-        }));
-
-        await supabase.from("message_attachments").insert(attachmentInserts);
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to send message");
       }
 
-      return message;
+      // Optimistically append to local state for immediate feedback
+      if (result?.message) {
+        setMessages((prev) => [...prev, result.message as Message]);
+      }
+
+      return result.message;
     } catch (err) {
       console.error("Error sending message:", err);
       throw err;
