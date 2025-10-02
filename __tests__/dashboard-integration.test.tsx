@@ -65,6 +65,7 @@ vi.mock("@/lib/supabase", () => ({
             },
             error: null,
           }),
+          order: vi.fn().mockResolvedValue({ data: [], error: null }),
         }),
         or: vi.fn().mockReturnValue({
           order: vi.fn().mockResolvedValue({ data: [], error: null }),
@@ -87,6 +88,7 @@ vi.mock("@/lib/supabase", () => ({
         }),
         subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
       }),
+      subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
       send: vi.fn().mockResolvedValue(undefined),
     }),
     removeChannel: vi.fn(),
@@ -281,6 +283,7 @@ vi.mock("lucide-react", () => ({
   MessageSquare: () => (
     <div data-testid="message-square-icon">MessageSquare</div>
   ),
+  AlertCircle: () => <div data-testid="alert-circle-icon">AlertCircle</div>,
 }));
 
 describe("Dashboard Integration Tests", () => {

@@ -90,6 +90,7 @@ vi.mock("@/lib/supabase", () => ({
         })),
         subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
       })),
+      subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
       send: vi.fn(() => Promise.resolve()),
     })),
     removeChannel: vi.fn(),
@@ -222,6 +223,7 @@ vi.mock("lucide-react", () => ({
   MessageSquare: () => (
     <div data-testid="message-square-icon">MessageSquare</div>
   ),
+  AlertCircle: () => <div data-testid="alert-circle-icon">AlertCircle</div>,
 }));
 
 // Mock FloatingAskButton
