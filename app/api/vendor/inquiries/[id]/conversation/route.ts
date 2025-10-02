@@ -66,7 +66,12 @@ export async function POST(
 
     const { data: inquiry, error: inquiryError } = await serviceSupabase
       .from("customer_inquiries")
-      .select("*")
+      .select(
+        `
+        *,
+        vehicles(name, brand)
+      `
+      )
       .eq("id", inquiryId)
       .eq("vendor_id", vendor.id)
       .single();
@@ -96,6 +101,10 @@ export async function POST(
     }
 
     // Create the conversation
+    const vehicleName = inquiry.vehicles?.name || "";
+    const vehicleBrand = inquiry.vehicles?.brand || "";
+    const vehicleDisplay =
+      [vehicleBrand, vehicleName].filter(Boolean).join(" ") || "Vehículo";
     const { data: conversation, error: conversationError } =
       await serviceSupabase
         .from("conversations")
@@ -103,7 +112,7 @@ export async function POST(
           customer_id: inquiry.customer_id,
           vendor_id: inquiry.vendor_id,
           vehicle_id: inquiry.vehicle_id,
-          subject: `Consulta sobre ${inquiry.vehicle_id}`, // You might want to get vehicle name here
+          subject: `Consulta sobre ${vehicleDisplay}`,
           last_message_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

@@ -5,14 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  ArrowLeft,
-  MoreVertical,
-  Phone,
-  Video,
-  Archive,
-  X,
-} from "lucide-react";
+import { ArrowLeft, MoreVertical, Archive, X } from "lucide-react";
 
 interface ConversationHeaderProps {
   conversation: {
@@ -125,22 +118,6 @@ export function ConversationHeader({
 
       {/* Right side - Actions */}
       <div className="flex items-center space-x-1">
-        {/* Call buttons (future feature) */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hidden sm:flex"
-        >
-          <Phone className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hidden sm:flex"
-        >
-          <Video className="h-4 w-4" />
-        </Button>
-
         {/* Archive button */}
         {conversation.status === "open" && onArchive && (
           <Button

@@ -69,8 +69,6 @@ export function CustomerDashboard() {
           </div>
         </main>
       </div>
-
-      <Footer />
     </div>
   );
 }
