@@ -100,6 +100,9 @@ export function VendorInquiriesSection() {
 
     try {
       setActionLoading(true);
+      console.log("Creating conversation for inquiry:", selectedInquiry.id);
+      console.log("Initial message:", initialMessage);
+
       const response = await fetch(
         `/api/vendor/inquiries/${selectedInquiry.id}/conversation`,
         {
@@ -118,7 +121,7 @@ export function VendorInquiriesSection() {
         throw new Error(data.error || "Error creating conversation");
       }
 
-      // Update local state to mark inquiry as converted
+      // Only update local state after successful API call
       setInquiries((prev) =>
         prev.map((inquiry) =>
           inquiry.id === selectedInquiry.id
@@ -135,6 +138,7 @@ export function VendorInquiriesSection() {
     } catch (err) {
       console.error("Error creating conversation:", err);
       setError("Error creating conversation");
+      alert("Error al crear la conversación. Por favor, inténtalo de nuevo.");
       throw err;
     } finally {
       setActionLoading(false);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * POST /api/vendor/inquiries/[id]/conversation
@@ -7,7 +8,7 @@ import { supabase } from "@/lib/supabase";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get user from auth header
@@ -46,7 +47,7 @@ export async function POST(
       );
     }
 
-    const inquiryId = params.id;
+    const { id: inquiryId } = await params;
     const body = await request.json();
     const { initialMessage } = body;
 
@@ -57,8 +58,13 @@ export async function POST(
       );
     }
 
-    // Get the inquiry details
-    const { data: inquiry, error: inquiryError } = await supabase
+    // Use service role client to bypass RLS (like in inquiries API)
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: inquiry, error: inquiryError } = await serviceSupabase
       .from("customer_inquiries")
       .select("*")
       .eq("id", inquiryId)
@@ -66,11 +72,12 @@ export async function POST(
       .single();
 
     if (inquiryError || !inquiry) {
+      console.error("Inquiry not found - Error:", inquiryError);
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
     // Check if conversation already exists for this inquiry
-    const { data: existingConversation } = await supabase
+    const { data: existingConversation } = await serviceSupabase
       .from("conversations")
       .select("id")
       .eq("vehicle_id", inquiry.vehicle_id)
@@ -89,30 +96,32 @@ export async function POST(
     }
 
     // Create the conversation
-    const { data: conversation, error: conversationError } = await supabase
-      .from("conversations")
-      .insert({
-        customer_id: inquiry.customer_id,
-        vendor_id: inquiry.vendor_id,
-        vehicle_id: inquiry.vehicle_id,
-        subject: `Consulta sobre ${inquiry.vehicle_id}`, // You might want to get vehicle name here
-        last_message_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    const { data: conversation, error: conversationError } =
+      await serviceSupabase
+        .from("conversations")
+        .insert({
+          customer_id: inquiry.customer_id,
+          vendor_id: inquiry.vendor_id,
+          vehicle_id: inquiry.vehicle_id,
+          subject: `Consulta sobre ${inquiry.vehicle_id}`, // You might want to get vehicle name here
+          last_message_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
 
     if (conversationError) {
       throw conversationError;
     }
 
     // Create the initial message from the vendor
-    const { data: message, error: messageError } = await supabase
+    const { data: message, error: messageError } = await serviceSupabase
       .from("messages")
       .insert({
         conversation_id: conversation.id,
         sender_id: user.id,
+        sender_type: "vendor",
         content: initialMessage,
         is_read: false,
         created_at: new Date().toISOString(),
@@ -123,13 +132,16 @@ export async function POST(
 
     if (messageError) {
       // If message creation fails, clean up the conversation
-      await supabase.from("conversations").delete().eq("id", conversation.id);
+      await serviceSupabase
+        .from("conversations")
+        .delete()
+        .eq("id", conversation.id);
 
       throw messageError;
     }
 
     // Update the inquiry status to "converted"
-    const { error: updateError } = await supabase
+    const { error: updateError } = await serviceSupabase
       .from("customer_inquiries")
       .update({
         status: "converted",
