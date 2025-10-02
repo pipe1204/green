@@ -8,30 +8,35 @@ import {
   ChevronLeft,
   ChevronRight,
   Bike,
+  Heart,
+  Calendar,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type DashboardSection = "vehicles" | "analytics" | "messages";
+export type CustomerDashboardSection =
+  | "favorites"
+  | "testDrives"
+  | "priceAlerts"
+  | "inquiries";
 
 interface DashboardSidebarProps {
-  activeSection: DashboardSection;
-  onSectionChange: (section: DashboardSection) => void;
+  activeSection: DashboardSection | CustomerDashboardSection;
+  onSectionChange: (
+    section: DashboardSection | CustomerDashboardSection
+  ) => void;
+  userType?: "vendor" | "customer";
   className?: string;
 }
 
-const navigationItems = [
+const vendorNavigationItems = [
   {
     id: "vehicles" as DashboardSection,
     label: "Mis Vehículos",
     icon: Bike,
     description: "Gestiona tu inventario de vehículos",
-  },
-  {
-    id: "analytics" as DashboardSection,
-    label: "Analítica",
-    icon: BarChart3,
-    description: "Métricas y estadísticas (Próximamente)",
-    disabled: true,
+    disabled: false,
   },
   {
     id: "messages" as DashboardSection,
@@ -40,14 +45,56 @@ const navigationItems = [
     description: "Consulta con clientes (Próximamente)",
     disabled: true,
   },
+  {
+    id: "analytics" as DashboardSection,
+    label: "Analítica",
+    icon: BarChart3,
+    description: "Métricas y estadísticas (Próximamente)",
+    disabled: true,
+  },
+];
+
+const customerNavigationItems = [
+  {
+    id: "favorites" as CustomerDashboardSection,
+    label: "Favoritos",
+    icon: Heart,
+    description: "Vehículos que te interesan",
+    disabled: false,
+  },
+  {
+    id: "testDrives" as CustomerDashboardSection,
+    label: "Pruebas de Manejo",
+    icon: Calendar,
+    description: "Pruebas programadas",
+    disabled: false,
+  },
+  {
+    id: "priceAlerts" as CustomerDashboardSection,
+    label: "Alertas de Precio",
+    icon: Bell,
+    description: "Notificaciones de precio",
+    disabled: false,
+  },
+  {
+    id: "inquiries" as CustomerDashboardSection,
+    label: "Mis Consultas",
+    icon: MessageSquare,
+    description: "Mensajes a vendedores",
+    disabled: false,
+  },
 ];
 
 export function DashboardSidebar({
   activeSection,
   onSectionChange,
+  userType = "vendor",
   className,
 }: DashboardSidebarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+
+  const navigationItems =
+    userType === "customer" ? customerNavigationItems : vendorNavigationItems;
 
   return (
     <div
@@ -64,9 +111,15 @@ export function DashboardSidebar({
           {!isCollapsed && (
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Panel de Vendedor
+                {userType === "customer"
+                  ? "Panel de Cliente"
+                  : "Panel de Vendedor"}
               </h2>
-              <p className="text-sm text-gray-500">Gestión de inventario</p>
+              <p className="text-sm text-gray-500">
+                {userType === "customer"
+                  ? "Gestión de favoritos y alertas"
+                  : "Gestión de inventario"}
+              </p>
             </div>
           )}
           <Button

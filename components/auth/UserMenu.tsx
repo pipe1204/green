@@ -91,7 +91,7 @@ export function UserMenu() {
               if (userRole === "vendor") {
                 router.push("/dashboard");
               } else {
-                router.push("/");
+                router.push("/customer-dashboard");
               }
             }}
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

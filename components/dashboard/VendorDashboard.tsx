@@ -256,20 +256,7 @@ export function VendorDashboard() {
             />
           </div>
         );
-      case "analytics":
-        return (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Analítica en Desarrollo
-            </h3>
-            <p className="text-gray-600">
-              Próximamente podrás ver métricas detalladas de tus vehículos
-            </p>
-          </div>
-        );
+
       case "messages":
         return (
           <div className="text-center py-12">
@@ -281,6 +268,20 @@ export function VendorDashboard() {
             </h3>
             <p className="text-gray-600">
               Próximamente podrás gestionar consultas de clientes
+            </p>
+          </div>
+        );
+      case "analytics":
+        return (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Analítica en Desarrollo
+            </h3>
+            <p className="text-gray-600">
+              Próximamente podrás ver métricas detalladas de tus vehículos
             </p>
           </div>
         );
@@ -310,7 +311,9 @@ export function VendorDashboard() {
         <div className="hidden lg:block">
           <DashboardSidebar
             activeSection={activeSection}
-            onSectionChange={setActiveSection}
+            onSectionChange={(section) =>
+              setActiveSection(section as DashboardSection)
+            }
             className="flex-shrink-0"
           />
         </div>

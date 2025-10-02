@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +20,11 @@ import {
   Users,
   Zap,
   Car,
+  CheckCircle,
 } from "lucide-react";
 import { timeSlots } from "@/data";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { supabase } from "@/lib/supabase";
 
 interface TestDriveModalProps {
   isOpen: boolean;
@@ -34,7 +37,10 @@ export const TestDriveModal: React.FC<TestDriveModalProps> = ({
   onClose,
   vehicle,
 }) => {
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,28 +50,108 @@ export const TestDriveModal: React.FC<TestDriveModalProps> = ({
     message: "",
   });
 
+  // Pre-fill form with user data if authenticated
+  useEffect(() => {
+    if (isOpen && user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.user_metadata?.full_name || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [isOpen, user]);
+
+  // Reset states when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSuccess(false);
+      setError(null);
+    }
+  }, [isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert(
-        "¡Prueba de manejo programada! Te contactaremos para confirmar la fecha y hora."
+    try {
+      // Get vendor ID from vehicle
+      const { data: vehicleData, error: vehicleError } = await supabase
+        .from("vehicles")
+        .select("vendor_id")
+        .eq("id", vehicle.id)
+        .single();
+
+      if (vehicleError) throw vehicleError;
+
+      // Create test drive booking
+      const { error: insertError } = await supabase
+        .from("test_drive_bookings")
+        .insert({
+          vehicle_id: vehicle.id,
+          customer_id: user?.id || null,
+          vendor_id: vehicleData.vendor_id,
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          preferred_date: formData.preferredDate,
+          preferred_time: formData.preferredTime,
+          message: formData.message || null,
+          status: "pending",
+        });
+
+      if (insertError) throw insertError;
+
+      // Success!
+      setSuccess(true);
+
+      // Reset form after delay
+      setTimeout(() => {
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          preferredDate: "",
+          preferredTime: "",
+          message: "",
+        });
+        setSuccess(false);
+        onClose();
+      }, 3000);
+    } catch (err) {
+      console.error("Error booking test drive:", err);
+      setError(
+        "Hubo un error al programar tu prueba de manejo. Por favor intenta de nuevo."
       );
-      onClose();
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        preferredDate: "",
-        preferredTime: "",
-        message: "",
-      });
-    }, 1500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Success state
+  if (success) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md">
+          <div className="text-center py-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              ¡Prueba Programada!
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Tu solicitud de prueba de manejo ha sido enviada exitosamente.
+            </p>
+            <p className="text-sm text-gray-500">
+              El vendedor se pondrá en contacto contigo pronto para confirmar la
+              fecha y hora.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -76,6 +162,12 @@ export const TestDriveModal: React.FC<TestDriveModalProps> = ({
             Programar Prueba de Manejo
           </DialogTitle>
         </DialogHeader>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Vehicle Details */}

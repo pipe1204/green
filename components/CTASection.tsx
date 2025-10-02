@@ -15,7 +15,7 @@ export default function CTASection() {
           hue={220}
           xOffset={0}
           speed={0.8}
-          intensity={0.4}
+          intensity={0.2}
           size={1.2}
         />
       </div>

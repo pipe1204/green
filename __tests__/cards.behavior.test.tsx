@@ -67,15 +67,15 @@ describe("Cards behavior", () => {
     expect(screen.getByText(/imagen no disponible/i)).toBeInTheDocument();
   });
 
-  it("opens TestDriveModal from list card", () => {
+  it("opens auth prompt when booking test drive (not logged in)", () => {
     render(<VehicleListCard vehicle={baseVehicle} />);
     fireEvent.click(screen.getByRole("button", { name: /agenda una prueba/i }));
-    // Scope assertion to dialog content to avoid multiple name matches
+    // Should show auth prompt modal instead of test drive modal
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
-    expect(dialog.textContent).toMatch(
-      new RegExp(baseVehicle.name.substring(0, 3), "i")
-    );
+    // Check for auth prompt content
+    expect(dialog.textContent).toMatch(/Agenda tu prueba de manejo/i);
+    expect(dialog.textContent).toMatch(/Iniciar Sesión/i);
   });
 
   it("navigates to product page when clicking Ver Detalles (grid)", () => {

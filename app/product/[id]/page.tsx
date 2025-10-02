@@ -4,12 +4,18 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { TestDriveModal } from "@/components/resultados/TestDriveModal";
+import { ContactVendorModal } from "@/components/resultados/ContactVendorModal";
+import { PriceAlertModal } from "@/components/resultados/PriceAlertModal";
+import { FavoritesButton } from "@/components/resultados/FavoritesButton";
 import { getVehicleById } from "@/lib/vehicle-queries";
 import { handleVehicleError } from "@/lib/error-handler";
+import { formatPrice } from "@/lib/utils";
 import { Vehicle } from "@/types";
+import { useAuthActions } from "@/hooks/useAuthCheck";
+import { usePriceAlert } from "@/hooks/usePriceAlert";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -26,6 +32,7 @@ import {
   Battery,
   Users,
   Car,
+  Bell,
 } from "lucide-react";
 
 export default function ProductPage() {
@@ -35,14 +42,22 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestDriveModalOpen, setIsTestDriveModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isPriceAlertModalOpen, setIsPriceAlertModalOpen] = useState(false);
+
+  const {
+    requireAuthForTestDrive,
+    requireAuthForPriceAlert,
+    authPrompt,
+    closeAuthPrompt,
+    handleAuthSuccess,
+  } = useAuthActions();
+
+  // Check if user has a price alert for this vehicle
+  const { hasAlert, alertData, refreshAlert } = usePriceAlert(
+    vehicle?.id || ""
+  );
 
   useEffect(() => {
     const fetchVehicle = async () => {
@@ -69,17 +84,6 @@ export default function ProductPage() {
       fetchVehicle();
     }
   }, [params.id]);
-
-  const handleContactVendor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("¡Gracias! El vendedor se pondrá en contacto contigo pronto.");
-    }, 1000);
-  };
 
   // Loading state
   if (loading) {
@@ -145,9 +149,42 @@ export default function ProductPage() {
 
         {/* Vehicle Header */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {vehicle.name}
-          </h1>
+          <div className="flex items-start justify-between mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex-1">
+              {vehicle.name}
+            </h1>
+            <div className="flex items-center gap-2 ml-4">
+              <FavoritesButton vehicleId={vehicle.id} />
+              <Button
+                variant={hasAlert ? "default" : "outline"}
+                size="sm"
+                onClick={() =>
+                  requireAuthForPriceAlert(() => setIsPriceAlertModalOpen(true))
+                }
+                title={
+                  hasAlert
+                    ? `Alerta activa: ${formatPrice(
+                        alertData?.target_price || 0
+                      )}`
+                    : "Crear alerta de precio"
+                }
+                className={
+                  hasAlert ? "bg-purple-600 hover:bg-purple-700 text-white" : ""
+                }
+              >
+                <Bell
+                  className={`w-4 h-4 ${
+                    hasAlert ? "text-white" : "text-purple-600"
+                  }`}
+                />
+                {hasAlert && (
+                  <span className="ml-1 text-xs font-medium">
+                    ${alertData?.target_price?.toLocaleString()}
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
           <p className="text-xl text-gray-600 max-w-3xl">
             {vehicle.description}
           </p>
@@ -251,9 +288,19 @@ export default function ProductPage() {
           <div className="space-y-8">
             {/* Price & Rating */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                ${vehicle.price.toLocaleString("es-CO")} COP
-              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-3xl font-bold text-gray-900">
+                  ${vehicle.price.toLocaleString("es-CO")} COP
+                </h2>
+                {hasAlert && (
+                  <div className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-medium">
+                    <Bell className="w-4 h-4" />
+                    <span>
+                      Alerta: ${alertData?.target_price?.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
                   <Star className="w-5 h-5 text-yellow-400 fill-current" />
@@ -272,88 +319,23 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Contact Vendor Form */}
+            {/* Contact Vendor Section */}
             <div className="bg-gray-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <MessageSquare className="w-5 h-5 text-blue-600 mr-2" />
                 Contactar Vendedor
               </h3>
-              <form onSubmit={handleContactVendor} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Tu nombre"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <Input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      placeholder="Tu teléfono"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="tu@email.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Mensaje (opcional)
-                  </label>
-                  <Textarea
-                    value={formData.message}
-                    onChange={(e) =>
-                      setFormData({ ...formData, message: e.target.value })
-                    }
-                    placeholder="Cuéntanos qué te interesa saber sobre este vehículo..."
-                    rows={3}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Zap className="w-4 h-4 mr-2 animate-pulse" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-4 h-4 mr-2" />
-                      Contactar Vendedor
-                    </>
-                  )}
-                </Button>
-              </form>
+              <p className="text-gray-600 mb-4">
+                ¿Tienes preguntas sobre {vehicle.name}? Envía un mensaje al
+                vendedor y te responderán pronto.
+              </p>
+              <Button
+                onClick={() => setIsContactModalOpen(true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Enviar Mensaje
+              </Button>
             </div>
 
             {/* Book Test Drive Button */}
@@ -367,7 +349,9 @@ export default function ProductPage() {
                 persona.
               </p>
               <Button
-                onClick={() => setIsTestDriveModalOpen(true)}
+                onClick={() =>
+                  requireAuthForTestDrive(() => setIsTestDriveModalOpen(true))
+                }
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Calendar className="w-4 h-4 mr-2" />
@@ -480,11 +464,7 @@ export default function ProductPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() =>
-                document
-                  .querySelector("form")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={() => setIsContactModalOpen(true)}
               size="lg"
               className="bg-green-600 hover:bg-green-700 text-white"
             >
@@ -492,7 +472,9 @@ export default function ProductPage() {
               Contactar Vendedor
             </Button>
             <Button
-              onClick={() => setIsTestDriveModalOpen(true)}
+              onClick={() =>
+                requireAuthForTestDrive(() => setIsTestDriveModalOpen(true))
+              }
               variant="outline"
               size="lg"
             >
@@ -505,11 +487,34 @@ export default function ProductPage() {
 
       <Footer />
 
-      {/* Test Drive Modal */}
+      {/* Modals */}
       <TestDriveModal
         isOpen={isTestDriveModalOpen}
         onClose={() => setIsTestDriveModalOpen(false)}
         vehicle={vehicle}
+      />
+
+      <ContactVendorModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        vehicle={vehicle}
+      />
+
+      <PriceAlertModal
+        isOpen={isPriceAlertModalOpen}
+        onClose={() => {
+          setIsPriceAlertModalOpen(false);
+          refreshAlert(); // Refresh alert status when modal closes
+        }}
+        vehicle={vehicle}
+      />
+
+      {/* Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={authPrompt.isOpen}
+        onClose={closeAuthPrompt}
+        action={authPrompt.action}
+        onAuthSuccess={handleAuthSuccess}
       />
     </div>
   );

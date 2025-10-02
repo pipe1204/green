@@ -1,30 +1,9 @@
-import { Vehicle } from "@/types";
-
-// Row shape returned from Supabase (snake_case) matching public.vehicles
-// This keeps DB types separate from app types (camelCase)
-export interface DbVehicleRow {
-  id: string;
-  vendor_id: string | null;
-  name: string;
-  brand: string;
-  type: Vehicle["type"]; // enum values align
-  price: number;
-  images: { url: string; alt: string }[];
-  specifications: Vehicle["specifications"];
-  delivery_time: string;
-  availability: Vehicle["availability"]; // 'in-stock' | 'pre-order' | 'coming-soon'
-  passenger_capacity: number;
-  charging_time: string;
-  max_speed: string;
-  power: string;
-  location: string;
-  description: string;
-  features: string[];
-  dealer: Vehicle["dealer"];
-  reviews: Vehicle["reviews"];
-  created_at: string;
-  updated_at: string;
-}
+import {
+  Vehicle,
+  PriceAlert,
+  TestDriveBooking,
+  CustomerInquiry,
+} from "@/types";
 
 // Convert frontend Vehicle (camelCase) to database format (snake_case)
 export function vehicleToDatabase(vehicle: Vehicle) {
@@ -143,5 +122,259 @@ export function databaseToVehicle(dbVehicle: unknown): Vehicle {
     },
     createdAt: String(raw.created_at ?? new Date().toISOString()),
     updatedAt: String(raw.updated_at ?? new Date().toISOString()),
+  };
+}
+
+// Database response type for price alerts with vehicle data
+export interface DatabasePriceAlertWithVehicle {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  target_price: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  vehicles: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: string[];
+    location: string;
+  } | null;
+}
+
+// Convert database price alert with vehicle to frontend format
+export function databaseToPriceAlertWithVehicle(
+  dbAlert: DatabasePriceAlertWithVehicle
+): PriceAlert & { vehicle?: Vehicle } {
+  return {
+    id: dbAlert.id,
+    customer_id: dbAlert.customer_id,
+    vehicle_id: dbAlert.vehicle_id,
+    target_price: dbAlert.target_price,
+    is_active: dbAlert.is_active,
+    created_at: dbAlert.created_at,
+    updated_at: dbAlert.updated_at,
+    vehicle: dbAlert.vehicles
+      ? {
+          id: dbAlert.vehicles.id,
+          name: dbAlert.vehicles.name,
+          brand: dbAlert.vehicles.brand,
+          type: dbAlert.vehicles.type as Vehicle["type"],
+          price: dbAlert.vehicles.price,
+          images: (dbAlert.vehicles.images || []).map((url: string) => ({
+            url,
+            alt: dbAlert.vehicles?.name || "Vehicle",
+          })),
+          location: dbAlert.vehicles.location,
+          // Add required Vehicle fields with defaults
+          vendorId: "",
+          specifications: {
+            range: "",
+            chargeTime: "",
+            warranty: "",
+            battery: "",
+            performance: {
+              maxSpeed: "",
+              power: "",
+            },
+          },
+          deliveryTime: "",
+          availability: "in-stock" as Vehicle["availability"],
+          passengerCapacity: 1,
+          chargingTime: "",
+          maxSpeed: "",
+          power: "",
+          description: "",
+          features: [],
+          dealer: {
+            name: "",
+            location: "",
+            rating: 0,
+          },
+          reviews: {
+            average: 0,
+            count: 0,
+          },
+          createdAt: "",
+          updatedAt: "",
+        }
+      : undefined,
+  };
+}
+
+// Database response type for test drive bookings with vehicle data
+export interface DatabaseTestDriveWithVehicle {
+  id: string;
+  vehicle_id: string;
+  customer_id: string;
+  vendor_id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  preferred_date?: string;
+  preferred_time?: string;
+  message?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  created_at: string;
+  updated_at: string;
+  vehicles: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: string[];
+    location: string;
+  } | null;
+}
+
+// Convert database test drive with vehicle to frontend format
+export function databaseToTestDriveWithVehicle(
+  dbBooking: DatabaseTestDriveWithVehicle
+): TestDriveBooking & { vehicle?: Vehicle } {
+  return {
+    id: dbBooking.id,
+    vehicle_id: dbBooking.vehicle_id,
+    customer_id: dbBooking.customer_id,
+    vendor_id: dbBooking.vendor_id,
+    customer_name: dbBooking.customer_name,
+    customer_email: dbBooking.customer_email,
+    customer_phone: dbBooking.customer_phone,
+    preferred_date: dbBooking.preferred_date,
+    preferred_time: dbBooking.preferred_time,
+    message: dbBooking.message,
+    status: dbBooking.status,
+    created_at: dbBooking.created_at,
+    updated_at: dbBooking.updated_at,
+    vehicle: dbBooking.vehicles
+      ? {
+          id: dbBooking.vehicles.id,
+          name: dbBooking.vehicles.name,
+          brand: dbBooking.vehicles.brand,
+          type: dbBooking.vehicles.type as Vehicle["type"],
+          price: dbBooking.vehicles.price,
+          images: (dbBooking.vehicles.images || []).map((url: string) => ({
+            url,
+            alt: dbBooking.vehicles?.name || "Vehicle",
+          })),
+          location: dbBooking.vehicles.location,
+          // Add required Vehicle fields with defaults
+          vendorId: "",
+          specifications: {
+            range: "",
+            chargeTime: "",
+            warranty: "",
+            battery: "",
+            performance: {
+              maxSpeed: "",
+              power: "",
+            },
+          },
+          deliveryTime: "",
+          availability: "in-stock" as Vehicle["availability"],
+          passengerCapacity: 1,
+          chargingTime: "",
+          maxSpeed: "",
+          power: "",
+          description: "",
+          features: [],
+          dealer: {
+            name: "",
+            location: "",
+            rating: 0,
+          },
+          reviews: {
+            average: 0,
+            count: 0,
+          },
+          createdAt: "",
+          updatedAt: "",
+        }
+      : undefined,
+  };
+}
+
+// Database interface for customer inquiries with vehicle data
+export interface DatabaseInquiryWithVehicle {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  vendor_id: string;
+  message: string;
+  status: "pending" | "replied" | "closed";
+  created_at: string;
+  updated_at: string;
+  vehicles: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: string[];
+    location: string;
+  } | null;
+}
+
+// Transform database inquiry with vehicle to frontend format
+export function databaseToInquiryWithVehicle(
+  dbInquiry: DatabaseInquiryWithVehicle
+): CustomerInquiry & { vehicle?: Vehicle } {
+  return {
+    id: dbInquiry.id,
+    customer_id: dbInquiry.customer_id,
+    vehicle_id: dbInquiry.vehicle_id,
+    vendor_id: dbInquiry.vendor_id,
+    message: dbInquiry.message,
+    status: dbInquiry.status,
+    created_at: dbInquiry.created_at,
+    updated_at: dbInquiry.updated_at,
+    vehicle: dbInquiry.vehicles
+      ? {
+          id: dbInquiry.vehicles.id,
+          name: dbInquiry.vehicles.name,
+          brand: dbInquiry.vehicles.brand,
+          type: dbInquiry.vehicles.type as Vehicle["type"],
+          price: dbInquiry.vehicles.price,
+          images: (dbInquiry.vehicles.images || []).map((url: string) => ({
+            url,
+            alt: dbInquiry.vehicles?.name || "Vehicle",
+          })),
+          location: dbInquiry.vehicles.location,
+          // Add required Vehicle fields with defaults
+          vendorId: "",
+          specifications: {
+            range: "",
+            chargeTime: "",
+            warranty: "",
+            battery: "",
+            performance: {
+              maxSpeed: "",
+              power: "",
+            },
+          },
+          deliveryTime: "",
+          availability: "in-stock" as Vehicle["availability"],
+          passengerCapacity: 1,
+          chargingTime: "",
+          maxSpeed: "",
+          power: "",
+          description: "",
+          features: [],
+          dealer: {
+            name: "",
+            location: "",
+            rating: 0,
+          },
+          reviews: {
+            average: 0,
+            count: 0,
+          },
+          createdAt: "",
+          updatedAt: "",
+        }
+      : undefined,
   };
 }
