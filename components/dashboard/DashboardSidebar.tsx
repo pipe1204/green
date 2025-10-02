@@ -39,17 +39,17 @@ const vendorNavigationItems = [
     disabled: false,
   },
   {
-    id: "analytics" as DashboardSection,
-    label: "Analítica",
-    icon: BarChart3,
-    description: "Métricas y estadísticas (Próximamente)",
-    disabled: true,
-  },
-  {
     id: "messages" as DashboardSection,
     label: "Mensajes",
     icon: MessageSquare,
     description: "Consulta con clientes (Próximamente)",
+    disabled: true,
+  },
+  {
+    id: "analytics" as DashboardSection,
+    label: "Analítica",
+    icon: BarChart3,
+    description: "Métricas y estadísticas (Próximamente)",
     disabled: true,
   },
 ];
