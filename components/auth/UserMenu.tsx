@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 import { useAuth } from "./AuthProvider";
@@ -8,6 +8,7 @@ import { LoginModal } from "./LoginModal";
 import { SignUpModal } from "./SignUpModal";
 import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
@@ -15,6 +16,40 @@ export function UserMenu() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [profile, setProfile] = useState<{
+    id: string;
+    email: string;
+    full_name: string | null;
+    role: string;
+    phone?: string;
+    company_name?: string;
+    avatar_url?: string;
+  } | null>(null);
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching profile:", error);
+        } else {
+          setProfile(data);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -70,7 +105,7 @@ export function UserMenu() {
       >
         <User className="w-4 h-4" />
         <span className="hidden sm:inline">
-          {user.user_metadata?.full_name || user.email}
+          {profile?.full_name || user.email}
         </span>
       </Button>
 
@@ -78,16 +113,18 @@ export function UserMenu() {
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
           <div className="px-4 py-2 border-b">
             <p className="text-sm font-medium text-gray-900">
-              {user.user_metadata?.full_name || "Usuario"}
+              {profile?.full_name || "Usuario"}
             </p>
-            <p className="text-xs text-gray-500">{user.email}</p>
+            <p className="text-xs text-gray-500">
+              {profile?.email || user.email}
+            </p>
           </div>
 
           <button
             onClick={() => {
               setShowUserMenu(false);
               // Check user role and redirect accordingly
-              const userRole = user?.user_metadata?.role || "customer";
+              const userRole = profile?.role || "customer";
               if (userRole === "vendor") {
                 router.push("/dashboard");
               } else {
@@ -97,9 +134,7 @@ export function UserMenu() {
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <LayoutDashboard className="w-4 h-4 mr-3" />
-            {user?.user_metadata?.role === "vendor"
-              ? "Panel de Vendedor"
-              : "Mi Panel"}
+            {profile?.role === "vendor" ? "Panel de Vendedor" : "Mi Panel"}
           </button>
 
           <button
