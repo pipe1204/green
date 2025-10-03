@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CheckCircle, XCircle, Calendar, Clock, Car } from "lucide-react";
+import { CheckCircle, XCircle, Calendar, Clock, Car, Zap } from "lucide-react";
 import { VendorTestDriveBooking } from "@/types";
 
 interface TestDriveResponseModalProps {

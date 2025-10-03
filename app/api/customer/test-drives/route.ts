@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * GET /api/customer/test-drives
@@ -29,8 +30,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use service role client to bypass RLS
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     // Get test drive bookings for this customer
-    const { data: bookings, error: bookingsError } = await supabase
+    const { data: bookings, error: bookingsError } = await serviceSupabase
       .from("test_drive_bookings")
       .select(
         `

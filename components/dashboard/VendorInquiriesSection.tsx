@@ -287,17 +287,9 @@ export function VendorInquiriesSection() {
 
       setShowTestDriveResponseModal(false);
       setSelectedTestDrive(null);
-      alert(
-        `Prueba de manejo ${
-          response === "accepted" ? "aceptada" : "declinada"
-        } exitosamente`
-      );
     } catch (err) {
       console.error("Error responding to test drive:", err);
       setError("Error responding to test drive");
-      alert(
-        "Error al responder a la prueba de manejo. Por favor, inténtalo de nuevo."
-      );
       throw err;
     } finally {
       setUpdatingTestDriveId(null);

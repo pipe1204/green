@@ -103,6 +103,7 @@ export async function PATCH(
         vendor_message: message.trim(),
         vendor_response_date: new Date().toISOString(),
         vendor_responded_by: user.id,
+        status: response === "accepted" ? "confirmed" : "declined",
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId)
