@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ConversationDetails, Message } from "@/types/messaging";
@@ -13,9 +13,15 @@ export function useRealtimeConversation(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasMarkedAsRead = useRef(false);
 
   useEffect(() => {
-    if (!conversationId || !user) return;
+    if (!conversationId || !user) {
+      return;
+    }
+
+    // Reset the hasMarkedAsRead flag when conversation changes
+    hasMarkedAsRead.current = false;
 
     // Initial fetch
     const fetchConversation = async () => {
@@ -133,6 +139,7 @@ export function useRealtimeConversation(conversationId: string | null) {
           })) || [];
 
         setConversation(transformedConversation);
+
         setMessages(transformedMessages);
       } catch (err) {
         console.error("Error fetching conversation:", err);
@@ -293,6 +300,57 @@ export function useRealtimeConversation(conversationId: string | null) {
     }
   };
 
+  // Mark all messages as read when conversation is viewed
+  const markAllAsRead = useCallback(async () => {
+    if (!user || !conversationId) return;
+
+    try {
+      // Use the new Supabase function that bypasses RLS
+      const { data, error } = await supabase.rpc("mark_messages_as_read", {
+        p_conversation_id: conversationId,
+        p_user_id: user.id,
+      });
+
+      if (error) {
+        console.error("❌ Error marking all messages as read:", error);
+        console.error("❌ Error details:", JSON.stringify(error, null, 2));
+      } else {
+        // Update local state to reflect read status immediately
+        setMessages((prev) => {
+          const updated = prev.map((msg) =>
+            msg.senderId !== user.id ? { ...msg, isRead: true } : msg
+          );
+          return updated;
+        });
+
+        // Note: Real-time subscription will handle the conversation list update
+      }
+    } catch (err) {
+      console.error("❌ Error marking all messages as read:", err);
+    }
+  }, [user, conversationId]);
+
+  // Auto-mark messages as read when conversation is viewed
+  useEffect(() => {
+    if (
+      !conversationId ||
+      !user ||
+      !messages.length ||
+      hasMarkedAsRead.current
+    ) {
+      return;
+    }
+
+    hasMarkedAsRead.current = true;
+
+    // Mark all unread messages as read after a short delay
+    const timer = setTimeout(() => {
+      markAllAsRead();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [conversationId, user, messages.length, markAllAsRead]);
+
   const sendMessage = async (data: {
     content: string;
     attachments?: Array<{
@@ -344,6 +402,7 @@ export function useRealtimeConversation(conversationId: string | null) {
     loading,
     error,
     markAsRead,
+    markAllAsRead,
     sendMessage,
   };
 }

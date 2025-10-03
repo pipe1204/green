@@ -19,7 +19,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import { useMessageUpload } from "@/hooks/useMessaging";
+import { useMessageUpload } from "@/hooks/useMessageUpload";
 import { formatFileSize } from "@/lib/message-storage";
 
 interface FileUploadProps {

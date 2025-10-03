@@ -2,14 +2,14 @@
 
 import React from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { useConversations } from "@/hooks/useMessaging";
+import { useRealtimeConversations } from "@/hooks/useRealtimeConversations";
 import { MessagingInterface } from "@/components/messaging/MessagingInterface";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare } from "lucide-react";
 
 export function InquiriesSection() {
   const { user } = useAuth();
-  const { conversations } = useConversations();
+  const { conversations } = useRealtimeConversations();
 
   // Calculate unread message count
   const unreadCount = conversations.reduce(
