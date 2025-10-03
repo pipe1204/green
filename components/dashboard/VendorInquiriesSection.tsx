@@ -146,7 +146,6 @@ export function VendorInquiriesSection() {
 
       setShowStartConversationModal(false);
       setSelectedInquiry(null);
-      alert("Conversación creada exitosamente");
 
       return data;
     } catch (err) {

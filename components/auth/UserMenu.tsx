@@ -42,6 +42,51 @@ export function UserMenu() {
           console.error("Error fetching profile:", error);
         } else {
           setProfile(data);
+
+          // Trigger guest inquiry linking for customers
+          if (data?.role === "customer" && user.email) {
+            try {
+              // Get the current session for the API call
+              const {
+                data: { session },
+              } = await supabase.auth.getSession();
+              if (!session?.access_token) {
+                console.error("❌ UserMenu: No access token available");
+                return;
+              }
+
+              const response = await fetch("/api/link-guest-inquiries", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+              });
+
+              const linkingResult = await response.json();
+              if (linkingResult.success && linkingResult.linkedCount > 0) {
+                // Store linking result for potential notification
+                localStorage.setItem(
+                  "linkedInquiriesCount",
+                  linkingResult.linkedCount.toString()
+                );
+              } else if (
+                linkingResult.success &&
+                linkingResult.linkedCount === 0
+              ) {
+              } else {
+                console.error(
+                  "❌ UserMenu: Failed to link guest inquiries:",
+                  linkingResult.error
+                );
+              }
+            } catch (linkingError) {
+              console.error(
+                "❌ UserMenu: Error linking guest inquiries:",
+                linkingError
+              );
+            }
+          }
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
