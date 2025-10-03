@@ -457,7 +457,7 @@ export function EmojiPicker({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-10 max-w-xs">
+    <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 z-50 w-80 max-h-64">
       <div className="space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -473,22 +473,28 @@ export function EmojiPicker({
         </div>
 
         {/* Emoji Categories */}
-        <div className="space-y-3 max-h-48 overflow-y-auto">
+        <div className="space-y-2 max-h-48 overflow-y-auto">
           {emojiCategories.map((category) => (
             <div key={category.name}>
-              <h5 className="text-xs font-medium text-gray-600 mb-2">
+              <h5 className="text-xs font-medium text-gray-500 mb-1 px-1">
                 {category.name}
               </h5>
-              <div className="grid grid-cols-8 gap-1">
-                {category.emojis.map((emoji, index) => (
+              <div className="grid grid-cols-10 gap-0.5">
+                {category.emojis.slice(0, 20).map((emoji, index) => (
                   <button
                     key={index}
                     onClick={() => onEmojiSelect(emoji)}
-                    className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-lg"
+                    className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 text-base transition-colors"
+                    title={emoji}
                   >
                     {emoji}
                   </button>
                 ))}
+                {category.emojis.length > 20 && (
+                  <div className="w-7 h-7 flex items-center justify-center text-xs text-gray-400">
+                    +{category.emojis.length - 20}
+                  </div>
+                )}
               </div>
             </div>
           ))}

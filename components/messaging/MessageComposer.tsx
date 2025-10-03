@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MessageAttachment } from "@/types/messaging";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,6 +36,7 @@ export function MessageComposer({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const emojiButtonRef = useRef<HTMLDivElement>(null);
 
   const handleContentChange = (value: string) => {
     setContent(value);
@@ -114,6 +115,27 @@ export function MessageComposer({
 
   const canSubmit = content.trim().length > 0 || attachments.length > 0;
 
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiButtonRef.current &&
+        !emojiButtonRef.current.contains(event.target as Node) &&
+        showEmojiPicker
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
   return (
     <div className="border-t border-gray-200 p-4">
       {/* File Attachments Preview */}
@@ -154,15 +176,26 @@ export function MessageComposer({
         </Button>
 
         {/* Emoji Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          disabled={disabled}
-          className="h-10 w-10 p-0"
-        >
-          <Smile className="h-5 w-5" />
-        </Button>
+        <div className="relative" ref={emojiButtonRef}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            disabled={disabled}
+            className="h-10 w-10 p-0"
+          >
+            <Smile className="h-5 w-5" />
+          </Button>
+
+          {/* Emoji Picker */}
+          {showEmojiPicker && (
+            <EmojiPicker
+              onEmojiSelect={handleEmojiSelect}
+              onClose={() => setShowEmojiPicker(false)}
+              isOpen={showEmojiPicker}
+            />
+          )}
+        </div>
 
         {/* Text Input */}
         <div className="flex-1 relative">
@@ -199,15 +232,6 @@ export function MessageComposer({
           )}
         </Button>
       </div>
-
-      {/* Emoji Picker */}
-      {showEmojiPicker && (
-        <EmojiPicker
-          onEmojiSelect={handleEmojiSelect}
-          onClose={() => setShowEmojiPicker(false)}
-          isOpen={showEmojiPicker}
-        />
-      )}
 
       {/* File Upload Modal */}
       {showFileUpload && (
