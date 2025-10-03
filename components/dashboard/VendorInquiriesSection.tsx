@@ -25,6 +25,7 @@ import {
 import { StartConversationModal } from "./StartConversationModal";
 import { SendMessageModal } from "./SendMessageModal";
 import { TestDriveResponseModal } from "./TestDriveResponseModal";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export function VendorInquiriesSection() {
   const { user, session } = useAuth();
@@ -421,133 +422,153 @@ export function VendorInquiriesSection() {
   }
 
   return (
-    <div className="h-[calc(100vh-10rem)] flex flex-col">
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white flex-shrink-0">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Consultas de Clientes
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            {inquiries.length} consulta{inquiries.length !== 1 ? "s" : ""}{" "}
-            pendiente{inquiries.length !== 1 ? "s" : ""}
-          </p>
-        </div>
+    <Tabs defaultValue="inquiries" className="w-full">
+      <div className="flex items-center justify-between mb-4">
+        <TabsList>
+          <TabsTrigger value="inquiries">
+            Consultas ({inquiries.length})
+          </TabsTrigger>
+          <TabsTrigger value="test-drives">
+            Pruebas de Manejo ({testDrives.length})
+          </TabsTrigger>
+        </TabsList>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <div className="space-y-4 p-6">
-            {inquiries.map((inquiry) => (
-              <div
-                key={inquiry.id}
-                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <User className="h-5 w-5 text-green-600" />
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {inquiry.customer.name}
-                      </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Mail className="h-4 w-4" />
-                          <span className="text-gray-400">
-                            {inquiry.customer.email.replace(
-                              /(.{2}).*(@.*)/,
-                              "$1***$2"
-                            )}
-                          </span>
-                          <span className="text-xs text-gray-500 ml-2">
-                            {inquiry.isGuest
-                              ? "(Usuario invitado)"
-                              : "(Usuario registrado)"}
-                          </span>
+      <TabsContent value="inquiries">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6">
+            <div className="space-y-4">
+              {inquiries.map((inquiry) => (
+                <div
+                  key={inquiry.id}
+                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <User className="h-5 w-5 text-green-600" />
                         </div>
-                        {inquiry.customer.phone && (
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {inquiry.customer.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
                           <div className="flex items-center space-x-1">
-                            <Phone className="h-4 w-4" />
-                            <span>
-                              {inquiry.customer.phone.replace(
-                                /(\d{2})\d{4}(\d{2})/,
-                                "$1****$2"
+                            <Mail className="h-4 w-4" />
+                            <span className="text-gray-400">
+                              {inquiry.customer.email.replace(
+                                /(.{2}).*(@.*)/,
+                                "$1***$2"
                               )}
                             </span>
+                            <span className="text-xs text-gray-500 ml-2">
+                              {inquiry.isGuest
+                                ? "(Usuario invitado)"
+                                : "(Usuario registrado)"}
+                            </span>
                           </div>
-                        )}
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{formatDate(inquiry.createdAt)}</span>
+                          {inquiry.customer.phone && (
+                            <div className="flex items-center space-x-1">
+                              <Phone className="h-4 w-4" />
+                              <span>
+                                {inquiry.customer.phone.replace(
+                                  /(\d{2})\d{4}(\d{2})/,
+                                  "$1****$2"
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDate(inquiry.createdAt)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {getStatusBadge(inquiry.status)}
-                    {inquiry.isGuest && (
-                      <Badge
-                        variant="outline"
-                        className="bg-blue-50 text-blue-700 border-blue-200"
-                      >
-                        Invitado
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Car className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Vehículo consultado:
-                    </span>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <h4 className="font-medium text-gray-900">
-                      {inquiry.vehicle.brand} {inquiry.vehicle.name}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Mensaje:
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-gray-900">{inquiry.message}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-gray-500">
-                    {inquiry.isGuest
-                      ? "Usuario invitado"
-                      : "Usuario registrado"}
-                  </div>
-                  <div className="flex space-x-2">
-                    {inquiry.status === "pending" && (
-                      <>
-                        <Button
-                          size="sm"
+                    <div className="flex items-center space-x-2 mt-1 md:mt-0">
+                      {getStatusBadge(inquiry.status)}
+                      {inquiry.isGuest && (
+                        <Badge
                           variant="outline"
-                          onClick={() =>
-                            updateInquiryStatus(inquiry.id, "replied")
-                          }
-                          disabled={updatingInquiryId === inquiry.id}
+                          className="bg-blue-50 text-blue-700 border-blue-200"
                         >
-                          {updatingInquiryId === inquiry.id ? (
-                            <>
-                              <Zap className="h-4 w-4 animate-spin mr-2" />
-                              Actualizando...
-                            </>
-                          ) : (
-                            "Marcar como Respondido"
-                          )}
-                        </Button>
+                          Invitado
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Car className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Vehículo consultado:
+                      </span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <h4 className="font-medium text-gray-900">
+                        {inquiry.vehicle.brand} {inquiry.vehicle.name}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">
+                      Mensaje:
+                    </h4>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-gray-900">{inquiry.message}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div className="text-xs text-gray-500">
+                      {inquiry.isGuest
+                        ? "Usuario invitado"
+                        : "Usuario registrado"}
+                    </div>
+                    <div className="flex flex-wrap gap-2 md:justify-end">
+                      {inquiry.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              updateInquiryStatus(inquiry.id, "replied")
+                            }
+                            disabled={updatingInquiryId === inquiry.id}
+                          >
+                            {updatingInquiryId === inquiry.id ? (
+                              <>
+                                <Zap className="h-4 w-4 animate-spin mr-2" />
+                                Actualizando...
+                              </>
+                            ) : (
+                              "Marcar como Respondido"
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              updateInquiryStatus(inquiry.id, "closed")
+                            }
+                            disabled={updatingInquiryId === inquiry.id}
+                          >
+                            {updatingInquiryId === inquiry.id ? (
+                              <>
+                                <Zap className="h-4 w-4 animate-spin mr-2" />
+                                Cerrando...
+                              </>
+                            ) : (
+                              "Cerrar conversación"
+                            )}
+                          </Button>
+                        </>
+                      )}
+                      {inquiry.status === "replied" && (
                         <Button
                           size="sm"
                           variant="outline"
@@ -565,113 +586,80 @@ export function VendorInquiriesSection() {
                             "Cerrar conversación"
                           )}
                         </Button>
-                      </>
-                    )}
-                    {inquiry.status === "replied" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          updateInquiryStatus(inquiry.id, "closed")
-                        }
-                        disabled={updatingInquiryId === inquiry.id}
-                      >
-                        {updatingInquiryId === inquiry.id ? (
-                          <>
-                            <Zap className="h-4 w-4 animate-spin mr-2" />
-                            Cerrando...
-                          </>
-                        ) : (
-                          "Cerrar conversación"
-                        )}
-                      </Button>
-                    )}
-                    {inquiry.status === "closed" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          updateInquiryStatus(inquiry.id, "pending")
-                        }
-                        disabled={updatingInquiryId === inquiry.id}
-                      >
-                        {updatingInquiryId === inquiry.id ? (
-                          <>
-                            <Zap className="h-4 w-4 animate-spin mr-2" />
-                            Reabriendo...
-                          </>
-                        ) : (
-                          "Reabrir conversación"
-                        )}
-                      </Button>
-                    )}
-                    {inquiry.status !== "converted" &&
-                      inquiry.status !== "closed" && (
-                        <>
-                          {inquiry.isGuest ? (
-                            // Guest users: Only email option
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                              onClick={() => {
-                                setSelectedInquiry(inquiry);
-                                setShowSendMessageModal(true);
-                              }}
-                            >
-                              Enviar Email
-                            </Button>
-                          ) : (
-                            // Registered users: Only conversation option
-                            <Button
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700"
-                              onClick={() => {
-                                setSelectedInquiry(inquiry);
-                                setShowStartConversationModal(true);
-                              }}
-                            >
-                              Iniciar Conversación
-                            </Button>
-                          )}
-                        </>
                       )}
-                    {inquiry.status === "converted" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="bg-blue-50 text-blue-700 border-blue-200"
-                        disabled
-                      >
-                        Conversación Creada
-                      </Button>
-                    )}
+                      {inquiry.status === "closed" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            updateInquiryStatus(inquiry.id, "pending")
+                          }
+                          disabled={updatingInquiryId === inquiry.id}
+                        >
+                          {updatingInquiryId === inquiry.id ? (
+                            <>
+                              <Zap className="h-4 w-4 animate-spin mr-2" />
+                              Reabriendo...
+                            </>
+                          ) : (
+                            "Reabrir conversación"
+                          )}
+                        </Button>
+                      )}
+                      {inquiry.status !== "converted" &&
+                        inquiry.status !== "closed" && (
+                          <>
+                            {inquiry.isGuest ? (
+                              // Guest users: Only email option
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                                onClick={() => {
+                                  setSelectedInquiry(inquiry);
+                                  setShowSendMessageModal(true);
+                                }}
+                              >
+                                Enviar Email
+                              </Button>
+                            ) : (
+                              // Registered users: Only conversation option
+                              <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700"
+                                onClick={() => {
+                                  setSelectedInquiry(inquiry);
+                                  setShowStartConversationModal(true);
+                                }}
+                              >
+                                Iniciar Conversación
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      {inquiry.status === "converted" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-blue-50 text-blue-700 border-blue-200"
+                          disabled
+                        >
+                          Conversación Creada
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </TabsContent>
 
-      {/* Test Drives Section */}
-      <div className="mt-8">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white flex-shrink-0">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-              <Calendar className="w-6 h-6 text-blue-500 mr-2" />
-              Pruebas de Manejo
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {testDrives.length} prueba{testDrives.length !== 1 ? "s" : ""}{" "}
-              programada{testDrives.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="h-full overflow-y-auto">
-            <div className="space-y-4 p-6">
+      <TabsContent value="test-drives">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6">
+            <div className="space-y-4">
               {testDrivesLoading ? (
                 <div className="flex items-center justify-center h-32">
                   <Zap className="w-8 h-8 animate-spin text-blue-600" />
@@ -707,7 +695,7 @@ export function VendorInquiriesSection() {
                     key={testDrive.id}
                     className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
                   >
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -718,15 +706,26 @@ export function VendorInquiriesSection() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {testDrive.customerName}
                           </h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
                             <div className="flex items-center space-x-1">
                               <Mail className="h-4 w-4" />
-                              <span>{testDrive.customerEmail}</span>
+                              {testDrive.customerEmail.replace(
+                                /(.{2}).*(@.*)/,
+                                "$1***$2"
+                              )}
                             </div>
-                            <div className="flex items-center space-x-1">
-                              <Phone className="h-4 w-4" />
-                              <span>{testDrive.customerPhone}</span>
-                            </div>
+                            {testDrive.customerPhone && (
+                              <div className="flex items-center space-x-1">
+                                <Phone className="h-4 w-4" />
+                                <span>
+                                  {testDrive.customerPhone.replace(
+                                    /(\d{2})\d{4}(\d{2})/,
+                                    "$1****$2"
+                                  )}
+                                </span>
+                              </div>
+                            )}
+
                             <div className="flex items-center space-x-1">
                               <Calendar className="h-4 w-4" />
                               <span>
@@ -742,7 +741,7 @@ export function VendorInquiriesSection() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mt-1 md:mt-0">
                         {testDrive.vendorResponse === "pending" && (
                           <Badge
                             variant="outline"
@@ -808,14 +807,14 @@ export function VendorInquiriesSection() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                       <div className="text-xs text-gray-500">
                         Programada:{" "}
                         {new Date(testDrive.createdAt).toLocaleDateString(
                           "es-CO"
                         )}
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex flex-wrap gap-2 md:justify-end">
                         {testDrive.vendorResponse === "pending" && (
                           <Button
                             size="sm"
@@ -856,7 +855,7 @@ export function VendorInquiriesSection() {
             </div>
           </div>
         </div>
-      </div>
+      </TabsContent>
 
       {/* Modals */}
       <StartConversationModal
@@ -929,6 +928,6 @@ export function VendorInquiriesSection() {
         }
         loading={updatingTestDriveId !== null}
       />
-    </div>
+    </Tabs>
   );
 }

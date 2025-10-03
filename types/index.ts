@@ -302,6 +302,49 @@ export interface VendorTestDrivesResponse {
   error?: string;
 }
 
+export interface CustomerTestDriveBooking {
+  id: string;
+  vehicleId: string;
+  customerId: string;
+  vendorId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  preferredDate: string;
+  preferredTime: string;
+  message?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  vendorResponse: "pending" | "accepted" | "declined";
+  vendorMessage?: string;
+  vendorResponseDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  vehicle?: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: Array<{ url: string; alt: string }>;
+    location: string;
+  };
+  vendor?: {
+    id: string;
+    businessName: string;
+    contact?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+}
+
+export interface CustomerTestDrivesResponse {
+  bookings: CustomerTestDriveBooking[];
+  count: number;
+  error?: string;
+}
+
 export interface PriceAlert {
   id: string;
   customer_id: string;

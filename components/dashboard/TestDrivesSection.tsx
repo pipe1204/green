@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { supabase } from "@/lib/supabase";
-import { TestDriveBooking, Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,21 +13,17 @@ import {
   Mail,
   MessageSquare,
   ArrowRight,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  databaseToTestDriveWithVehicle,
-  DatabaseTestDriveWithVehicle,
-} from "@/lib/database-mapping";
-
-interface TestDriveWithVehicle extends TestDriveBooking {
-  vehicle?: Vehicle;
-}
+import { CustomerTestDriveBooking, CustomerTestDrivesResponse } from "@/types";
 
 export function TestDrivesSection() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const router = useRouter();
-  const [testDrives, setTestDrives] = useState<TestDriveWithVehicle[]>([]);
+  const [testDrives, setTestDrives] = useState<CustomerTestDriveBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,42 +32,26 @@ export function TestDrivesSection() {
       setLoading(true);
       setError(null);
 
-      // Get user's test drive bookings
-      const { data: bookings, error: bookingsError } = await supabase
-        .from("test_drive_bookings")
-        .select(
-          `
-          *,
-          vehicles (
-            id,
-            name,
-            brand,
-            type,
-            price,
-            images,
-            location
-          )
-        `
-        )
-        .eq("customer_id", user?.id)
-        .order("created_at", { ascending: false });
+      const response = await fetch("/api/customer/test-drives", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
 
-      if (bookingsError) throw bookingsError;
+      const data: CustomerTestDrivesResponse = await response.json();
 
-      // Transform to include vehicle data using utility function
-      const transformedBookings: TestDriveWithVehicle[] =
-        bookings?.map((booking: DatabaseTestDriveWithVehicle) =>
-          databaseToTestDriveWithVehicle(booking)
-        ) || [];
+      if (!response.ok) {
+        throw new Error(data.error || "Error fetching test drives");
+      }
 
-      setTestDrives(transformedBookings);
+      setTestDrives(data.bookings || []);
     } catch (err) {
       console.error("Error fetching test drives:", err);
       setError("Error al cargar tus pruebas de manejo");
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [session]);
 
   useEffect(() => {
     if (user) {
@@ -108,6 +86,45 @@ export function TestDrivesSection() {
         return "Cancelada";
       default:
         return status;
+    }
+  };
+
+  const getVendorResponseColor = (vendorResponse: string) => {
+    switch (vendorResponse) {
+      case "pending":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "accepted":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "declined":
+        return "bg-red-50 text-red-700 border-red-200";
+      default:
+        return "bg-gray-50 text-gray-700 border-gray-200";
+    }
+  };
+
+  const getVendorResponseText = (vendorResponse: string) => {
+    switch (vendorResponse) {
+      case "pending":
+        return "Esperando respuesta";
+      case "accepted":
+        return "Aceptada";
+      case "declined":
+        return "Declinada";
+      default:
+        return vendorResponse;
+    }
+  };
+
+  const getVendorResponseIcon = (vendorResponse: string) => {
+    switch (vendorResponse) {
+      case "pending":
+        return <AlertCircle className="w-4 h-4" />;
+      case "accepted":
+        return <CheckCircle className="w-4 h-4" />;
+      case "declined":
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <AlertCircle className="w-4 h-4" />;
     }
   };
 
@@ -234,10 +251,26 @@ export function TestDrivesSection() {
                   <Badge className={getStatusColor(booking.status)}>
                     {getStatusText(booking.status)}
                   </Badge>
+                  <Badge
+                    variant="outline"
+                    className={getVendorResponseColor(booking.vendorResponse)}
+                  >
+                    <div className="flex items-center space-x-1">
+                      {getVendorResponseIcon(booking.vendorResponse)}
+                      <span>
+                        {getVendorResponseText(booking.vendorResponse)}
+                      </span>
+                    </div>
+                  </Badge>
                 </div>
                 <p className="text-sm text-gray-600">
                   {booking.vehicle?.brand} • {booking.vehicle?.type}
                 </p>
+                {booking.vendor && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Vendedor: {booking.vendor.businessName}
+                  </p>
+                )}
               </div>
               {booking.vehicle && (
                 <Button
@@ -255,8 +288,8 @@ export function TestDrivesSection() {
                 <div className="flex items-center space-x-2 text-sm">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-600">
-                    {booking.preferred_date
-                      ? new Date(booking.preferred_date).toLocaleDateString(
+                    {booking.preferredDate
+                      ? new Date(booking.preferredDate).toLocaleDateString(
                           "es-CO"
                         )
                       : "No especificada"}
@@ -265,7 +298,7 @@ export function TestDrivesSection() {
                 <div className="flex items-center space-x-2 text-sm">
                   <Clock className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-600">
-                    {booking.preferred_time || "No especificada"}
+                    {booking.preferredTime || "No especificada"}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
@@ -279,20 +312,16 @@ export function TestDrivesSection() {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-sm">
                   <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">
-                    {booking.customer_email}
-                  </span>
+                  <span className="text-gray-600">{booking.customerEmail}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <Phone className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">
-                    {booking.customer_phone}
-                  </span>
+                  <span className="text-gray-600">{booking.customerPhone}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <span className="text-gray-600">
                     Creada:{" "}
-                    {new Date(booking.created_at).toLocaleDateString("es-CO")}
+                    {new Date(booking.createdAt).toLocaleDateString("es-CO")}
                   </span>
                 </div>
               </div>
@@ -304,9 +333,47 @@ export function TestDrivesSection() {
                   <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-1">
-                      Mensaje:
+                      Tu mensaje:
                     </p>
                     <p className="text-sm text-gray-600">{booking.message}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {booking.vendorMessage && (
+              <div className="border-t pt-4">
+                <div className="flex items-start space-x-2">
+                  <div className="flex-shrink-0">
+                    {getVendorResponseIcon(booking.vendorResponse)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <p className="text-sm font-medium text-gray-700">
+                        Respuesta del vendedor:
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={getVendorResponseColor(
+                          booking.vendorResponse
+                        )}
+                      >
+                        {getVendorResponseText(booking.vendorResponse)}
+                      </Badge>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-sm text-gray-900">
+                        {booking.vendorMessage}
+                      </p>
+                    </div>
+                    {booking.vendorResponseDate && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        Respondido:{" "}
+                        {new Date(
+                          booking.vendorResponseDate
+                        ).toLocaleDateString("es-CO")}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
