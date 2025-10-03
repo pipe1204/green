@@ -36,3 +36,10 @@ export interface DbVehicleRow {
   created_at: string;
   updated_at: string;
 }
+
+export interface FileUploadResult {
+  url: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+}

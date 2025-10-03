@@ -308,6 +308,84 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Enable RLS for messaging tables
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.message_attachments ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for conversations table
+CREATE POLICY "Users can view their own conversations" ON public.conversations
+  FOR SELECT USING (
+    customer_id = auth.uid() OR 
+    vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "Customers can create conversations" ON public.conversations
+  FOR INSERT WITH CHECK (customer_id = auth.uid());
+
+CREATE POLICY "Users can update their own conversations" ON public.conversations
+  FOR UPDATE USING (
+    customer_id = auth.uid() OR 
+    vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "Users can delete their own conversations" ON public.conversations
+  FOR DELETE USING (
+    customer_id = auth.uid() OR 
+    vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+  );
+
+-- RLS Policies for messages table
+CREATE POLICY "Users can view messages in their conversations" ON public.messages
+  FOR SELECT USING (
+    conversation_id IN (
+      SELECT id FROM public.conversations WHERE 
+        customer_id = auth.uid() OR 
+        vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Users can create messages in their conversations" ON public.messages
+  FOR INSERT WITH CHECK (
+    sender_id = auth.uid() AND
+    conversation_id IN (
+      SELECT id FROM public.conversations WHERE 
+        customer_id = auth.uid() OR 
+        vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Users can update their own messages" ON public.messages
+  FOR UPDATE USING (sender_id = auth.uid());
+
+CREATE POLICY "Users can delete their own messages" ON public.messages
+  FOR DELETE USING (sender_id = auth.uid());
+
+-- RLS Policies for message_attachments table
+CREATE POLICY "Users can view attachments in their conversations" ON public.message_attachments
+  FOR SELECT USING (
+    message_id IN (
+      SELECT m.id FROM public.messages m
+      JOIN public.conversations c ON m.conversation_id = c.id
+      WHERE c.customer_id = auth.uid() OR 
+            c.vendor_id IN (SELECT id FROM public.vendors WHERE user_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Users can create attachments for their messages" ON public.message_attachments
+  FOR INSERT WITH CHECK (
+    message_id IN (
+      SELECT id FROM public.messages WHERE sender_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can delete attachments from their messages" ON public.message_attachments
+  FOR DELETE USING (
+    message_id IN (
+      SELECT id FROM public.messages WHERE sender_id = auth.uid()
+    )
+  );
+
 -- Add updated_at triggers to all tables
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -327,5 +405,62 @@ CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON public.reviews
 CREATE TRIGGER update_customer_inquiries_updated_at BEFORE UPDATE ON public.customer_inquiries
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+-- Create conversations table for customer-vendor messaging
+CREATE TABLE public.conversations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  vendor_id UUID REFERENCES public.vendors(id) ON DELETE CASCADE,
+  vehicle_id TEXT REFERENCES public.vehicles(id) ON DELETE CASCADE,
+  subject TEXT NOT NULL,
+  status TEXT DEFAULT 'open', -- 'open', 'closed', 'archived'
+  last_message_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  -- Ensure unique conversation per customer-vendor-vehicle combination
+  CONSTRAINT unique_conversation UNIQUE (customer_id, vendor_id, vehicle_id)
+);
+
+-- Create messages table for individual messages within conversations
+CREATE TABLE public.messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
+  sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  sender_type TEXT NOT NULL CHECK (sender_type IN ('customer', 'vendor')),
+  content TEXT NOT NULL,
+  message_type TEXT DEFAULT 'text' CHECK (message_type IN ('text', 'image', 'file', 'mixed')),
+  is_read BOOLEAN DEFAULT FALSE,
+  read_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create message attachments table for file uploads
+CREATE TABLE public.message_attachments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  message_id UUID REFERENCES public.messages(id) ON DELETE CASCADE,
+  file_url TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_type TEXT NOT NULL,
+  file_size INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for performance
+CREATE INDEX idx_conversations_customer_id ON public.conversations(customer_id);
+CREATE INDEX idx_conversations_vendor_id ON public.conversations(vendor_id);
+CREATE INDEX idx_conversations_vehicle_id ON public.conversations(vehicle_id);
+CREATE INDEX idx_conversations_last_message_at ON public.conversations(last_message_at DESC);
+CREATE INDEX idx_messages_conversation_id ON public.messages(conversation_id);
+CREATE INDEX idx_messages_sender_id ON public.messages(sender_id);
+CREATE INDEX idx_messages_created_at ON public.messages(created_at DESC);
+CREATE INDEX idx_messages_is_read ON public.messages(is_read);
+CREATE INDEX idx_message_attachments_message_id ON public.message_attachments(message_id);
+
 CREATE TRIGGER update_price_alerts_updated_at BEFORE UPDATE ON public.price_alerts
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON public.conversations
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_messages_updated_at BEFORE UPDATE ON public.messages
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

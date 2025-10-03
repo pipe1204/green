@@ -304,7 +304,11 @@ export interface DatabaseInquiryWithVehicle {
   vehicle_id: string;
   vendor_id: string;
   message: string;
-  status: "pending" | "replied" | "closed";
+  status: "pending" | "replied" | "closed" | "converted";
+  is_guest: boolean;
+  guest_name?: string;
+  guest_email?: string;
+  guest_phone?: string;
   created_at: string;
   updated_at: string;
   vehicles: {
@@ -329,6 +333,10 @@ export function databaseToInquiryWithVehicle(
     vendor_id: dbInquiry.vendor_id,
     message: dbInquiry.message,
     status: dbInquiry.status,
+    is_guest: dbInquiry.is_guest,
+    guest_name: dbInquiry.guest_name,
+    guest_email: dbInquiry.guest_email,
+    guest_phone: dbInquiry.guest_phone,
     created_at: dbInquiry.created_at,
     updated_at: dbInquiry.updated_at,
     vehicle: dbInquiry.vehicles

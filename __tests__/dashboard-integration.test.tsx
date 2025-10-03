@@ -65,7 +65,12 @@ vi.mock("@/lib/supabase", () => ({
             },
             error: null,
           }),
+          order: vi.fn().mockResolvedValue({ data: [], error: null }),
         }),
+        or: vi.fn().mockReturnValue({
+          order: vi.fn().mockResolvedValue({ data: [], error: null }),
+        }),
+        order: vi.fn().mockResolvedValue({ data: [], error: null }),
       }),
       upsert: vi.fn().mockReturnValue({
         error: null,
@@ -76,6 +81,17 @@ vi.mock("@/lib/supabase", () => ({
         }),
       }),
     }),
+    channel: vi.fn().mockReturnValue({
+      on: vi.fn().mockReturnValue({
+        on: vi.fn().mockReturnValue({
+          subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+        }),
+        subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+      }),
+      subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+      send: vi.fn().mockResolvedValue(undefined),
+    }),
+    removeChannel: vi.fn(),
     auth: {
       getSession: vi.fn().mockResolvedValue({
         data: { session: { user: { id: "user-1" } } },
@@ -100,12 +116,12 @@ vi.mock("@/components/FloatingAskButton", () => ({
 }));
 
 // Mock dashboard components with proper typing
-vi.mock("@/components/dashboard/DashboardSidebar", () => ({
-  DashboardSidebar: ({
+vi.mock("@/components/dashboard/ResponsiveDashboardSidebar", () => ({
+  ResponsiveDashboardSidebar: ({
     activeSection,
     onSectionChange,
   }: DashboardSidebarProps) => (
-    <div data-testid="dashboard-sidebar">
+    <div data-testid="responsive-dashboard-sidebar">
       <nav>
         <button
           onClick={() => onSectionChange("vehicles")}
@@ -115,11 +131,11 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
           Mis Vehículos
         </button>
         <button
-          onClick={() => onSectionChange("analytics")}
-          data-testid="analytics-nav"
-          className={activeSection === "analytics" ? "active" : ""}
+          onClick={() => onSectionChange("inquiries")}
+          data-testid="inquiries-nav"
+          className={activeSection === "inquiries" ? "active" : ""}
         >
-          Analítica
+          Consultas
         </button>
         <button
           onClick={() => onSectionChange("messages")}
@@ -127,6 +143,13 @@ vi.mock("@/components/dashboard/DashboardSidebar", () => ({
           className={activeSection === "messages" ? "active" : ""}
         >
           Mensajes
+        </button>
+        <button
+          onClick={() => onSectionChange("analytics")}
+          data-testid="analytics-nav"
+          className={activeSection === "analytics" ? "active" : ""}
+        >
+          Analítica
         </button>
       </nav>
     </div>
@@ -257,6 +280,17 @@ vi.mock("@/components/dashboard/ProductForm", () => ({
 vi.mock("@/lib/database-mapping", () => ({
   databaseToVehicle: (vehicle: Vehicle) => vehicle,
   vehicleToDatabase: (vehicle: Vehicle) => vehicle,
+}));
+
+// Mock Lucide icons
+vi.mock("lucide-react", () => ({
+  Plus: () => <div data-testid="plus-icon">Plus</div>,
+  Zap: () => <div data-testid="zap-icon">Zap</div>,
+  ArrowLeft: () => <div data-testid="arrow-left-icon">ArrowLeft</div>,
+  MessageSquare: () => (
+    <div data-testid="message-square-icon">MessageSquare</div>
+  ),
+  AlertCircle: () => <div data-testid="alert-circle-icon">AlertCircle</div>,
 }));
 
 describe("Dashboard Integration Tests", () => {
@@ -402,12 +436,13 @@ describe("Dashboard Integration Tests", () => {
       expect(screen.getByText("Tabla de Vehículos")).toBeInTheDocument();
     });
 
-    // Switch to analytics
-    fireEvent.click(screen.getByTestId("analytics-nav"));
+    // Switch to inquiries
+    fireEvent.click(screen.getByTestId("inquiries-nav"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("analytics-nav")).toHaveClass("active");
-      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
+      expect(screen.getByTestId("inquiries-nav")).toHaveClass("active");
+      // The inquiries section shows a loading state initially
+      expect(screen.getByText("Cargando consultas...")).toBeInTheDocument();
     });
 
     // Switch to messages
@@ -415,7 +450,17 @@ describe("Dashboard Integration Tests", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("messages-nav")).toHaveClass("active");
-      expect(screen.getByText("Mensajes en Desarrollo")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Mensajes" })
+      ).toBeInTheDocument();
+    });
+
+    // Switch to analytics
+    fireEvent.click(screen.getByTestId("analytics-nav"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("analytics-nav")).toHaveClass("active");
+      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
     });
 
     // Back to vehicles

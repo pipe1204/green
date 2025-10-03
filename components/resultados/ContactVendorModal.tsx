@@ -131,7 +131,7 @@ export const ContactVendorModal: React.FC<ContactVendorModalProps> = ({
         });
         setSuccess(false);
         onClose();
-      }, 3000);
+      }, 9000);
     } catch (err) {
       console.error("Error sending inquiry:", err);
       setError(

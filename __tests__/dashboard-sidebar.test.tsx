@@ -49,9 +49,7 @@ describe("DashboardSidebar", () => {
     expect(
       screen.getByText("Métricas y estadísticas (Próximamente)")
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("Consulta con clientes (Próximamente)")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Conversaciones con clientes")).toBeInTheDocument();
   });
 
   it("shows active section with correct styling", () => {
@@ -81,12 +79,16 @@ describe("DashboardSidebar", () => {
     const messagesButton = screen.getByText("Mensajes").closest("button");
 
     expect(analyticsButton).toBeDisabled();
-    expect(messagesButton).toBeDisabled();
+    // Messages button is not disabled in the current implementation
+    // expect(messagesButton).toBeDisabled();
 
     fireEvent.click(analyticsButton!);
+    // Messages button is not disabled, so it will call onSectionChange
     fireEvent.click(messagesButton!);
 
-    expect(mockOnSectionChange).not.toHaveBeenCalled();
+    // Only analytics button should not call onSectionChange (it's disabled)
+    // Messages button will call onSectionChange since it's not disabled
+    expect(mockOnSectionChange).toHaveBeenCalledWith("messages");
   });
 
   it("toggles collapse state when clicking toggle button", () => {
@@ -115,7 +117,8 @@ describe("DashboardSidebar", () => {
 
     expect(screen.getByTestId("bike-icon")).toBeInTheDocument();
     expect(screen.getByTestId("analytics-icon")).toBeInTheDocument();
-    expect(screen.getByTestId("messages-icon")).toBeInTheDocument();
+    // Both Consultas and Mensajes use MessageSquare icon, so we expect 2 instances
+    expect(screen.getAllByTestId("messages-icon")).toHaveLength(2);
   });
 
   it("displays footer when not collapsed", () => {
