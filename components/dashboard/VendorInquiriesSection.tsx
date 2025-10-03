@@ -4,7 +4,15 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, User, Mail, Phone, Calendar, Car } from "lucide-react";
+import {
+  MessageSquare,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Car,
+  Zap,
+} from "lucide-react";
 import {
   CustomerInquiryWithDetails,
   VendorInquiriesResponse,
@@ -24,6 +32,9 @@ export function VendorInquiriesSection() {
   const [selectedInquiry, setSelectedInquiry] =
     useState<CustomerInquiryWithDetails | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [updatingInquiryId, setUpdatingInquiryId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (!user || !session) return;
@@ -61,6 +72,7 @@ export function VendorInquiriesSection() {
 
   const updateInquiryStatus = async (inquiryId: string, status: string) => {
     try {
+      setUpdatingInquiryId(inquiryId);
       const response = await fetch(`/api/vendor/inquiries/${inquiryId}`, {
         method: "PATCH",
         headers: {
@@ -92,6 +104,8 @@ export function VendorInquiriesSection() {
     } catch (err) {
       console.error("Error updating inquiry status:", err);
       setError("Error updating inquiry status");
+    } finally {
+      setUpdatingInquiryId(null);
     }
   };
 
@@ -258,8 +272,8 @@ export function VendorInquiriesSection() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-sm text-gray-600">Cargando consultas...</p>
+          <Zap className="w-8 h-8 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Cargando consultas...</p>
         </div>
       </div>
     );
@@ -353,7 +367,12 @@ export function VendorInquiriesSection() {
                         {inquiry.customer.phone && (
                           <div className="flex items-center space-x-1">
                             <Phone className="h-4 w-4" />
-                            <span>{inquiry.customer.phone}</span>
+                            <span>
+                              {inquiry.customer.phone.replace(
+                                /(\d{2})\d{4}(\d{2})/,
+                                "$1****$2"
+                              )}
+                            </span>
                           </div>
                         )}
                         <div className="flex items-center space-x-1">
@@ -414,8 +433,16 @@ export function VendorInquiriesSection() {
                           onClick={() =>
                             updateInquiryStatus(inquiry.id, "replied")
                           }
+                          disabled={updatingInquiryId === inquiry.id}
                         >
-                          Marcar como Respondido
+                          {updatingInquiryId === inquiry.id ? (
+                            <>
+                              <Zap className="h-4 w-4 animate-spin mr-2" />
+                              Actualizando...
+                            </>
+                          ) : (
+                            "Marcar como Respondido"
+                          )}
                         </Button>
                         <Button
                           size="sm"
@@ -423,8 +450,16 @@ export function VendorInquiriesSection() {
                           onClick={() =>
                             updateInquiryStatus(inquiry.id, "closed")
                           }
+                          disabled={updatingInquiryId === inquiry.id}
                         >
-                          Cerrar conversación
+                          {updatingInquiryId === inquiry.id ? (
+                            <>
+                              <Zap className="h-4 w-4 animate-spin mr-2" />
+                              Cerrando...
+                            </>
+                          ) : (
+                            "Cerrar conversación"
+                          )}
                         </Button>
                       </>
                     )}
@@ -435,8 +470,16 @@ export function VendorInquiriesSection() {
                         onClick={() =>
                           updateInquiryStatus(inquiry.id, "closed")
                         }
+                        disabled={updatingInquiryId === inquiry.id}
                       >
-                        Cerrar conversación
+                        {updatingInquiryId === inquiry.id ? (
+                          <>
+                            <Zap className="h-4 w-4 animate-spin mr-2" />
+                            Cerrando...
+                          </>
+                        ) : (
+                          "Cerrar conversación"
+                        )}
                       </Button>
                     )}
                     {inquiry.status === "closed" && (
@@ -446,40 +489,49 @@ export function VendorInquiriesSection() {
                         onClick={() =>
                           updateInquiryStatus(inquiry.id, "pending")
                         }
+                        disabled={updatingInquiryId === inquiry.id}
                       >
-                        Reabrir conversación
+                        {updatingInquiryId === inquiry.id ? (
+                          <>
+                            <Zap className="h-4 w-4 animate-spin mr-2" />
+                            Reabriendo...
+                          </>
+                        ) : (
+                          "Reabrir conversación"
+                        )}
                       </Button>
                     )}
-                    {inquiry.status !== "converted" && (
-                      <>
-                        {inquiry.isGuest ? (
-                          // Guest users: Only email option
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                            onClick={() => {
-                              setSelectedInquiry(inquiry);
-                              setShowSendMessageModal(true);
-                            }}
-                          >
-                            Enviar Email
-                          </Button>
-                        ) : (
-                          // Registered users: Only conversation option
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => {
-                              setSelectedInquiry(inquiry);
-                              setShowStartConversationModal(true);
-                            }}
-                          >
-                            Iniciar Conversación
-                          </Button>
-                        )}
-                      </>
-                    )}
+                    {inquiry.status !== "converted" &&
+                      inquiry.status !== "closed" && (
+                        <>
+                          {inquiry.isGuest ? (
+                            // Guest users: Only email option
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                              onClick={() => {
+                                setSelectedInquiry(inquiry);
+                                setShowSendMessageModal(true);
+                              }}
+                            >
+                              Enviar Email
+                            </Button>
+                          ) : (
+                            // Registered users: Only conversation option
+                            <Button
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => {
+                                setSelectedInquiry(inquiry);
+                                setShowStartConversationModal(true);
+                              }}
+                            >
+                              Iniciar Conversación
+                            </Button>
+                          )}
+                        </>
+                      )}
                     {inquiry.status === "converted" && (
                       <Button
                         size="sm"
