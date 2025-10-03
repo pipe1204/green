@@ -12,14 +12,19 @@ import {
   Calendar,
   Car,
   Zap,
+  Clock,
 } from "lucide-react";
 import {
   CustomerInquiryWithDetails,
   VendorInquiriesResponse,
   CreateConversationResponse,
+  VendorTestDriveBooking,
+  VendorTestDrivesResponse,
+  TestDriveResponseResponse,
 } from "@/types";
 import { StartConversationModal } from "./StartConversationModal";
 import { SendMessageModal } from "./SendMessageModal";
+import { TestDriveResponseModal } from "./TestDriveResponseModal";
 
 export function VendorInquiriesSection() {
   const { user, session } = useAuth();
@@ -33,6 +38,18 @@ export function VendorInquiriesSection() {
     useState<CustomerInquiryWithDetails | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [updatingInquiryId, setUpdatingInquiryId] = useState<string | null>(
+    null
+  );
+
+  // Test drive state
+  const [testDrives, setTestDrives] = useState<VendorTestDriveBooking[]>([]);
+  const [testDrivesLoading, setTestDrivesLoading] = useState(false);
+  const [testDrivesError, setTestDrivesError] = useState<string | null>(null);
+  const [showTestDriveResponseModal, setShowTestDriveResponseModal] =
+    useState(false);
+  const [selectedTestDrive, setSelectedTestDrive] =
+    useState<VendorTestDriveBooking | null>(null);
+  const [updatingTestDriveId, setUpdatingTestDriveId] = useState<string | null>(
     null
   );
 
@@ -67,7 +84,36 @@ export function VendorInquiriesSection() {
       }
     };
 
+    const fetchTestDrives = async () => {
+      try {
+        setTestDrivesLoading(true);
+        setTestDrivesError(null);
+
+        const response = await fetch("/api/vendor/test-drives", {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+        });
+
+        const data: VendorTestDrivesResponse = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Error fetching test drives");
+        }
+
+        setTestDrives(data.bookings || []);
+      } catch (err) {
+        console.error("Error fetching test drives:", err);
+        setTestDrivesError(
+          err instanceof Error ? err.message : "Error loading test drives"
+        );
+      } finally {
+        setTestDrivesLoading(false);
+      }
+    };
+
     fetchInquiries();
+    fetchTestDrives();
   }, [user, session]);
 
   const updateInquiryStatus = async (inquiryId: string, status: string) => {
@@ -195,6 +241,65 @@ export function VendorInquiriesSection() {
       throw err;
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const respondToTestDrive = async (
+    response: "accepted" | "declined",
+    message: string
+  ) => {
+    if (!selectedTestDrive) return;
+
+    try {
+      setUpdatingTestDriveId(selectedTestDrive.id);
+      const apiResponse = await fetch(
+        `/api/vendor/test-drives/${selectedTestDrive.id}/respond`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ response, message }),
+        }
+      );
+
+      const data: TestDriveResponseResponse = await apiResponse.json();
+
+      if (!apiResponse.ok) {
+        throw new Error(data.error || "Error responding to test drive");
+      }
+
+      // Update local state
+      setTestDrives((prev) =>
+        prev.map((testDrive) =>
+          testDrive.id === selectedTestDrive.id
+            ? {
+                ...testDrive,
+                vendorResponse: response,
+                vendorMessage: message,
+                vendorResponseDate: new Date().toISOString(),
+              }
+            : testDrive
+        )
+      );
+
+      setShowTestDriveResponseModal(false);
+      setSelectedTestDrive(null);
+      alert(
+        `Prueba de manejo ${
+          response === "accepted" ? "aceptada" : "declinada"
+        } exitosamente`
+      );
+    } catch (err) {
+      console.error("Error responding to test drive:", err);
+      setError("Error responding to test drive");
+      alert(
+        "Error al responder a la prueba de manejo. Por favor, inténtalo de nuevo."
+      );
+      throw err;
+    } finally {
+      setUpdatingTestDriveId(null);
     }
   };
 
@@ -549,6 +654,210 @@ export function VendorInquiriesSection() {
         </div>
       </div>
 
+      {/* Test Drives Section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white flex-shrink-0">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+              <Calendar className="w-6 h-6 text-blue-500 mr-2" />
+              Pruebas de Manejo
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {testDrives.length} prueba{testDrives.length !== 1 ? "s" : ""}{" "}
+              programada{testDrives.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full overflow-y-auto">
+            <div className="space-y-4 p-6">
+              {testDrivesLoading ? (
+                <div className="flex items-center justify-center h-32">
+                  <Zap className="w-8 h-8 animate-spin text-blue-600" />
+                  <span className="ml-2 text-gray-600">
+                    Cargando pruebas de manejo...
+                  </span>
+                </div>
+              ) : testDrivesError ? (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-600">{testDrivesError}</p>
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              ) : testDrives.length === 0 ? (
+                <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+                  <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No hay pruebas programadas
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Los clientes aún no han programado pruebas de manejo
+                  </p>
+                </div>
+              ) : (
+                testDrives.map((testDrive) => (
+                  <div
+                    key={testDrive.id}
+                    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Calendar className="h-5 w-5 text-blue-600" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {testDrive.customerName}
+                          </h3>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <div className="flex items-center space-x-1">
+                              <Mail className="h-4 w-4" />
+                              <span>{testDrive.customerEmail}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Phone className="h-4 w-4" />
+                              <span>{testDrive.customerPhone}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>
+                                {new Date(
+                                  testDrive.preferredDate
+                                ).toLocaleDateString("es-CO")}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-4 w-4" />
+                              <span>{testDrive.preferredTime}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {testDrive.vendorResponse === "pending" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-yellow-50 text-yellow-700 border-yellow-200"
+                          >
+                            Pendiente
+                          </Badge>
+                        )}
+                        {testDrive.vendorResponse === "accepted" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-green-50 text-green-700 border-green-200"
+                          >
+                            Aceptada
+                          </Badge>
+                        )}
+                        {testDrive.vendorResponse === "declined" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-red-50 text-red-700 border-red-200"
+                          >
+                            Declinada
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Car className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700">
+                          Vehículo:
+                        </span>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <h4 className="font-medium text-gray-900">
+                          {testDrive.vehicle?.brand} {testDrive.vehicle?.name}
+                        </h4>
+                      </div>
+                    </div>
+
+                    {testDrive.message && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                          Mensaje del cliente:
+                        </h4>
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p className="text-gray-900">{testDrive.message}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {testDrive.vendorMessage && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                          Tu respuesta:
+                        </h4>
+                        <div className="bg-blue-50 rounded-lg p-3">
+                          <p className="text-gray-900">
+                            {testDrive.vendorMessage}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-gray-500">
+                        Programada:{" "}
+                        {new Date(testDrive.createdAt).toLocaleDateString(
+                          "es-CO"
+                        )}
+                      </div>
+                      <div className="flex space-x-2">
+                        {testDrive.vendorResponse === "pending" && (
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                            onClick={() => {
+                              setSelectedTestDrive(testDrive);
+                              setShowTestDriveResponseModal(true);
+                            }}
+                            disabled={updatingTestDriveId === testDrive.id}
+                          >
+                            {updatingTestDriveId === testDrive.id ? (
+                              <>
+                                <Zap className="h-4 w-4 animate-spin mr-2" />
+                                Respondiendo...
+                              </>
+                            ) : (
+                              "Responder"
+                            )}
+                          </Button>
+                        )}
+                        {testDrive.vendorResponse !== "pending" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-gray-50 text-gray-700 border-gray-200"
+                            disabled
+                          >
+                            {testDrive.vendorResponse === "accepted"
+                              ? "Aceptada"
+                              : "Declinada"}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Modals */}
       <StartConversationModal
         isOpen={showStartConversationModal}
@@ -575,6 +884,51 @@ export function VendorInquiriesSection() {
           loading={actionLoading}
         />
       )}
+
+      <TestDriveResponseModal
+        isOpen={showTestDriveResponseModal}
+        onClose={() => {
+          setShowTestDriveResponseModal(false);
+          setSelectedTestDrive(null);
+        }}
+        onSubmit={respondToTestDrive}
+        testDrive={
+          selectedTestDrive || {
+            id: "",
+            vehicleId: "",
+            customerId: "",
+            vendorId: "",
+            customerName: "",
+            customerEmail: "",
+            customerPhone: "",
+            preferredDate: "",
+            preferredTime: "",
+            message: "",
+            status: "pending",
+            vendorResponse: "pending",
+            vendorMessage: "",
+            vendorResponseDate: "",
+            vendorRespondedBy: "",
+            createdAt: "",
+            updatedAt: "",
+            vehicle: {
+              id: "",
+              name: "",
+              brand: "",
+              type: "",
+              price: 0,
+              images: [],
+              location: "",
+            },
+            customer: {
+              id: "",
+              name: "",
+              email: "",
+            },
+          }
+        }
+        loading={updatingTestDriveId !== null}
+      />
     </div>
   );
 }
