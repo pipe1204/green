@@ -29,7 +29,7 @@ function createAuthenticatedClient(request: NextRequest) {
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -43,7 +43,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const messageId = params.id;
+    const { id: messageId } = await params;
     const body = (await request.json()) as UpdateMessageRequest;
     const { isRead, content } = body;
 
@@ -122,7 +122,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -136,7 +136,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const messageId = params.id;
+    const { id: messageId } = await params;
 
     // Get message and check if user is the sender
     const { data: message, error: msgError } = await supabaseClient

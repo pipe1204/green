@@ -306,7 +306,7 @@ export function useRealtimeConversation(conversationId: string | null) {
 
     try {
       // Use the new Supabase function that bypasses RLS
-      const { data, error } = await supabase.rpc("mark_messages_as_read", {
+      const { error } = await supabase.rpc("mark_messages_as_read", {
         p_conversation_id: conversationId,
         p_user_id: user.id,
       });

@@ -1,7 +1,7 @@
 "use client";
 
+import { TypingUser } from "@/types/messaging";
 import React from "react";
-import { TypingUser } from "@/hooks/useTypingIndicator";
 
 interface TypingIndicatorProps {
   typingUsers: TypingUser[];

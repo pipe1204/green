@@ -137,6 +137,7 @@ export function FileUpload({
 
   const getFileIcon = (file: File) => {
     if (file.type.startsWith("image/")) {
+      // eslint-disable-next-line jsx-a11y/alt-text
       return <Image className="h-4 w-4 text-blue-500" />;
     } else if (file.type.includes("pdf")) {
       return <FileText className="h-4 w-4 text-red-500" />;

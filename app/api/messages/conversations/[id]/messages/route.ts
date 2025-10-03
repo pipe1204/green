@@ -33,7 +33,7 @@ function createAuthenticatedClient(request: NextRequest) {
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -47,7 +47,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const conversationId = params.id;
+    const { id: conversationId } = await params;
     const body = (await request.json()) as SendMessageRequest;
     const { content, messageType = "text", attachments = [] } = body;
 

@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get user from auth header
@@ -46,7 +46,7 @@ export async function POST(
       );
     }
 
-    const inquiryId = params.id;
+    const { id: inquiryId } = await params;
     const body = await request.json();
     const { message } = body;
 
@@ -80,9 +80,6 @@ export async function POST(
     const customerEmail = isGuest
       ? inquiry.guest_email
       : inquiry.profiles?.email;
-    const customerName = isGuest
-      ? inquiry.guest_name
-      : inquiry.profiles?.full_name;
 
     // TODO: Implement actual email sending
     // For now, we'll just log the email details

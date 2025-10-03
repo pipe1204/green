@@ -457,7 +457,10 @@ export function EmojiPicker({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 z-50 w-80 max-h-64">
+    <div
+      className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 z-50 w-80 max-h-80"
+      key="emoji-picker"
+    >
       <div className="space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -473,14 +476,14 @@ export function EmojiPicker({
         </div>
 
         {/* Emoji Categories */}
-        <div className="space-y-2 max-h-48 overflow-y-auto">
+        <div className="space-y-2 max-h-64 overflow-y-auto">
           {emojiCategories.map((category) => (
             <div key={category.name}>
               <h5 className="text-xs font-medium text-gray-500 mb-1 px-1">
                 {category.name}
               </h5>
               <div className="grid grid-cols-10 gap-0.5">
-                {category.emojis.slice(0, 20).map((emoji, index) => (
+                {category.emojis.map((emoji, index) => (
                   <button
                     key={index}
                     onClick={() => onEmojiSelect(emoji)}
@@ -490,11 +493,6 @@ export function EmojiPicker({
                     {emoji}
                   </button>
                 ))}
-                {category.emojis.length > 20 && (
-                  <div className="w-7 h-7 flex items-center justify-center text-xs text-gray-400">
-                    +{category.emojis.length - 20}
-                  </div>
-                )}
               </div>
             </div>
           ))}

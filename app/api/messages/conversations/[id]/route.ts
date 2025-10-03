@@ -33,7 +33,7 @@ function createAuthenticatedClient(request: NextRequest) {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -47,7 +47,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const conversationId = params.id;
+    const { id: conversationId } = await params;
 
     // Get conversation with participants and vehicle info
     const { data: conversation, error: convError } = (await supabaseClient
@@ -180,7 +180,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -194,7 +194,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const conversationId = params.id;
+    const { id: conversationId } = await params;
     const body = (await request.json()) as UpdateConversationRequest;
     const { status, subject } = body;
 
@@ -255,7 +255,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabaseClient = createAuthenticatedClient(request);
@@ -269,7 +269,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const conversationId = params.id;
+    const { id: conversationId } = await params;
 
     // Check if user has access to this conversation
     const { data: conversation } = await supabaseClient

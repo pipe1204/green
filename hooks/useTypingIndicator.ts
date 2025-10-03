@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { TypingUser } from "@/types/messaging";
 
 export function useTypingIndicator(conversationId: string | null) {
   const { user } = useAuth();

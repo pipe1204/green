@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { ResponsiveDashboardSidebar } from "./ResponsiveDashboardSidebar";
 
 import { CustomerDashboardSection } from "@/types";
