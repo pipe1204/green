@@ -269,7 +269,7 @@ export function VehicleViewModal({
                         Nombre
                       </p>
                       <p className="text-sm text-gray-600">
-                        {coerceText(vehicle.dealer?.name)}
+                        {coerceText(vehicle.vendor?.businessName)}
                       </p>
                     </div>
                   </div>
@@ -280,7 +280,7 @@ export function VehicleViewModal({
                         Ubicación
                       </p>
                       <p className="text-sm text-gray-600">
-                        {coerceText(vehicle.dealer?.location)}
+                        {coerceText(vehicle.location)}
                       </p>
                     </div>
                   </div>
@@ -296,7 +296,7 @@ export function VehicleViewModal({
                             <Star
                               key={star}
                               className={`w-4 h-4 ${
-                                star <= (vehicle.dealer?.rating || 0)
+                                star <= (vehicle.vendor?.rating || 0)
                                   ? "text-yellow-400 fill-current"
                                   : "text-gray-300"
                               }`}
@@ -304,7 +304,7 @@ export function VehicleViewModal({
                           ))}
                         </div>
                         <span className="text-sm text-gray-600">
-                          ({vehicle.dealer?.rating || 0}/5)
+                          ({vehicle.vendor?.rating || 0}/5)
                         </span>
                       </div>
                     </div>

@@ -79,6 +79,20 @@ export function SignUpModal({
       return;
     }
 
+    // Validate phone number for vendors (must have country code)
+    if (userType === "vendor" && phone) {
+      // Must start with + and have country code
+      const phoneRegex = /^\+[1-9]\d{7,14}$/; // International format: +country code + 7-14 digits
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, ""); // Remove spaces, dashes, parentheses
+      if (!phoneRegex.test(cleanPhone)) {
+        setError(
+          "El teléfono debe incluir código de país internacional (ej: +61 4xx xxx xxx, +57 300 xxx xxxx, +1 555 xxx xxxx)"
+        );
+        setLoading(false);
+        return;
+      }
+    }
+
     const { error } = await signUp(email, password, fullName, userType);
 
     if (error) {
@@ -174,6 +188,25 @@ export function SignUpModal({
             </button>
           </div>
         </div>
+
+        {/* WhatsApp Contact Emphasis for Vendors */}
+        {userType === "vendor" && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">📱</span>
+              </div>
+              <h3 className="font-semibold text-green-800">
+                Contacto WhatsApp
+              </h3>
+            </div>
+            <p className="text-sm text-green-700">
+              Los clientes podrán contactarte directamente por WhatsApp usando
+              tu número móvil. Asegúrate de incluir el código de país (ej: +57
+              300 123 4567).
+            </p>
+          </div>
+        )}
 
         {/* Google OAuth for Customers */}
         {userType === "customer" && (
@@ -394,16 +427,30 @@ export function SignUpModal({
                   htmlFor="phone"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Teléfono
+                  Teléfono Móvil <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+57 300 123 4567"
+                  placeholder="+61 4xx xxx xxx"
                   className="bg-gray-50"
+                  required
                 />
+                <div className="mt-1 text-xs text-gray-600">
+                  <p className="flex items-center gap-1">
+                    <span className="text-green-600">📱</span>
+                    <span>Número móvil con código de país internacional</span>
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    Ejemplos: +61 4xx xxx xxx (Australia), +57 300 xxx xxxx
+                    (Colombia), +1 555 xxx xxxx (USA)
+                  </p>
+                  <p className="text-green-600 font-medium">
+                    Los clientes podrán contactarte por WhatsApp
+                  </p>
+                </div>
               </div>
 
               <div>

@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
-import {
-  CustomerInquiryWithDetails,
-  VendorInquiriesResponse,
-  UpdateInquiryStatusRequest,
-  UpdateInquiryStatusResponse,
-} from "@/types";
+import { CustomerInquiryWithDetails, VendorInquiriesResponse } from "@/types";
 
 /**
  * GET /api/vendor/inquiries

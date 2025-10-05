@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { TestDriveModal } from "./TestDriveModal";
 import { PriceAlertModal } from "./PriceAlertModal";
 import { FavoritesButton } from "./FavoritesButton";
+import { WhatsAppContactButton } from "./WhatsAppContactButton";
 import { useAuthActions } from "@/hooks/useAuthCheck";
 import { usePriceAlert } from "@/hooks/usePriceAlert";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
@@ -201,9 +202,14 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-1 mb-2">
+            <div className="flex items-center space-x-2 mb-2">
               <MapPin className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-gray-500">{vehicle.location}</span>
+              <span className="text-sm text-gray-400">•</span>
+              <span className="text-sm text-gray-500">
+                {vehicle.vendor.businessName}
+              </span>
+              <WhatsAppContactButton vehicle={vehicle} />
             </div>
           </div>
           <div className="flex justify-between items-center gap-2">
@@ -278,14 +284,6 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
           <span className="text-sm text-gray-600">
             {vehicle.specifications.warranty}
           </span>
-        </div>
-
-        {/* Dealer Info */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span>{vehicle.dealer.rating}</span>
-          </div>
         </div>
 
         {/* Action Buttons */}

@@ -3,13 +3,14 @@ import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { VehicleCard } from "@/components/resultados/VehicleCard";
 import { VehicleListCard } from "@/components/resultados/VehicleListCard";
-import { vehicles } from "@/data/vehicles";
+import { vehicles, staticVehicleToVehicle } from "@/data/vehicles";
 
 // next/navigation is mocked in __tests__/setup.ts
 
 describe("Vehicle cards", () => {
-  const sampleVehicle =
-    vehicles.find((v) => v.images.length > 0) ?? vehicles[0];
+  const sampleVehicle = staticVehicleToVehicle(
+    vehicles.find((v) => v.images.length > 0) ?? vehicles[0]
+  );
 
   it("renders VehicleListCard with name, type next to name, location and price", () => {
     render(<VehicleListCard vehicle={sampleVehicle} />);

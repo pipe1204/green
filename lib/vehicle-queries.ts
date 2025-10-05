@@ -10,7 +10,17 @@ import { DbVehicleRow, PaginatedVehiclesResult } from "@/types/queries";
 export async function getAllVehicles(): Promise<Vehicle[]> {
   const { data, error } = await supabase
     .from("vehicles")
-    .select("*")
+    .select(
+      `
+      *,
+      vendors (
+        business_name,
+        phone,
+        email,
+        rating
+      )
+    `
+    )
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -28,7 +38,17 @@ export async function getAllVehicles(): Promise<Vehicle[]> {
 export async function getVehicleById(id: string): Promise<Vehicle | null> {
   const { data, error } = await supabase
     .from("vehicles")
-    .select("*")
+    .select(
+      `
+      *,
+      vendors (
+        business_name,
+        phone,
+        email,
+        rating
+      )
+    `
+    )
     .eq("id", id)
     .single();
 
@@ -55,7 +75,17 @@ export async function getVehiclesByIds(ids: string[]): Promise<Vehicle[]> {
 
   const { data, error } = await supabase
     .from("vehicles")
-    .select("*")
+    .select(
+      `
+      *,
+      vendors (
+        business_name,
+        phone,
+        email,
+        rating
+      )
+    `
+    )
     .in("id", ids);
 
   if (error) {
@@ -78,7 +108,18 @@ function buildVehicleQuery(
   page: number = 0,
   pageSize: number = 20
 ) {
-  let query = supabase.from("vehicles").select("*", { count: "exact" });
+  let query = supabase.from("vehicles").select(
+    `
+    *,
+    vendors (
+      business_name,
+      phone,
+      email,
+      rating
+    )
+  `,
+    { count: "exact" }
+  );
 
   // Filter by vehicle type
   if (filters.vehicleType.length > 0) {
@@ -159,7 +200,7 @@ function applyClientSideFilters(
     filtered = filtered.filter((v) => {
       return filters.dealerRating.some((rating) => {
         const minRating = parseFloat(rating.replace("+", ""));
-        return v.dealer.rating >= minRating;
+        return v.vendor.rating >= minRating;
       });
     });
   }

@@ -118,14 +118,15 @@ describe("VehicleViewModal", () => {
     location: "Bogotá, Colombia",
     description: "Amazing electric car with autopilot and premium features",
     features: ["GPS integrado", "Autopilot", "Carga rápida"],
-    dealer: {
-      name: "Tesla Store Colombia",
-      location: "Bogotá, Colombia",
-      rating: 4.5,
-    },
     reviews: {
       average: 4.5,
       count: 120,
+    },
+    vendor: {
+      businessName: "Tesla Store Colombia",
+      phone: "+57 300 123 4567",
+      email: "contacto@tesla.com",
+      rating: 4.5,
     },
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",
