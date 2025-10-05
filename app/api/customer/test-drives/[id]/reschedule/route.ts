@@ -55,7 +55,9 @@ export async function POST(
     // First, check if the booking exists and belongs to this customer
     const { data: booking, error: bookingError } = await serviceSupabase
       .from("test_drive_bookings")
-      .select("id, customer_id, status, vendor_response, reschedule_count")
+      .select(
+        "id, customer_id, status, vendor_response, reschedule_count, preferred_date, preferred_time, original_preferred_date, original_preferred_time"
+      )
       .eq("id", bookingId)
       .eq("customer_id", user.id)
       .single();
@@ -93,6 +95,11 @@ export async function POST(
     const { data: updatedBooking, error: updateError } = await serviceSupabase
       .from("test_drive_bookings")
       .update({
+        // Preserve original date/time if this is the first reschedule
+        original_preferred_date:
+          booking.original_preferred_date || booking.preferred_date,
+        original_preferred_time:
+          booking.original_preferred_time || booking.preferred_time,
         // Update preferred date/time to new values
         preferred_date: newDate,
         preferred_time: newTime,
