@@ -122,10 +122,10 @@ export function TestDrivesSection() {
 
       setShowRescheduleModal(false);
       setSelectedBooking(null);
-      alert("Solicitud de reagendamiento enviada exitosamente");
+      // Success - no alert needed, user can see the updated status
     } catch (err) {
       console.error("Error submitting reschedule request:", err);
-      alert("Error al enviar la solicitud de reagendamiento");
+      setError("Error al enviar la solicitud de reagendamiento");
     } finally {
       setRescheduleLoading(false);
     }

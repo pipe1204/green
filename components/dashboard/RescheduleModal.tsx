@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Calendar, Clock, AlertCircle, Zap } from "lucide-react";
+import { timeSlots } from "@/data";
 
 interface RescheduleModalProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export function RescheduleModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Calendar className="w-5 h-5 text-blue-600" />
@@ -150,15 +151,21 @@ export function RescheduleModal({
               >
                 Nueva Hora *
               </label>
-              <Input
+              <select
                 id="newTime"
-                type="time"
                 value={newTime}
                 onChange={(e) => setNewTime(e.target.value)}
                 required
                 disabled={loading}
-                className="w-full"
-              />
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">Seleccionar hora</option>
+                {timeSlots.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Reason */}

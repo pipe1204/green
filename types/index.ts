@@ -141,8 +141,6 @@ export interface TestDriveBooking {
   // Reschedule fields
   reschedule_count?: number;
   reschedule_reason?: string;
-  suggested_date?: string;
-  suggested_time?: string;
   reschedule_requested_by?: string;
   reschedule_requested_at?: string;
   reschedule_status?: "none" | "requested" | "approved" | "rejected";
@@ -305,8 +303,6 @@ export interface VendorTestDriveBooking {
   // Reschedule fields
   rescheduleCount?: number;
   rescheduleReason?: string;
-  suggestedDate?: string;
-  suggestedTime?: string;
   rescheduleRequestedBy?: string;
   rescheduleRequestedAt?: string;
   rescheduleStatus?: "none" | "requested" | "approved" | "rejected";
@@ -361,8 +357,6 @@ export interface CustomerTestDriveBooking {
   // Reschedule fields
   rescheduleCount?: number;
   rescheduleReason?: string;
-  suggestedDate?: string;
-  suggestedTime?: string;
   rescheduleRequestedBy?: string;
   rescheduleRequestedAt?: string;
   rescheduleStatus?: "none" | "requested" | "approved" | "rejected";
@@ -411,6 +405,25 @@ export interface RescheduleResponse {
     rescheduleCount: number;
     rescheduleReason: string;
     rescheduleRequestedAt: string;
+  };
+  error?: string;
+}
+
+// Vendor reschedule response interfaces
+export interface VendorRescheduleResponseRequest {
+  response: "approved" | "rejected";
+  message: string;
+}
+
+export interface VendorRescheduleResponseResponse {
+  success: boolean;
+  booking: {
+    id: string;
+    status: "confirmed" | "reschedule_rejected";
+    vendorResponse: "accepted" | "declined";
+    vendorMessage: string;
+    vendorResponseDate: string;
+    rescheduleStatus: "approved" | "rejected";
   };
   error?: string;
 }

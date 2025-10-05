@@ -101,6 +101,14 @@ export async function GET(request: NextRequest) {
         vendorMessage: booking.vendor_message,
         vendorResponseDate: booking.vendor_response_date,
         vendorRespondedBy: booking.vendor_responded_by,
+        // Reschedule fields
+        rescheduleCount: booking.reschedule_count,
+        rescheduleReason: booking.reschedule_reason,
+        rescheduleRequestedBy: booking.reschedule_requested_by,
+        rescheduleRequestedAt: booking.reschedule_requested_at,
+        rescheduleStatus: booking.reschedule_status,
+        originalPreferredDate: booking.original_preferred_date,
+        originalPreferredTime: booking.original_preferred_time,
         createdAt: booking.created_at,
         updatedAt: booking.updated_at,
         vehicle: booking.vehicles
