@@ -126,11 +126,28 @@ export interface TestDriveBooking {
   preferred_date?: string;
   preferred_time?: string;
   message?: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "confirmed"
+    | "completed"
+    | "cancelled"
+    | "reschedule_requested"
+    | "reschedule_approved"
+    | "reschedule_rejected";
   vendor_response?: "pending" | "accepted" | "declined";
   vendor_message?: string;
   vendor_response_date?: string;
   vendor_responded_by?: string;
+  // Reschedule fields
+  reschedule_count?: number;
+  reschedule_reason?: string;
+  suggested_date?: string;
+  suggested_time?: string;
+  reschedule_requested_by?: string;
+  reschedule_requested_at?: string;
+  reschedule_status?: "none" | "requested" | "approved" | "rejected";
+  original_preferred_date?: string;
+  original_preferred_time?: string;
   created_at: string;
   updated_at: string;
 }
@@ -273,11 +290,28 @@ export interface VendorTestDriveBooking {
   preferredDate: string;
   preferredTime: string;
   message?: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "confirmed"
+    | "completed"
+    | "cancelled"
+    | "reschedule_requested"
+    | "reschedule_approved"
+    | "reschedule_rejected";
   vendorResponse: "pending" | "accepted" | "declined";
   vendorMessage?: string;
   vendorResponseDate?: string;
   vendorRespondedBy?: string;
+  // Reschedule fields
+  rescheduleCount?: number;
+  rescheduleReason?: string;
+  suggestedDate?: string;
+  suggestedTime?: string;
+  rescheduleRequestedBy?: string;
+  rescheduleRequestedAt?: string;
+  rescheduleStatus?: "none" | "requested" | "approved" | "rejected";
+  originalPreferredDate?: string;
+  originalPreferredTime?: string;
   createdAt: string;
   updatedAt: string;
   vehicle?: {
@@ -313,10 +347,27 @@ export interface CustomerTestDriveBooking {
   preferredDate: string;
   preferredTime: string;
   message?: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "confirmed"
+    | "completed"
+    | "cancelled"
+    | "reschedule_requested"
+    | "reschedule_approved"
+    | "reschedule_rejected";
   vendorResponse: "pending" | "accepted" | "declined";
   vendorMessage?: string;
   vendorResponseDate?: string;
+  // Reschedule fields
+  rescheduleCount?: number;
+  rescheduleReason?: string;
+  suggestedDate?: string;
+  suggestedTime?: string;
+  rescheduleRequestedBy?: string;
+  rescheduleRequestedAt?: string;
+  rescheduleStatus?: "none" | "requested" | "approved" | "rejected";
+  originalPreferredDate?: string;
+  originalPreferredTime?: string;
   createdAt: string;
   updatedAt: string;
   vehicle?: {
@@ -342,6 +393,25 @@ export interface CustomerTestDriveBooking {
 export interface CustomerTestDrivesResponse {
   bookings: CustomerTestDriveBooking[];
   count: number;
+  error?: string;
+}
+
+// Reschedule request interfaces
+export interface RescheduleRequest {
+  newDate: string;
+  newTime: string;
+  reason: string;
+}
+
+export interface RescheduleResponse {
+  success: boolean;
+  booking: {
+    id: string;
+    rescheduleStatus: "requested";
+    rescheduleCount: number;
+    rescheduleReason: string;
+    rescheduleRequestedAt: string;
+  };
   error?: string;
 }
 

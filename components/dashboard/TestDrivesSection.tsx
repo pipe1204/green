@@ -16,9 +16,15 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  CalendarDays,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CustomerTestDriveBooking, CustomerTestDrivesResponse } from "@/types";
+import {
+  CustomerTestDriveBooking,
+  CustomerTestDrivesResponse,
+  RescheduleResponse,
+} from "@/types";
+import { RescheduleModal } from "./RescheduleModal";
 
 export function TestDrivesSection() {
   const { user, session } = useAuth();
@@ -26,6 +32,12 @@ export function TestDrivesSection() {
   const [testDrives, setTestDrives] = useState<CustomerTestDriveBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Reschedule modal state
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] =
+    useState<CustomerTestDriveBooking | null>(null);
+  const [rescheduleLoading, setRescheduleLoading] = useState(false);
 
   const fetchTestDrives = useCallback(async () => {
     try {
@@ -58,6 +70,77 @@ export function TestDrivesSection() {
       fetchTestDrives();
     }
   }, [user, fetchTestDrives]);
+
+  const handleRescheduleRequest = async (
+    newDate: string,
+    newTime: string,
+    reason: string
+  ) => {
+    if (!selectedBooking || !session) return;
+
+    try {
+      setRescheduleLoading(true);
+
+      const response = await fetch(
+        `/api/customer/test-drives/${selectedBooking.id}/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ newDate, newTime, reason }),
+        }
+      );
+
+      const data: RescheduleResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error processing reschedule request");
+      }
+
+      // Update local state
+      setTestDrives((prev) =>
+        prev.map((booking) =>
+          booking.id === selectedBooking.id
+            ? {
+                ...booking,
+                status: "reschedule_requested",
+                vendorResponse: "pending",
+                vendorMessage: undefined,
+                vendorResponseDate: undefined,
+                preferredDate: newDate,
+                preferredTime: newTime,
+                rescheduleCount: (booking.rescheduleCount || 0) + 1,
+                rescheduleReason: reason,
+                rescheduleStatus: "requested",
+                rescheduleRequestedAt: new Date().toISOString(),
+              }
+            : booking
+        )
+      );
+
+      setShowRescheduleModal(false);
+      setSelectedBooking(null);
+      alert("Solicitud de reagendamiento enviada exitosamente");
+    } catch (err) {
+      console.error("Error submitting reschedule request:", err);
+      alert("Error al enviar la solicitud de reagendamiento");
+    } finally {
+      setRescheduleLoading(false);
+    }
+  };
+
+  const canReschedule = (booking: CustomerTestDriveBooking): boolean => {
+    return (
+      // Must have vendor response (not pending)
+      booking.vendorResponse !== "pending" &&
+      // Cannot be completed or cancelled
+      !["completed", "cancelled"].includes(booking.status) &&
+      // Cannot exceed reschedule limit
+      (booking.rescheduleCount || 0) < 2
+    );
+  };
 
   const getVendorResponseColor = (vendorResponse: string) => {
     switch (vendorResponse) {
@@ -346,9 +429,44 @@ export function TestDrivesSection() {
                 </div>
               </div>
             )}
+
+            {/* Reschedule Button */}
+            {canReschedule(booking) && (
+              <div className="border-t pt-4">
+                <Button
+                  onClick={() => {
+                    setSelectedBooking(booking);
+                    setShowRescheduleModal(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                >
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Reagendar Prueba
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>
+
+      {/* Reschedule Modal */}
+      {selectedBooking && (
+        <RescheduleModal
+          isOpen={showRescheduleModal}
+          onClose={() => {
+            setShowRescheduleModal(false);
+            setSelectedBooking(null);
+          }}
+          onSubmit={handleRescheduleRequest}
+          vehicleName={selectedBooking.vehicle?.name || "Vehículo"}
+          currentDate={selectedBooking.preferredDate}
+          currentTime={selectedBooking.preferredTime}
+          rescheduleCount={selectedBooking.rescheduleCount || 0}
+          loading={rescheduleLoading}
+        />
+      )}
     </div>
   );
 }
