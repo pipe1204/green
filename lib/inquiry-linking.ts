@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * Links guest inquiries to a newly registered user based on email match
@@ -11,10 +12,15 @@ export async function linkGuestInquiriesByEmail(
   email: string
 ): Promise<{ success: boolean; linkedCount: number; error?: string }> {
   try {
+    // Use service role client to bypass RLS for guest inquiries
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     // Find all guest inquiries with matching email
-    const { data: guestInquiries, error: fetchError } = await supabase
+    const { data: guestInquiries, error: fetchError } = await serviceSupabase
       .from("customer_inquiries")
-      .select("id, guest_name, guest_email, message, created_at")
+      .select("id, guest_name, guest_email, message, created_at, is_guest")
       .eq("guest_email", email)
       .eq("is_guest", true);
 
@@ -28,7 +34,7 @@ export async function linkGuestInquiriesByEmail(
     }
 
     // Update the inquiries to link them to the user
-    const { error: updateError } = await supabase
+    const { error: updateError } = await serviceSupabase
       .from("customer_inquiries")
       .update({
         customer_id: userId,
@@ -45,10 +51,6 @@ export async function linkGuestInquiriesByEmail(
       console.error("Error linking guest inquiries:", updateError);
       return { success: false, linkedCount: 0, error: updateError.message };
     }
-
-    console.log(
-      `Successfully linked ${guestInquiries.length} guest inquiries for user ${userId}`
-    );
 
     return {
       success: true,

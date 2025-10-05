@@ -198,7 +198,7 @@ function applyClientSideFilters(
   // Filter by charging time
   if (filters.chargingTime.length > 0) {
     filtered = filtered.filter((v) => {
-      const chargingTime = parseFloat(v.chargingTime);
+      const chargingTime = parseFloat(v.specifications.chargeTime || "0");
       return filters.chargingTime.some((timeRange) => {
         if (timeRange === "8+") {
           return chargingTime >= 8;
@@ -212,10 +212,10 @@ function applyClientSideFilters(
   // Filter by max speed
   if (filters.maxSpeed.length > 0) {
     filtered = filtered.filter((v) => {
-      const maxSpeed = parseInt(v.maxSpeed);
+      const maxSpeed = parseInt(v.specifications.performance?.maxSpeed || "0");
       return filters.maxSpeed.some((speedRange) => {
-        if (speedRange === "100+") {
-          return maxSpeed >= 100;
+        if (speedRange === "150+") {
+          return maxSpeed >= 150;
         }
         const [min, max] = speedRange.split("-").map(Number);
         return maxSpeed >= min && maxSpeed <= max;
@@ -303,8 +303,6 @@ export async function getFilteredVehicles(
   pageSize: number = 20
 ): Promise<PaginatedVehiclesResult> {
   try {
-    console.log("getFilteredVehicles called with filters:", filters);
-
     // Step 1: Apply server-side filters and fetch data
     const query = buildVehicleQuery(filters, sortBy, 0, 1000); // Fetch more for client-side filtering
     const { data, error } = await query;
@@ -314,8 +312,6 @@ export async function getFilteredVehicles(
       throw new Error("No se pudieron cargar los vehículos");
     }
 
-    console.log("Server-side query returned:", data?.length, "vehicles");
-
     // Step 2: Convert to Vehicle objects (with proper type assertion for enum handling)
     let vehicles = (data || []).map((row) =>
       databaseToVehicle(row as unknown as DbVehicleRow)
@@ -323,7 +319,6 @@ export async function getFilteredVehicles(
 
     // Step 3: Apply client-side filters (complex JSONB queries)
     vehicles = applyClientSideFilters(vehicles, filters);
-    console.log("After client-side filters:", vehicles.length, "vehicles");
 
     // Step 4: Apply client-side sorting if needed (rating, range)
     if (sortBy === "rating" || sortBy === "range") {
@@ -335,12 +330,6 @@ export async function getFilteredVehicles(
     const startIndex = page * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedVehicles = vehicles.slice(startIndex, endIndex);
-    console.log(
-      "Returning paginated vehicles:",
-      paginatedVehicles.length,
-      "of",
-      totalFilteredCount
-    );
 
     return {
       vehicles: paginatedVehicles,

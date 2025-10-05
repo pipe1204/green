@@ -127,6 +127,10 @@ export interface TestDriveBooking {
   preferred_time?: string;
   message?: string;
   status: "pending" | "confirmed" | "completed" | "cancelled";
+  vendor_response?: "pending" | "accepted" | "declined";
+  vendor_message?: string;
+  vendor_response_date?: string;
+  vendor_responded_by?: string;
   created_at: string;
   updated_at: string;
 }
@@ -238,6 +242,106 @@ export interface CreateConversationResponse {
     sender_id: string;
     created_at: string;
   };
+  error?: string;
+}
+
+// Test Drive Response Types
+export interface TestDriveResponseRequest {
+  response: "accepted" | "declined";
+  message: string;
+}
+
+export interface TestDriveResponseResponse {
+  success: boolean;
+  booking: {
+    id: string;
+    vendorResponse: "accepted" | "declined";
+    vendorMessage: string;
+    vendorResponseDate: string;
+  };
+  error?: string;
+}
+
+export interface VendorTestDriveBooking {
+  id: string;
+  vehicleId: string;
+  customerId: string;
+  vendorId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  preferredDate: string;
+  preferredTime: string;
+  message?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  vendorResponse: "pending" | "accepted" | "declined";
+  vendorMessage?: string;
+  vendorResponseDate?: string;
+  vendorRespondedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  vehicle?: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: Array<{ url: string; alt: string }>;
+    location: string;
+  };
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface VendorTestDrivesResponse {
+  bookings: VendorTestDriveBooking[];
+  count: number;
+  error?: string;
+}
+
+export interface CustomerTestDriveBooking {
+  id: string;
+  vehicleId: string;
+  customerId: string;
+  vendorId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  preferredDate: string;
+  preferredTime: string;
+  message?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  vendorResponse: "pending" | "accepted" | "declined";
+  vendorMessage?: string;
+  vendorResponseDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  vehicle?: {
+    id: string;
+    name: string;
+    brand: string;
+    type: string;
+    price: number;
+    images: Array<{ url: string; alt: string }>;
+    location: string;
+  };
+  vendor?: {
+    id: string;
+    businessName: string;
+    contact?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+}
+
+export interface CustomerTestDrivesResponse {
+  bookings: CustomerTestDriveBooking[];
+  count: number;
   error?: string;
 }
 

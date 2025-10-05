@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { Message } from "@/types/messaging";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Zap } from "lucide-react";
 import { MessageItem } from "./MessageItem";
 
 interface MessageListProps {
@@ -33,8 +33,10 @@ export function MessageList({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        <p className="text-sm text-gray-500">Cargando mensajes...</p>
+        <div className="text-center">
+          <Zap className="w-8 h-8 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Cargando mensajes...</p>
+        </div>
       </div>
     );
   }
