@@ -202,7 +202,7 @@ export function useVehicleSearch() {
         filters.chargingTime.length > 0
       ) {
         filtered = filtered.filter((v) => {
-          const chargingTime = parseFloat(v.chargingTime || "0");
+          const chargingTime = parseFloat(v.specifications.chargeTime || "0");
           return filters.chargingTime.some((timeRange) => {
             if (timeRange === "8+") return chargingTime >= 8;
             const [min, max] = timeRange.split("-").map(Number);
@@ -214,7 +214,9 @@ export function useVehicleSearch() {
       // Apply max speed filter
       if (excludeFilterKey !== "maxSpeed" && filters.maxSpeed.length > 0) {
         filtered = filtered.filter((v) => {
-          const maxSpeed = parseInt(v.maxSpeed || "0");
+          const maxSpeed = parseInt(
+            v.specifications.performance?.maxSpeed || "0"
+          );
           return filters.maxSpeed.some((speedRange) => {
             if (speedRange === "150+") return maxSpeed >= 150;
             const [min, max] = speedRange.split("-").map(Number);
