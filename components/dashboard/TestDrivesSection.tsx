@@ -59,36 +59,6 @@ export function TestDrivesSection() {
     }
   }, [user, fetchTestDrives]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmed":
-        return "bg-green-100 text-green-800";
-      case "completed":
-        return "bg-blue-100 text-blue-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Pendiente";
-      case "confirmed":
-        return "Confirmada";
-      case "completed":
-        return "Completada";
-      case "cancelled":
-        return "Cancelada";
-      default:
-        return status;
-    }
-  };
-
   const getVendorResponseColor = (vendorResponse: string) => {
     switch (vendorResponse) {
       case "pending":
@@ -248,9 +218,7 @@ export function TestDrivesSection() {
                   <h3 className="text-lg font-semibold text-gray-900">
                     {booking.vehicle?.name || "Vehículo no disponible"}
                   </h3>
-                  <Badge className={getStatusColor(booking.status)}>
-                    {getStatusText(booking.status)}
-                  </Badge>
+
                   <Badge
                     variant="outline"
                     className={getVendorResponseColor(booking.vendorResponse)}

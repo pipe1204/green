@@ -295,12 +295,12 @@ export function useVehicleSearch() {
         case "chargingTime": {
           if (filterValue === "8+") {
             return filteredVehicles.filter(
-              (v) => parseFloat(v.chargingTime || "0") >= 8
+              (v) => parseFloat(v.specifications.chargeTime || "0") >= 8
             ).length;
           }
           const [min, max] = filterValue.split("-").map(Number);
           return filteredVehicles.filter((v) => {
-            const time = parseFloat(v.chargingTime || "0");
+            const time = parseFloat(v.specifications.chargeTime || "0");
             return time >= min && time <= max;
           }).length;
         }
@@ -308,12 +308,15 @@ export function useVehicleSearch() {
         case "maxSpeed": {
           if (filterValue === "150+") {
             return filteredVehicles.filter(
-              (v) => parseInt(v.maxSpeed || "0") >= 150
+              (v) =>
+                parseInt(v.specifications.performance?.maxSpeed || "0") >= 150
             ).length;
           }
           const [min, max] = filterValue.split("-").map(Number);
           return filteredVehicles.filter((v) => {
-            const speed = parseInt(v.maxSpeed || "0");
+            const speed = parseInt(
+              v.specifications.performance?.maxSpeed || "0"
+            );
             return speed >= min && speed <= max;
           }).length;
         }
