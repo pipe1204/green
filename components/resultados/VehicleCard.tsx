@@ -202,7 +202,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 mb-2">
+            <div className="flex items-center space-x-2 mb-2">
               <MapPin className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-gray-500">{vehicle.location}</span>
               <span className="text-sm text-gray-400">•</span>
