@@ -6,6 +6,7 @@ import { Vehicle } from "@/types";
 import { TestDriveModal } from "./TestDriveModal";
 import { PriceAlertModal } from "./PriceAlertModal";
 import { FavoritesButton } from "./FavoritesButton";
+import { WhatsAppContactButton } from "./WhatsAppContactButton";
 import { useAuthActions } from "@/hooks/useAuthCheck";
 import { usePriceAlert } from "@/hooks/usePriceAlert";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
@@ -204,11 +205,17 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-1 mb-2">
+              <div className="flex items-center space-x-3 mb-2">
                 <MapPin className="w-4 h-4 text-gray-400" />
                 <span className="text-sm text-gray-500">
                   {vehicle.location}
                 </span>
+                <span className="text-sm text-gray-400">•</span>
+                <span className="text-sm text-gray-500">
+                  {vehicle.vendor.businessName}
+                </span>
+
+                <WhatsAppContactButton vehicle={vehicle} />
               </div>
             </div>
             <div className="text-left sm:text-right">
@@ -277,16 +284,11 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             </div>
           </div>
 
-          {/* Warranty and Dealer Info */}
+          {/* Warranty and Vendor Info */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 mb-4 gap-2 sm:gap-0">
             <div className="flex items-center space-x-2">
               <Shield className="w-4 h-4 text-green-500" />
               <span>{vehicle.specifications.warranty}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span>Calificación del vendedor</span>
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span>{vehicle.vendor.rating}</span>
             </div>
           </div>
 
