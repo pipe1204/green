@@ -21,10 +21,12 @@ import {
   VendorTestDriveBooking,
   VendorTestDrivesResponse,
   TestDriveResponseResponse,
+  VendorRescheduleResponseResponse,
 } from "@/types";
 import { StartConversationModal } from "./StartConversationModal";
 import { SendMessageModal } from "./SendMessageModal";
 import { TestDriveResponseModal } from "./TestDriveResponseModal";
+import { VendorRescheduleResponseModal } from "./VendorRescheduleResponseModal";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export function VendorInquiriesSection() {
@@ -53,6 +55,14 @@ export function VendorInquiriesSection() {
   const [updatingTestDriveId, setUpdatingTestDriveId] = useState<string | null>(
     null
   );
+
+  // Reschedule response state
+  const [showRescheduleResponseModal, setShowRescheduleResponseModal] =
+    useState(false);
+  const [selectedRescheduleTestDrive, setSelectedRescheduleTestDrive] =
+    useState<VendorTestDriveBooking | null>(null);
+  const [rescheduleResponseLoading, setRescheduleResponseLoading] =
+    useState(false);
 
   useEffect(() => {
     if (!user || !session) return;
@@ -198,7 +208,6 @@ export function VendorInquiriesSection() {
     } catch (err) {
       console.error("Error creating conversation:", err);
       setError("Error creating conversation");
-      alert("Error al crear la conversación. Por favor, inténtalo de nuevo.");
       throw err;
     } finally {
       setActionLoading(false);
@@ -230,11 +239,7 @@ export function VendorInquiriesSection() {
 
       setShowSendMessageModal(false);
       setSelectedInquiry(null);
-      alert(
-        selectedInquiry.isGuest
-          ? "Email enviado exitosamente"
-          : "Notificación enviada exitosamente"
-      );
+      // Success - no alert needed, user can see the updated status
       return data;
     } catch (err) {
       console.error("Error sending email:", err);
@@ -294,6 +299,67 @@ export function VendorInquiriesSection() {
     } finally {
       setUpdatingTestDriveId(null);
     }
+  };
+
+  const respondToRescheduleRequest = async (
+    response: "approved" | "rejected",
+    message: string
+  ) => {
+    if (!selectedRescheduleTestDrive) return;
+
+    try {
+      setRescheduleResponseLoading(true);
+
+      const apiResponse = await fetch(
+        `/api/vendor/test-drives/${selectedRescheduleTestDrive.id}/reschedule`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            response,
+            message: message.trim(),
+          }),
+        }
+      );
+
+      const data: VendorRescheduleResponseResponse = await apiResponse.json();
+
+      if (!apiResponse.ok) {
+        throw new Error(data.error || "Error responding to reschedule request");
+      }
+
+      // Update local state
+      setTestDrives((prev) =>
+        prev.map((testDrive) =>
+          testDrive.id === selectedRescheduleTestDrive.id
+            ? {
+                ...testDrive,
+                status: data.booking.status,
+                vendorResponse: data.booking.vendorResponse,
+                vendorMessage: data.booking.vendorMessage,
+                vendorResponseDate: data.booking.vendorResponseDate,
+                rescheduleStatus: data.booking.rescheduleStatus,
+              }
+            : testDrive
+        )
+      );
+
+      setShowRescheduleResponseModal(false);
+      setSelectedRescheduleTestDrive(null);
+    } catch (err) {
+      console.error("Error responding to reschedule request:", err);
+      setError("Error responding to reschedule request");
+      throw err;
+    } finally {
+      setRescheduleResponseLoading(false);
+    }
+  };
+
+  const hasRescheduleRequest = (testDrive: VendorTestDriveBooking): boolean => {
+    return testDrive.rescheduleStatus === "requested";
   };
 
   const getStatusBadge = (status: string) => {
@@ -807,38 +873,67 @@ export function VendorInquiriesSection() {
                         )}
                       </div>
                       <div className="flex flex-wrap gap-2 md:justify-end">
-                        {testDrive.vendorResponse === "pending" && (
+                        {testDrive.vendorResponse === "pending" &&
+                          !hasRescheduleRequest(testDrive) && (
+                            <Button
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700"
+                              onClick={() => {
+                                setSelectedTestDrive(testDrive);
+                                setShowTestDriveResponseModal(true);
+                              }}
+                              disabled={updatingTestDriveId === testDrive.id}
+                            >
+                              {updatingTestDriveId === testDrive.id ? (
+                                <>
+                                  <Zap className="h-4 w-4 animate-spin mr-2" />
+                                  Respondiendo...
+                                </>
+                              ) : (
+                                "Responder"
+                              )}
+                            </Button>
+                          )}
+
+                        {/* Reschedule Response Button */}
+                        {hasRescheduleRequest(testDrive) && (
                           <Button
                             size="sm"
-                            className="bg-blue-600 hover:bg-blue-700"
+                            variant="outline"
+                            className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
                             onClick={() => {
-                              setSelectedTestDrive(testDrive);
-                              setShowTestDriveResponseModal(true);
+                              setSelectedRescheduleTestDrive(testDrive);
+                              setShowRescheduleResponseModal(true);
                             }}
-                            disabled={updatingTestDriveId === testDrive.id}
+                            disabled={rescheduleResponseLoading}
                           >
-                            {updatingTestDriveId === testDrive.id ? (
+                            {rescheduleResponseLoading ? (
                               <>
                                 <Zap className="h-4 w-4 animate-spin mr-2" />
                                 Respondiendo...
                               </>
                             ) : (
-                              "Responder"
+                              <>
+                                <Calendar className="h-4 w-4 mr-2" />
+                                Responder Reagendamiento
+                              </>
                             )}
                           </Button>
                         )}
-                        {testDrive.vendorResponse !== "pending" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-gray-50 text-gray-700 border-gray-200"
-                            disabled
-                          >
-                            {testDrive.vendorResponse === "accepted"
-                              ? "Aceptada"
-                              : "Declinada"}
-                          </Button>
-                        )}
+
+                        {testDrive.vendorResponse !== "pending" &&
+                          !hasRescheduleRequest(testDrive) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-gray-50 text-gray-700 border-gray-200"
+                              disabled
+                            >
+                              {testDrive.vendorResponse === "accepted"
+                                ? "Aceptada"
+                                : "Declinada"}
+                            </Button>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -920,6 +1015,20 @@ export function VendorInquiriesSection() {
         }
         loading={updatingTestDriveId !== null}
       />
+
+      {/* Vendor Reschedule Response Modal */}
+      {selectedRescheduleTestDrive && (
+        <VendorRescheduleResponseModal
+          isOpen={showRescheduleResponseModal}
+          onClose={() => {
+            setShowRescheduleResponseModal(false);
+            setSelectedRescheduleTestDrive(null);
+          }}
+          onSubmit={respondToRescheduleRequest}
+          testDrive={selectedRescheduleTestDrive}
+          loading={rescheduleResponseLoading}
+        />
+      )}
     </Tabs>
   );
 }
