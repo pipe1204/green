@@ -87,14 +87,15 @@ describe("VehicleTable", () => {
     location: "Bogotá, Colombia",
     description: "Amazing electric car",
     features: ["GPS", "Autopilot"],
-    dealer: {
-      name: "Tesla Store",
-      location: "Bogotá",
-      rating: 4.5,
-    },
     reviews: {
       average: 4.5,
       count: 120,
+    },
+    vendor: {
+      businessName: "Tesla Store",
+      phone: "+57 300 123 4567",
+      email: "contacto@tesla.com",
+      rating: 4.5,
     },
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-01-01T00:00:00Z",

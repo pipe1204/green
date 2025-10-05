@@ -57,11 +57,6 @@ export function ProductForm({
       },
     },
     features: [] as string[],
-    dealer: {
-      name: "",
-      location: "",
-      rating: 0,
-    },
     reviews: {
       average: 0,
       count: 0,
@@ -110,7 +105,6 @@ export function ProductForm({
           images: editingVehicle.images,
           specifications: editingVehicle.specifications,
           features: editingVehicle.features,
-          dealer: editingVehicle.dealer,
           reviews: editingVehicle.reviews,
         });
       } else {
@@ -134,11 +128,6 @@ export function ProductForm({
             },
           },
           features: [] as string[],
-          dealer: {
-            name: "",
-            location: "",
-            rating: 0,
-          },
           reviews: {
             average: 0,
             count: 0,

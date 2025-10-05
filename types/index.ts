@@ -102,14 +102,15 @@ export interface Vehicle {
   location: string;
   description: string;
   features: string[];
-  dealer: {
-    name: string;
-    location: string;
-    rating: number;
-  };
   reviews: {
     average: number;
     count: number;
+  };
+  vendor: {
+    businessName: string;
+    phone: string;
+    email: string;
+    rating: number;
   };
   createdAt: string;
   updatedAt: string;

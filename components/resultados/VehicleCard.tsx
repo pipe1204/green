@@ -284,7 +284,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
           <div className="flex items-center space-x-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span>{vehicle.dealer.rating}</span>
+            <span>{vehicle.vendor.rating}</span>
           </div>
         </div>
 

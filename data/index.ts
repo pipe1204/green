@@ -1,5 +1,11 @@
 import { FilterSection, SortOption } from "@/types";
-import { batteryRanges, cities, vehicles, vehicleTypes } from "./vehicles";
+import {
+  batteryRanges,
+  cities,
+  vehicles,
+  vehicleTypes,
+  staticVehicleToVehicle,
+} from "./vehicles";
 
 export const sortOptions: SortOption[] = [
   { value: "relevance", label: "Más relevantes" },
@@ -141,17 +147,23 @@ export const filterSections: FilterSection[] = [
           {
             value: "4.5+",
             label: "4.5+ estrellas",
-            count: vehicles.filter((v) => v.dealer.rating >= 4.5).length,
+            count: vehicles
+              .map(staticVehicleToVehicle)
+              .filter((v) => v.vendor.rating >= 4.5).length,
           },
           {
             value: "4.0+",
             label: "4.0+ estrellas",
-            count: vehicles.filter((v) => v.dealer.rating >= 4.0).length,
+            count: vehicles
+              .map(staticVehicleToVehicle)
+              .filter((v) => v.vendor.rating >= 4.0).length,
           },
           {
             value: "3.5+",
             label: "3.5+ estrellas",
-            count: vehicles.filter((v) => v.dealer.rating >= 3.5).length,
+            count: vehicles
+              .map(staticVehicleToVehicle)
+              .filter((v) => v.vendor.rating >= 3.5).length,
           },
         ],
       },

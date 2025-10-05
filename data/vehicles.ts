@@ -28,11 +28,6 @@ export interface StaticVehicle {
   location: string;
   description: string;
   features: string[];
-  dealer: {
-    name: string;
-    location: string;
-    rating: number;
-  };
   reviews: {
     average: number;
     count: number;
@@ -44,6 +39,12 @@ export function staticVehicleToVehicle(staticVehicle: StaticVehicle): Vehicle {
   return {
     ...staticVehicle,
     vendorId: "static-vendor", // Placeholder for static data
+    vendor: {
+      businessName: "Vendor Business", // Placeholder since dealer is removed
+      phone: "+57 300 123 4567", // Placeholder phone
+      email: "contacto@ejemplo.com", // Placeholder email
+      rating: 4.5, // Placeholder rating
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -87,7 +88,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Motorcycle eléctrica de alta gama con tecnología avanzada",
     features: ["Modo deportivo", "Carga rápida", "GPS integrado"],
-    dealer: { name: "Zero Colombia", location: "Bogotá", rating: 4.8 },
     reviews: { average: 4.7, count: 156 },
   },
   {
@@ -119,7 +119,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "Superbike eléctrica italiana de ultra alta gama",
     features: ["Suspensión Öhlins", "Frenos Brembo", "Modo carrera"],
-    dealer: { name: "Energica Medellín", location: "Medellín", rating: 4.9 },
     reviews: { average: 4.8, count: 89 },
   },
   {
@@ -151,7 +150,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Cali",
     description: "Primera motocicleta eléctrica de Harley-Davidson",
     features: ["Sonido simulado", "Carga rápida DC", "App conectada"],
-    dealer: { name: "Harley Cali", location: "Cali", rating: 4.7 },
     reviews: { average: 4.6, count: 203 },
   },
   {
@@ -183,7 +181,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Enduro eléctrica para aventuras off-road",
     features: ["Suspensión WP", "Modo off-road", "Ligera"],
-    dealer: { name: "KTM Colombia", location: "Bogotá", rating: 4.6 },
     reviews: { average: 4.4, count: 78 },
   },
   {
@@ -219,7 +216,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "patineta eléctrico premium de BMW",
     features: ["Pantalla TFT", "Carga rápida", "Modo eco"],
-    dealer: { name: "BMW Motorrad", location: "Medellín", rating: 4.8 },
     reviews: { average: 4.5, count: 134 },
   },
 
@@ -252,7 +248,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "patineta eléctrico con el clásico diseño Vespa",
     features: ["Diseño clásico", "Silencioso", "Fácil manejo"],
-    dealer: { name: "Vespa Colombia", location: "Bogotá", rating: 4.5 },
     reviews: { average: 4.3, count: 267 },
   },
   {
@@ -280,7 +275,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Cali",
     description: "patineta urbana inteligente con conectividad",
     features: ["App conectada", "GPS", "Antirrobo"],
-    dealer: { name: "Niu Colombia", location: "Cali", rating: 4.3 },
     reviews: { average: 4.2, count: 189 },
   },
   {
@@ -308,7 +302,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "patineta con sistema de baterías intercambiables",
     features: ["Baterías intercambiables", "Red de carga", "Modo deportivo"],
-    dealer: { name: "Gogoro Medellín", location: "Medellín", rating: 4.7 },
     reviews: { average: 4.6, count: 145 },
   },
   {
@@ -336,7 +329,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Barranquilla",
     description: "patineta urbana silencioso y eficiente",
     features: ["Ultra silencioso", "Eficiente", "Mantenimiento mínimo"],
-    dealer: { name: "Silence Colombia", location: "Barranquilla", rating: 4.4 },
     reviews: { average: 4.1, count: 98 },
   },
   {
@@ -367,7 +359,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "patineta plegable para movilidad urbana",
     features: ["Plegable", "Ligero", "Precio accesible"],
-    dealer: { name: "Xiaomi Store", location: "Bogotá", rating: 4.2 },
     reviews: { average: 4.0, count: 312 },
   },
 
@@ -400,7 +391,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "Bicicleta eléctrica de alta gama para ciudad",
     features: ["Motor Fazua", "Ligera", "Suspensión"],
-    dealer: { name: "Specialized Colombia", location: "Medellín", rating: 4.8 },
     reviews: { average: 4.7, count: 178 },
   },
   {
@@ -431,7 +421,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Mountain bike eléctrica para aventuras",
     features: ["Suspensión completa", "Frenos hidráulicos", "Modo turbo"],
-    dealer: { name: "Trek Colombia", location: "Bogotá", rating: 4.6 },
     reviews: { average: 4.5, count: 203 },
   },
   {
@@ -457,7 +446,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Cali",
     description: "Bicicleta eléctrica versátil para ciudad y carretera",
     features: ["Motor Yamaha", "Comfortable", "Eficiente"],
-    dealer: { name: "Giant Colombia", location: "Cali", rating: 4.5 },
     reviews: { average: 4.4, count: 156 },
   },
   {
@@ -485,7 +473,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "Bicicleta eléctrica premium con diseño italiano",
     features: ["Diseño italiano", "Motor Bosch", "Suspensión"],
-    dealer: { name: "Cannondale Colombia", location: "Medellín", rating: 4.7 },
     reviews: { average: 4.6, count: 134 },
   },
   {
@@ -511,7 +498,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Bicicleta eléctrica de carretera de alta gama",
     features: ["Carbonio", "Motor Shimano", "Ultra ligera"],
-    dealer: { name: "Scott Colombia", location: "Bogotá", rating: 4.9 },
     reviews: { average: 4.8, count: 89 },
   },
 
@@ -541,7 +527,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Sedán eléctrico premium con tecnología autónoma",
     features: ["Autopilot", "Supercharger", "Pantalla 15"],
-    dealer: { name: "Tesla Colombia", location: "Bogotá", rating: 4.9 },
     reviews: { average: 4.8, count: 445 },
   },
   {
@@ -567,7 +552,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "Hatchback eléctrico urbano de BMW",
     features: ["Diseño futurista", "Materiales reciclados", "iDrive"],
-    dealer: { name: "BMW Colombia", location: "Medellín", rating: 4.6 },
     reviews: { average: 4.5, count: 234 },
   },
   {
@@ -595,7 +579,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Cali",
     description: "Hatchback eléctrico confiable y accesible",
     features: ["e-Pedal", "ProPILOT", "Carga bidireccional"],
-    dealer: { name: "Nissan Colombia", location: "Cali", rating: 4.4 },
     reviews: { average: 4.3, count: 189 },
   },
   {
@@ -626,7 +609,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "SUV eléctrico con carga ultra rápida",
     features: ["Carga 800V", "V2L", 'Pantalla 12.3"'],
-    dealer: { name: "Hyundai Colombia", location: "Bogotá", rating: 4.7 },
     reviews: { average: 4.6, count: 167 },
   },
   {
@@ -654,7 +636,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Medellín",
     description: "SUV eléctrico familiar de Volkswagen",
     features: ["ID.Light", "AR HUD", "Carga inalámbrica"],
-    dealer: { name: "Volkswagen Colombia", location: "Medellín", rating: 4.5 },
     reviews: { average: 4.4, count: 123 },
   },
 
@@ -684,7 +665,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Pickup eléctrica de aventura y trabajo",
     features: ["4WD eléctrico", "Cama fría", "Tank Turn"],
-    dealer: { name: "Rivian Colombia", location: "Bogotá", rating: 4.8 },
     reviews: { average: 4.7, count: 78 },
   },
   {
@@ -715,7 +695,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Cali",
     description: "Pickup eléctrica icónica de Ford",
     features: ["Frunk", "Power Onboard", "BlueCruise"],
-    dealer: { name: "Ford Colombia", location: "Cali", rating: 4.6 },
     reviews: { average: 4.5, count: 145 },
   },
   {
@@ -746,7 +725,6 @@ export const vehicles: StaticVehicle[] = [
     location: "Bogotá",
     description: "Pickup eléctrica futurista de Tesla",
     features: ["Exoesqueleto", "Vidrio blindado", "Autopilot"],
-    dealer: { name: "Tesla Colombia", location: "Bogotá", rating: 4.9 },
     reviews: { average: 4.8, count: 234 },
   },
 ];

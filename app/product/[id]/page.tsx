@@ -314,7 +314,7 @@ export default function ProductPage() {
                 <div className="flex items-center space-x-1">
                   <span className="text-sm text-gray-600">Vendedor:</span>
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-medium">{vehicle.dealer.rating}</span>
+                  <span className="font-medium">{vehicle.vendor.rating}</span>
                 </div>
               </div>
             </div>

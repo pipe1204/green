@@ -130,14 +130,9 @@ export function VendorDashboard() {
       const mainLocation = Array.isArray(v.locations)
         ? v.locations.find((l) => l?.isMain) || v.locations[0]
         : undefined;
-      const dealerName =
-        (formData as Vehicle).dealer?.name?.trim() || v.business_name || "";
-      const dealerLocation =
-        (formData as Vehicle).dealer?.location?.trim() ||
-        mainLocation?.city ||
-        "";
-      const dealerRating =
-        (formData as Vehicle).dealer?.rating ?? v.rating ?? 0;
+      const dealerName = v.business_name || "";
+      const dealerLocation = mainLocation?.city || "";
+      const dealerRating = v.rating ?? 0;
 
       const defaulted = {
         ...(formData as Vehicle),

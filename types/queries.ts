@@ -31,7 +31,6 @@ export interface DbVehicleRow {
   location: string;
   description: string;
   features: string[];
-  dealer: Vehicle["dealer"];
   reviews: Vehicle["reviews"];
   created_at: string;
   updated_at: string;

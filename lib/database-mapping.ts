@@ -25,7 +25,6 @@ export function vehicleToDatabase(vehicle: Vehicle) {
     location: vehicle.location,
     description: vehicle.description,
     features: vehicle.features,
-    dealer: vehicle.dealer,
     reviews: vehicle.reviews,
     created_at: vehicle.createdAt,
     updated_at: vehicle.updatedAt,
@@ -111,14 +110,17 @@ export function databaseToVehicle(dbVehicle: unknown): Vehicle {
     location: String(raw.location ?? ""),
     description: String(raw.description ?? ""),
     features: (raw.features as string[]) ?? [],
-    dealer: (raw.dealer as Vehicle["dealer"]) ?? {
-      name: "",
-      location: "",
-      rating: 0,
-    },
     reviews: (raw.reviews as Vehicle["reviews"]) ?? {
       average: 0,
       count: 0,
+    },
+    vendor: {
+      businessName: String(
+        (raw.vendors as { business_name?: string })?.business_name ?? ""
+      ),
+      phone: String((raw.vendors as { phone?: string })?.phone ?? ""),
+      email: String((raw.vendors as { email?: string })?.email ?? ""),
+      rating: Number((raw.vendors as { rating?: number })?.rating ?? 0),
     },
     createdAt: String(raw.created_at ?? new Date().toISOString()),
     updatedAt: String(raw.updated_at ?? new Date().toISOString()),
@@ -189,14 +191,15 @@ export function databaseToPriceAlertWithVehicle(
           power: "",
           description: "",
           features: [],
-          dealer: {
-            name: "",
-            location: "",
-            rating: 0,
-          },
           reviews: {
             average: 0,
             count: 0,
+          },
+          vendor: {
+            businessName: "",
+            phone: "",
+            email: "",
+            rating: 0,
           },
           createdAt: "",
           updatedAt: "",
@@ -281,14 +284,15 @@ export function databaseToTestDriveWithVehicle(
           power: "",
           description: "",
           features: [],
-          dealer: {
-            name: "",
-            location: "",
-            rating: 0,
-          },
           reviews: {
             average: 0,
             count: 0,
+          },
+          vendor: {
+            businessName: "",
+            phone: "",
+            email: "",
+            rating: 0,
           },
           createdAt: "",
           updatedAt: "",
@@ -371,14 +375,15 @@ export function databaseToInquiryWithVehicle(
           power: "",
           description: "",
           features: [],
-          dealer: {
-            name: "",
-            location: "",
-            rating: 0,
-          },
           reviews: {
             average: 0,
             count: 0,
+          },
+          vendor: {
+            businessName: "",
+            phone: "",
+            email: "",
+            rating: 0,
           },
           createdAt: "",
           updatedAt: "",

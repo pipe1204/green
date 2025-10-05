@@ -191,7 +191,7 @@ export function useVehicleSearch() {
         filtered = filtered.filter((v) => {
           return filters.dealerRating.some((rating) => {
             const minRating = parseFloat(rating.replace("+", ""));
-            return v.dealer.rating >= minRating;
+            return v.vendor.rating >= minRating;
           });
         });
       }
@@ -290,7 +290,7 @@ export function useVehicleSearch() {
 
         case "dealerRating": {
           const minRating = parseFloat(filterValue.replace("+", ""));
-          return filteredVehicles.filter((v) => v.dealer.rating >= minRating)
+          return filteredVehicles.filter((v) => v.vendor.rating >= minRating)
             .length;
         }
 
