@@ -495,7 +495,6 @@ export interface VendorProfile {
   state?: string;
   country: string;
   phone?: string;
-  business_email?: string;
   website?: string;
   description?: string;
   locations?: VendorLocation[];
@@ -518,7 +517,6 @@ export interface UpdateVendorProfileRequest {
   state?: string;
   country?: string;
   phone?: string;
-  business_email?: string;
   website?: string;
   description?: string;
 }

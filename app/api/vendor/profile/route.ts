@@ -100,7 +100,6 @@ export async function GET(request: NextRequest) {
       state: vendor.state,
       country: vendor.country,
       phone: vendor.phone,
-      business_email: vendor.email,
       website: vendor.website,
       description: vendor.description,
       locations: vendor.locations,
@@ -163,7 +162,6 @@ export async function PATCH(request: NextRequest) {
       state,
       country,
       phone,
-      business_email,
       website,
       description,
     } = body;
@@ -224,8 +222,6 @@ export async function PATCH(request: NextRequest) {
     if (state !== undefined) vendorUpdateData.state = state.trim();
     if (country !== undefined) vendorUpdateData.country = country.trim();
     if (phone !== undefined) vendorUpdateData.phone = phone.trim();
-    if (business_email !== undefined)
-      vendorUpdateData.email = business_email.trim();
     if (website !== undefined) vendorUpdateData.website = website.trim();
     if (description !== undefined)
       vendorUpdateData.description = description.trim();
@@ -310,7 +306,6 @@ export async function PATCH(request: NextRequest) {
       state: updatedVendor.state,
       country: updatedVendor.country,
       phone: updatedVendor.phone,
-      business_email: updatedVendor.email,
       website: updatedVendor.website,
       description: updatedVendor.description,
       locations: updatedVendor.locations,

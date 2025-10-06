@@ -15,6 +15,14 @@ import {
   Globe,
   FileText,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { colombianDepartments, departmentLabels } from "@/data";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { VendorProfile, UpdateVendorProfileRequest } from "@/types";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -49,7 +57,6 @@ export default function VendorProfilePage() {
     state: "",
     country: "Colombia",
     phone: "",
-    business_email: "",
     website: "",
     description: "",
   });
@@ -59,7 +66,6 @@ export default function VendorProfilePage() {
     full_name?: string;
     business_name?: string;
     nit?: string;
-    business_email?: string;
     website?: string;
   }>({});
 
@@ -100,7 +106,6 @@ export default function VendorProfilePage() {
           state: data.profile.state || "",
           country: data.profile.country || "Colombia",
           phone: data.profile.phone || "",
-          business_email: data.profile.business_email || "",
           website: data.profile.website || "",
           description: data.profile.description || "",
         });
@@ -123,7 +128,6 @@ export default function VendorProfilePage() {
       full_name?: string;
       business_name?: string;
       nit?: string;
-      business_email?: string;
       website?: string;
     } = {};
 
@@ -150,13 +154,6 @@ export default function VendorProfilePage() {
       }
     }
 
-    if (formData.business_email && formData.business_email.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.business_email.trim())) {
-        errors.business_email = "Please enter a valid email address";
-      }
-    }
-
     if (formData.website && formData.website.trim()) {
       const urlRegex = /^https?:\/\/.+/;
       if (!urlRegex.test(formData.website.trim())) {
@@ -166,6 +163,13 @@ export default function VendorProfilePage() {
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  // Get cities for selected department
+  const getCitiesForDepartment = (dept: string) => {
+    return (
+      colombianDepartments[dept as keyof typeof colombianDepartments] || []
+    );
   };
 
   // Handle form input changes
@@ -179,6 +183,11 @@ export default function VendorProfilePage() {
         delete newErrors[field as keyof typeof validationErrors];
         return newErrors;
       });
+    }
+
+    // Reset city when department changes
+    if (field === "department") {
+      setFormData((prev) => ({ ...prev, city: "" }));
     }
   };
 
@@ -210,7 +219,6 @@ export default function VendorProfilePage() {
         state: formData.state.trim() || undefined,
         country: formData.country.trim(),
         phone: formData.phone.trim() || undefined,
-        business_email: formData.business_email.trim() || undefined,
         website: formData.website.trim() || undefined,
         description: formData.description.trim() || undefined,
       };
@@ -306,8 +314,8 @@ export default function VendorProfilePage() {
           </CardTitle>
           <CardDescription>Tu información personal básica</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
             <Label htmlFor="full_name" className="flex items-center space-x-2">
               <User className="w-4 h-4" />
               <span>Nombre Completo</span>
@@ -327,7 +335,7 @@ export default function VendorProfilePage() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label className="flex items-center space-x-2">
               <Mail className="w-4 h-4" />
               <span>Correo Electrónico</span>
@@ -338,12 +346,12 @@ export default function VendorProfilePage() {
               disabled
               className="bg-gray-50"
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500">
               El correo electrónico no se puede cambiar
             </p>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label className="flex items-center space-x-2">
               <Calendar className="w-4 h-4" />
               <span>Miembro desde</span>
@@ -374,8 +382,8 @@ export default function VendorProfilePage() {
           </CardTitle>
           <CardDescription>Detalles de tu empresa o negocio</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
             <Label
               htmlFor="business_name"
               className="flex items-center space-x-2"
@@ -400,7 +408,7 @@ export default function VendorProfilePage() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label
               htmlFor="business_type"
               className="flex items-center space-x-2"
@@ -408,18 +416,25 @@ export default function VendorProfilePage() {
               <Building2 className="w-4 h-4" />
               <span>Tipo de Negocio</span>
             </Label>
-            <Input
-              id="business_type"
-              type="text"
+            <Select
               value={formData.business_type}
-              onChange={(e) =>
-                handleInputChange("business_type", e.target.value)
+              onValueChange={(value) =>
+                handleInputChange("business_type", value)
               }
-              placeholder="Ej: Tienda, Distribuidor, Concesionario, Fabricante"
-            />
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona el tipo de negocio" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tienda">Tienda</SelectItem>
+                <SelectItem value="distribuidor">Distribuidor</SelectItem>
+                <SelectItem value="concesionario">Concesionario</SelectItem>
+                <SelectItem value="fabricante">Fabricante</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="nit" className="flex items-center space-x-2">
               <FileText className="w-4 h-4" />
               <span>NIT</span>
@@ -439,7 +454,7 @@ export default function VendorProfilePage() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="address" className="flex items-center space-x-2">
               <MapPin className="w-4 h-4" />
               <span>Dirección</span>
@@ -453,22 +468,8 @@ export default function VendorProfilePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="city" className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4" />
-                <span>Ciudad</span>
-              </Label>
-              <Input
-                id="city"
-                type="text"
-                value={formData.city}
-                onChange={(e) => handleInputChange("city", e.target.value)}
-                placeholder="Ciudad"
-              />
-            </div>
-
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
               <Label
                 htmlFor="department"
                 className="flex items-center space-x-2"
@@ -476,18 +477,59 @@ export default function VendorProfilePage() {
                 <MapPin className="w-4 h-4" />
                 <span>Departamento</span>
               </Label>
-              <Input
-                id="department"
-                type="text"
+              <Select
                 value={formData.department}
-                onChange={(e) =>
-                  handleInputChange("department", e.target.value)
+                onValueChange={(value) =>
+                  handleInputChange("department", value)
                 }
-                placeholder="Departamento"
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar departamento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(departmentLabels)
+                    .sort(([, a], [, b]) => a.localeCompare(b))
+                    .map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
+            <div className="space-y-2">
+              <Label htmlFor="city" className="flex items-center space-x-2">
+                <MapPin className="w-4 h-4" />
+                <span>Ciudad</span>
+              </Label>
+              <Select
+                value={formData.city}
+                onValueChange={(value) => handleInputChange("city", value)}
+                disabled={!formData.department}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      formData.department
+                        ? "Seleccionar ciudad"
+                        : "Primero selecciona el departamento"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {getCitiesForDepartment(formData.department).map(
+                    (cityName) => (
+                      <SelectItem key={cityName} value={cityName}>
+                        {cityName}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="country" className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4" />
                 <span>País</span>
@@ -502,7 +544,7 @@ export default function VendorProfilePage() {
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="phone" className="flex items-center space-x-2">
               <Phone className="w-4 h-4" />
               <span>Teléfono del Negocio</span>
@@ -516,34 +558,7 @@ export default function VendorProfilePage() {
             />
           </div>
 
-          <div>
-            <Label
-              htmlFor="business_email"
-              className="flex items-center space-x-2"
-            >
-              <Mail className="w-4 h-4" />
-              <span>Correo del Negocio</span>
-            </Label>
-            <Input
-              id="business_email"
-              type="email"
-              value={formData.business_email}
-              onChange={(e) =>
-                handleInputChange("business_email", e.target.value)
-              }
-              className={
-                validationErrors.business_email ? "border-red-500" : ""
-              }
-              placeholder="correo@negocio.com"
-            />
-            {validationErrors.business_email && (
-              <p className="text-sm text-red-600 mt-1">
-                {validationErrors.business_email}
-              </p>
-            )}
-          </div>
-
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="website" className="flex items-center space-x-2">
               <Globe className="w-4 h-4" />
               <span>Sitio Web</span>
@@ -563,7 +578,7 @@ export default function VendorProfilePage() {
             )}
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label
               htmlFor="description"
               className="flex items-center space-x-2"
