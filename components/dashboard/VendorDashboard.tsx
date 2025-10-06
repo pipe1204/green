@@ -18,6 +18,7 @@ import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import { VendorMessagesSection } from "./VendorMessagesSection";
 import { VendorInquiriesSection } from "./VendorInquiriesSection";
+import { CSVTemplateGenerator } from "./CSVTemplateGenerator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -219,13 +220,16 @@ export function VendorDashboard() {
                   Gestiona tu inventario de vehículos eléctricos
                 </p>
               </div>
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center space-x-2 bg-green-600 text-white mt-4 sm:mt-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Agregar Vehículo</span>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+                <CSVTemplateGenerator />
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center space-x-2 bg-green-600 text-white"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Vehículo</span>
+                </Button>
+              </div>
             </div>
 
             {/* Error Message */}
