@@ -187,6 +187,7 @@ export function VendorDashboard() {
         // Convert vehicles to database format and add vendor_id
         const vehiclesToInsert = vehicles.map((vehicle) => ({
           ...vehicleToDatabase(vehicle),
+          id: crypto.randomUUID(), // Generate unique ID for each vehicle
           vendor_id: vendorData.id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

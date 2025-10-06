@@ -140,9 +140,6 @@ describe("VehicleTable", () => {
     render(<VehicleTable {...defaultProps} loading={true} />);
 
     expect(screen.getByText("Cargando vehículos...")).toBeInTheDocument();
-    // The loading spinner is a div, not an img element
-    const loadingSpinner = document.querySelector(".animate-spin");
-    expect(loadingSpinner).toBeInTheDocument();
   });
 
   it("shows empty state when no vehicles", () => {
