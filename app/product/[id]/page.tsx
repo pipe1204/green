@@ -34,6 +34,7 @@ import {
   Car,
   Bell,
 } from "lucide-react";
+import { WhatsAppContactButton } from "@/components/resultados/WhatsAppContactButton";
 
 export default function ProductPage() {
   const params = useParams();
@@ -149,7 +150,7 @@ export default function ProductPage() {
 
         {/* Vehicle Header */}
         <div className="mb-12">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-2">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 flex-1">
               {vehicle.name}
             </h1>
@@ -185,6 +186,17 @@ export default function ProductPage() {
               </Button>
             </div>
           </div>
+          <div className="flex items-center space-x-2 mb-4">
+            <MapPin className="w-4 h-4 text-gray-400" />
+            <span className="text-md text-gray-500">{vehicle.location}</span>
+            <span className="text-md text-gray-400">•</span>
+            <span className="text-md text-gray-500">
+              {vehicle.vendor.businessName}
+            </span>
+
+            <WhatsAppContactButton vehicle={vehicle} />
+          </div>
+
           <p className="text-xl text-gray-600 max-w-3xl">
             {vehicle.description}
           </p>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Plus, Zap, ArrowLeft } from "lucide-react";
+import { Plus, Zap, ArrowLeft, Upload } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Vehicle } from "@/types";
@@ -18,6 +18,8 @@ import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import { VendorMessagesSection } from "./VendorMessagesSection";
 import { VendorInquiriesSection } from "./VendorInquiriesSection";
+import { CSVTemplateGenerator } from "./CSVTemplateGenerator";
+import { BulkUploadModal } from "./BulkUploadModal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,6 +58,7 @@ export function VendorDashboard() {
     useState<DashboardSection>("vehicles");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -164,6 +167,53 @@ export function VendorDashboard() {
     }
   };
 
+  const handleBulkUploadSuccess = useCallback(
+    async (vehicles: Vehicle[]) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get vendor data first
+        const { data: vendorData, error: vendorError } = await supabase
+          .from("vendors")
+          .select("id")
+          .eq("user_id", user?.id)
+          .single();
+
+        if (vendorError || !vendorData) {
+          throw new Error("No se pudo encontrar el vendedor");
+        }
+
+        // Convert vehicles to database format and add vendor_id
+        const vehiclesToInsert = vehicles.map((vehicle) => ({
+          ...vehicleToDatabase(vehicle),
+          id: crypto.randomUUID(), // Generate unique ID for each vehicle
+          vendor_id: vendorData.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }));
+
+        // Insert all vehicles
+        const { error: insertError } = await supabase
+          .from("vehicles")
+          .insert(vehiclesToInsert);
+
+        if (insertError) throw insertError;
+
+        // Refresh the vehicles list
+        await fetchVehicles();
+
+        setShowBulkUploadModal(false);
+      } catch (error) {
+        console.error("Error in bulk upload:", error);
+        setError("Error al cargar los vehículos. Intenta de nuevo.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.id, fetchVehicles]
+  );
+
   const handleEdit = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     setShowAddModal(true);
@@ -219,13 +269,24 @@ export function VendorDashboard() {
                   Gestiona tu inventario de vehículos eléctricos
                 </p>
               </div>
-              <Button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center space-x-2 bg-green-600 text-white mt-4 sm:mt-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Agregar Vehículo</span>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+                <CSVTemplateGenerator />
+                <Button
+                  onClick={() => setShowBulkUploadModal(true)}
+                  variant="outline"
+                  className="flex items-center space-x-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  <span>Carga Masiva</span>
+                </Button>
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center space-x-2 bg-green-600 text-white"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Agregar Vehículo</span>
+                </Button>
+              </div>
             </div>
 
             {/* Error Message */}
@@ -339,6 +400,12 @@ export function VendorDashboard() {
         vehicle={viewingVehicle}
         isOpen={!!viewingVehicle}
         onClose={handleCloseViewModal}
+      />
+
+      <BulkUploadModal
+        isOpen={showBulkUploadModal}
+        onClose={() => setShowBulkUploadModal(false)}
+        onSuccess={handleBulkUploadSuccess}
       />
 
       {/* Delete Confirmation Dialog */}
