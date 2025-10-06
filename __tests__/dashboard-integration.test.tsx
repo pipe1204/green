@@ -41,6 +41,12 @@ vi.mock("next/navigation", () => ({
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
+  useSearchParams: () => ({
+    get: vi.fn((key: string) => {
+      if (key === "section") return null;
+      return null;
+    }),
+  }),
 }));
 
 vi.mock("@/components/auth/AuthProvider", () => ({
@@ -57,6 +63,15 @@ vi.mock("@/lib/supabase", () => ({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
+            data: {
+              id: "vendor-1",
+              business_name: "Test Store",
+              rating: 4.5,
+              locations: [],
+            },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
             data: {
               id: "vendor-1",
               business_name: "Test Store",

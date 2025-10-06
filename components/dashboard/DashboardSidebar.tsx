@@ -18,7 +18,8 @@ export type DashboardSection =
   | "vehicles"
   | "inquiries"
   | "analytics"
-  | "messages";
+  | "messages"
+  | "profile";
 export type CustomerDashboardSection =
   | "favorites"
   | "testDrives"

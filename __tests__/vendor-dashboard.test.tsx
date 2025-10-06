@@ -41,7 +41,12 @@ vi.mock("next/navigation", () => ({
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => ({
+    get: vi.fn((key: string) => {
+      if (key === "section") return null;
+      return null;
+    }),
+  }),
   usePathname: () => "/",
 }));
 
@@ -60,6 +65,15 @@ vi.mock("@/lib/supabase", () => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           single: vi.fn(() => ({
+            data: {
+              id: "vendor-1",
+              business_name: "Test Store",
+              rating: 4.5,
+              locations: [],
+            },
+            error: null,
+          })),
+          maybeSingle: vi.fn(() => ({
             data: {
               id: "vendor-1",
               business_name: "Test Store",

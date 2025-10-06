@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -18,6 +18,7 @@ import { databaseToVehicle, vehicleToDatabase } from "@/lib/database-mapping";
 import { handleVendorError, handleVehicleError } from "@/lib/error-handler";
 import { VendorMessagesSection } from "./VendorMessagesSection";
 import { VendorInquiriesSection } from "./VendorInquiriesSection";
+import VendorProfilePage from "./VendorProfile";
 import { CSVTemplateGenerator } from "./CSVTemplateGenerator";
 import { BulkUploadModal } from "./BulkUploadModal";
 import {
@@ -48,6 +49,7 @@ type VendorRow = {
 export function VendorDashboard() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -100,6 +102,19 @@ export function VendorDashboard() {
       fetchVehicles();
     }
   }, [user, fetchVehicles]);
+
+  // Handle URL section parameter
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (
+      section &&
+      ["vehicles", "inquiries", "messages", "profile", "analytics"].includes(
+        section
+      )
+    ) {
+      setActiveSection(section as DashboardSection);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (formData: Partial<Vehicle>) => {
     setLoading(true);
@@ -319,6 +334,8 @@ export function VendorDashboard() {
         return <VendorInquiriesSection />;
       case "messages":
         return <VendorMessagesSection />;
+      case "profile":
+        return <VendorProfilePage />;
       case "analytics":
         return (
           <div className="text-center py-12">
