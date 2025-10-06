@@ -292,6 +292,8 @@ vi.mock("lucide-react", () => ({
   ),
   AlertCircle: () => <div data-testid="alert-circle-icon">AlertCircle</div>,
   Download: () => <div data-testid="download-icon">Download</div>,
+  Upload: () => <div data-testid="upload-icon">Upload</div>,
+  X: () => <div data-testid="x-icon">X</div>,
 }));
 
 describe("Dashboard Integration Tests", () => {
