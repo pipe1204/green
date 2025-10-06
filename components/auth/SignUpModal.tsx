@@ -79,6 +79,17 @@ export function SignUpModal({
       return;
     }
 
+    if (userType === "vendor" && nit) {
+      const nitRegex = /^\d{9}-\d$/;
+      if (!nitRegex.test(nit.trim())) {
+        setError(
+          "El NIT debe tener el formato: 9 dígitos + 1 dígito de verificación (ej: 900123456-7)"
+        );
+        setLoading(false);
+        return;
+      }
+    }
+
     // Validate phone number for vendors (must have country code)
     if (userType === "vendor" && phone) {
       // Must start with + and have country code
@@ -414,11 +425,12 @@ export function SignUpModal({
                   value={nit}
                   onChange={(e) => setNit(e.target.value)}
                   required={userType === "vendor"}
-                  placeholder="12345678-9"
+                  placeholder="900123456-7"
                   className="bg-gray-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Número de Identificación Tributaria
+                  Número de Identificación Tributaria (9 dígitos + 1 dígito de
+                  verificación)
                 </p>
               </div>
 

@@ -149,9 +149,10 @@ export default function VendorProfilePage() {
     }
 
     if (formData.nit && formData.nit.trim()) {
-      const nitRegex = /^\d{9,10}$/;
+      const nitRegex = /^\d{9}-\d$/;
       if (!nitRegex.test(formData.nit.trim())) {
-        errors.nit = "NIT must be 9-10 digits";
+        errors.nit =
+          "El NIT debe tener el formato: 9 dígitos + 1 dígito de verificación (ej: 900123456-7)";
       }
     }
 
@@ -446,8 +447,12 @@ export default function VendorProfilePage() {
               value={formData.nit}
               onChange={(e) => handleInputChange("nit", e.target.value)}
               className={validationErrors.nit ? "border-red-500" : ""}
-              placeholder="Número de Identificación Tributaria"
+              placeholder="900123456-7"
             />
+            <p className="text-xs text-gray-500">
+              Número de Identificación Tributaria (9 dígitos + 1 dígito de
+              verificación)
+            </p>
             {validationErrors.nit && (
               <p className="text-sm text-red-600 mt-1">
                 {validationErrors.nit}
