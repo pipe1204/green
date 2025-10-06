@@ -14,6 +14,7 @@ import {
   Phone,
   Globe,
   FileText,
+  Zap,
 } from "lucide-react";
 import {
   Select,
@@ -264,7 +265,7 @@ export default function VendorProfilePage() {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <Zap className="w-8 h-8 animate-spin text-green-600 mx-auto mb-4" />{" "}
           <p className="text-gray-600">Loading profile...</p>
         </div>
       </div>

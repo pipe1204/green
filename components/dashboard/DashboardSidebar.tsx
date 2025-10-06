@@ -24,7 +24,8 @@ export type CustomerDashboardSection =
   | "favorites"
   | "testDrives"
   | "priceAlerts"
-  | "inquiries";
+  | "inquiries"
+  | "profile";
 
 interface DashboardSidebarProps {
   activeSection: DashboardSection | CustomerDashboardSection;

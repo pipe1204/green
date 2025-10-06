@@ -210,9 +210,12 @@ export function UserMenu() {
               // Navigate to customer dashboard with profile section
               const userRole = profile?.role || "customer";
               if (userRole === "vendor") {
-                router.push("/dashboard?section=profile");
+                // Add timestamp to force navigation
+                router.push(`/dashboard?section=profile&t=${Date.now()}`);
               } else {
-                router.push("/customer-dashboard?section=profile");
+                router.push(
+                  `/customer-dashboard?section=profile&t=${Date.now()}`
+                );
               }
             }}
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
