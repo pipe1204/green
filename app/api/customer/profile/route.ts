@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import {
   UpdateProfileRequest,
   UpdateProfileResponse,
@@ -28,14 +29,19 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
+      console.error("Auth error:", userError);
       return NextResponse.json(
         { error: "Unauthorized - Invalid token" },
         { status: 401 }
       );
     }
 
-    // Get user profile
-    const { data: profile, error } = await supabase
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: profile, error } = await serviceSupabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
@@ -43,6 +49,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error fetching profile:", error);
+      console.error("User ID being queried:", user.id);
       return NextResponse.json(
         { error: "Failed to fetch profile" },
         { status: 500 }
@@ -92,7 +99,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body: UpdateProfileRequest = await request.json();
-    const { full_name, phone, avatar_url } = body;
+    const { full_name, avatar_url } = body;
 
     // Validate input
     if (full_name !== undefined && full_name.trim().length === 0) {
@@ -102,21 +109,18 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (phone !== undefined && phone.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Phone number cannot be empty" },
-        { status: 400 }
-      );
-    }
-
     // Prepare update data
     const updateData: Partial<CustomerProfile> = {};
     if (full_name !== undefined) updateData.full_name = full_name.trim();
-    if (phone !== undefined) updateData.phone = phone.trim();
     if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
 
-    // Update profile
-    const { data: updatedProfile, error } = await supabase
+    // Update profile using service role client to bypass RLS
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: updatedProfile, error } = await serviceSupabase
       .from("profiles")
       .update(updateData)
       .eq("id", user.id)

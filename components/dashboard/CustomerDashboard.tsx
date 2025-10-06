@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
@@ -12,11 +12,30 @@ import { FavoritesSection } from "./FavoritesSection";
 import { TestDrivesSection } from "./TestDrivesSection";
 import { PriceAlertsSection } from "./PriceAlertsSection";
 import { InquiriesSection } from "./InquiriesSection";
+import { CustomerProfilePage } from "./CustomerProfile";
 
 export function CustomerDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeSection, setActiveSection] =
     useState<CustomerDashboardSection>("favorites");
+
+  // Handle URL parameters to set active section
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (
+      section &&
+      [
+        "favorites",
+        "testDrives",
+        "priceAlerts",
+        "inquiries",
+        "profile",
+      ].includes(section)
+    ) {
+      setActiveSection(section as CustomerDashboardSection);
+    }
+  }, [searchParams]);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -28,6 +47,8 @@ export function CustomerDashboard() {
         return <PriceAlertsSection />;
       case "inquiries":
         return <InquiriesSection />;
+      case "profile":
+        return <CustomerProfilePage />;
       default:
         return <FavoritesSection />;
     }

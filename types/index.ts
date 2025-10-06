@@ -451,7 +451,6 @@ export interface CustomerProfile {
   id: string;
   email: string;
   full_name: string | null;
-  phone: string | null;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
@@ -459,7 +458,6 @@ export interface CustomerProfile {
 
 export interface UpdateProfileRequest {
   full_name?: string;
-  phone?: string;
   avatar_url?: string;
 }
 
