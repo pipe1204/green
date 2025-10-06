@@ -443,4 +443,38 @@ export type CustomerDashboardSection =
   | "favorites"
   | "testDrives"
   | "priceAlerts"
-  | "inquiries";
+  | "inquiries"
+  | "profile";
+
+// Profile management types
+export interface CustomerProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateProfileRequest {
+  full_name?: string;
+  phone?: string;
+  avatar_url?: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  profile?: CustomerProfile;
+  error?: string;
+}
+
+export interface DeleteAccountRequest {
+  confirmation: string; // User must type "DELETE" to confirm
+}
+
+export interface DeleteAccountResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
