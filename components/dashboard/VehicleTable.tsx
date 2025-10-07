@@ -270,10 +270,35 @@ export function VehicleTable({
 
                 {/* Price */}
                 <div className="col-span-2">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {formatPrice(vehicle.price)}
-                  </p>
-                  <p className="text-xs text-gray-500">COP</p>
+                  {vehicle.is_on_sale && vehicle.sale_price ? (
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-red-600">
+                          {formatPrice(vehicle.sale_price)}
+                        </p>
+                        <span className="bg-green-100 text-green-800 px-1 py-0.5 rounded text-xs font-bold">
+                          -
+                          {Math.round(
+                            ((vehicle.price - vehicle.sale_price) /
+                              vehicle.price) *
+                              100
+                          )}
+                          % OFF
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 line-through">
+                        {formatPrice(vehicle.price)}
+                      </p>
+                      <p className="text-xs text-gray-500">COP</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formatPrice(vehicle.price)}
+                      </p>
+                      <p className="text-xs text-gray-500">COP</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Specifications */}

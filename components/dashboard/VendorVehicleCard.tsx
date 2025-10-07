@@ -178,7 +178,7 @@ export default function VendorVehicleCard({
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4 flex flex-col gap-2">
             <div
               className={`${getAvailabilityColor(
                 availability
@@ -186,6 +186,11 @@ export default function VendorVehicleCard({
             >
               {getAvailabilityText(availability)}
             </div>
+            {vehicle.is_on_sale && (
+              <div className="bg-red-500 text-white border border-red-600 rounded-full px-3 py-1 text-xs font-bold shadow-lg">
+                🔥 EN OFERTA
+              </div>
+            )}
           </div>
         </div>
 
@@ -213,10 +218,36 @@ export default function VendorVehicleCard({
               </div>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-xl md:text-2xl font-bold text-gray-900">
-                {formatPrice(vehicle.price)}
-              </p>
-              <p className="text-sm text-gray-500">COP</p>
+              {vehicle.is_on_sale && vehicle.sale_price ? (
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xl md:text-2xl font-bold text-red-600">
+                      {formatPrice(vehicle.sale_price)}
+                    </p>
+                    <span className="text-sm text-gray-500">COP</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg text-gray-400 line-through">
+                      {formatPrice(vehicle.price)}
+                    </p>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">
+                      -
+                      {Math.round(
+                        ((vehicle.price - vehicle.sale_price) / vehicle.price) *
+                          100
+                      )}
+                      % OFF
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xl md:text-2xl font-bold text-gray-900">
+                    {formatPrice(vehicle.price)}
+                  </p>
+                  <p className="text-sm text-gray-500">COP</p>
+                </div>
+              )}
             </div>
           </div>
 

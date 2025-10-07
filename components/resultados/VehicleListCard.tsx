@@ -178,7 +178,7 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
               )}
             </Button>
           </div>
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4 flex flex-col gap-2">
             <div
               className={`${getAvailabilityColor(
                 vehicle.availability
@@ -186,6 +186,11 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             >
               {getAvailabilityText(vehicle.availability)}
             </div>
+            {vehicle.is_on_sale && (
+              <div className="bg-red-500 text-white border border-red-600 rounded-full px-3 py-1 text-xs font-bold animate-pulse shadow-lg">
+                🔥 ¡EN OFERTA!
+              </div>
+            )}
           </div>
         </div>
 
@@ -220,9 +225,37 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             </div>
             <div className="text-left sm:text-right">
               <div className="flex items-center gap-2 justify-end">
-                <p className="text-xl md:text-2xl font-bold text-gray-900">
-                  {formatPrice(vehicle.price)}
-                </p>
+                {vehicle.is_on_sale && vehicle.sale_price ? (
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xl md:text-2xl font-bold text-red-600">
+                        {formatPrice(vehicle.sale_price)}
+                      </p>
+                      <span className="text-sm text-gray-500">COP</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg text-gray-400 line-through">
+                        {formatPrice(vehicle.price)}
+                      </p>
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">
+                        -
+                        {Math.round(
+                          ((vehicle.price - vehicle.sale_price) /
+                            vehicle.price) *
+                            100
+                        )}
+                        % OFF
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-xl md:text-2xl font-bold text-gray-900">
+                      {formatPrice(vehicle.price)}
+                    </p>
+                    <span className="text-sm text-gray-500">COP</span>
+                  </div>
+                )}
                 {hasAlert && (
                   <div className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
                     <Bell className="w-3 h-3" />
@@ -230,7 +263,6 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                   </div>
                 )}
               </div>
-              <p className="text-sm text-gray-500">COP</p>
             </div>
           </div>
 
