@@ -536,3 +536,69 @@ export interface DeleteVendorAccountResponse {
   message?: string;
   error?: string;
 }
+
+// Vehicle view tracking
+export interface VehicleView {
+  id: string;
+  vehicle_id: string;
+  customer_id?: string;
+  session_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  referrer?: string;
+  viewed_at: string;
+  view_duration?: number;
+  updated_at: string;
+}
+
+// Analytics data structures
+export interface VehicleAnalytics {
+  vehicle_id: string;
+  vehicle_name: string;
+  total_views: number;
+  unique_viewers: number;
+  favorites_count: number;
+  inquiries_count: number;
+  test_drives_count: number;
+  price_alerts_count: number;
+  conversion_rate: number;
+}
+
+export interface VendorAnalytics {
+  summary: {
+    total_vehicles: number;
+    total_views: number;
+    total_favorites: number;
+    total_inquiries: number;
+    total_test_drives: number;
+    total_price_alerts: number;
+    average_conversion_rate: number;
+  };
+  top_performing_vehicles: VehicleAnalytics[];
+  engagement_metrics: {
+    views_by_day: { date: string; views: number }[];
+    favorites_by_day: { date: string; favorites: number }[];
+    inquiries_by_day: { date: string; inquiries: number }[];
+  };
+  vehicle_performance: VehicleAnalytics[];
+}
+
+// Analytics API request/response types
+export interface TrackViewRequest {
+  vehicle_id: string;
+  session_id?: string;
+  user_agent?: string;
+  referrer?: string;
+  view_duration?: number;
+}
+
+export interface TrackViewResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface VendorAnalyticsResponse {
+  success: boolean;
+  analytics?: VendorAnalytics;
+  error?: string;
+}

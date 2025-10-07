@@ -15,6 +15,7 @@ import { formatPrice } from "@/lib/utils";
 import { Vehicle } from "@/types";
 import { useAuthActions } from "@/hooks/useAuthCheck";
 import { usePriceAlert } from "@/hooks/usePriceAlert";
+import { useVehicleViewTracking } from "@/hooks/useVehicleViewTracking";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -59,6 +60,12 @@ export default function ProductPage() {
   const { hasAlert, alertData, refreshAlert } = usePriceAlert(
     vehicle?.id || ""
   );
+
+  // Track vehicle views for analytics
+  useVehicleViewTracking({
+    vehicleId: vehicle?.id || "",
+    enabled: !!vehicle?.id,
+  });
 
   useEffect(() => {
     const fetchVehicle = async () => {
