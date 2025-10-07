@@ -252,6 +252,7 @@ vi.mock("lucide-react", () => ({
   Car: () => <div data-testid="car-icon">Car</div>,
   Truck: () => <div data-testid="truck-icon">Truck</div>,
   UtilityPole: () => <div data-testid="utility-pole-icon">UtilityPole</div>,
+  RefreshCw: () => <div data-testid="refresh-cw-icon">RefreshCw</div>,
 }));
 
 // Mock FloatingAskButton
@@ -326,7 +327,8 @@ describe("VendorDashboard", () => {
     fireEvent.click(analyticsNav);
 
     await waitFor(() => {
-      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
+      // New analytics section renders Spanish header
+      expect(screen.getAllByText("Analítica").length).toBeGreaterThan(0);
       expect(analyticsNav).toHaveClass("active");
     });
   });
