@@ -62,6 +62,9 @@ export function VendorDashboard() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  // Client-side pagination for vehicles
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 10;
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -103,6 +106,11 @@ export function VendorDashboard() {
       fetchVehicles();
     }
   }, [user, fetchVehicles]);
+
+  // Reset to first page when vehicles list changes
+  useEffect(() => {
+    setPage(1);
+  }, [vehicles.length]);
 
   // Handle URL section parameter
   useEffect(() => {
@@ -321,13 +329,64 @@ export function VendorDashboard() {
             )}
 
             {/* Vehicle Table */}
-            <VehicleTable
-              vehicles={vehicles}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onView={handleView}
-              loading={loading}
-            />
+            {(() => {
+              const total = vehicles.length;
+              const totalPages = Math.max(1, Math.ceil(total / pageSize));
+              const startIndex = (page - 1) * pageSize;
+              const currentItems = vehicles.slice(
+                startIndex,
+                startIndex + pageSize
+              );
+
+              return (
+                <>
+                  <VehicleTable
+                    vehicles={currentItems}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                    loading={loading}
+                  />
+
+                  {/* Pagination Controls */}
+                  <div className="bg-white p-4 rounded-md flex items-center justify-between mt-4">
+                    <div className="text-sm text-gray-600">
+                      {total > 0
+                        ? `Mostrando ${startIndex + 1}-${Math.min(
+                            startIndex + currentItems.length,
+                            total
+                          )} de ${total}`
+                        : "Sin resultados"}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label="Página anterior"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page <= 1}
+                      >
+                        Anterior
+                      </Button>
+                      <span className="text-sm text-gray-700">
+                        Página {page} de {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label="Página siguiente"
+                        onClick={() =>
+                          setPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        disabled={page >= totalPages}
+                      >
+                        Siguiente
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         );
 

@@ -82,6 +82,8 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
   const [sortField, setSortField] =
     useState<keyof VehicleAnalytics>("conversion_rate");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 10;
 
   const sortedVehicles = [...vehicles].sort((a, b) => {
     const aValue = a[sortField];
@@ -107,7 +109,17 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
       setSortField(field);
       setSortDirection("desc");
     }
+    setPage(1);
   };
+
+  // Reset to first page when data changes
+  useEffect(() => {
+    setPage(1);
+  }, [vehicles]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedVehicles.length / pageSize));
+  const startIndex = (page - 1) * pageSize;
+  const currentItems = sortedVehicles.slice(startIndex, startIndex + pageSize);
 
   return (
     <Card>
@@ -158,7 +170,7 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
               </tr>
             </thead>
             <tbody>
-              {sortedVehicles.map((vehicle) => (
+              {currentItems.map((vehicle) => (
                 <tr
                   key={vehicle.vehicle_id}
                   className="border-b hover:bg-gray-50"
@@ -186,6 +198,36 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-gray-600">
+            Mostrando {currentItems.length} de {sortedVehicles.length}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label="Página anterior"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-sm text-gray-700">
+              Página {page} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label="Página siguiente"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              Siguiente
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -329,7 +371,11 @@ export function VendorAnalyticsSection() {
               clientes
             </p>
           </div>
-          <Button onClick={handleRefresh} disabled={refreshing}>
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center space-x-2 bg-green-600 text-white hover:bg-green-700"
+          >
             {refreshing ? (
               <RefreshCw className="w-4 h-4 animate-spin mr-2" />
             ) : (
@@ -380,7 +426,11 @@ export function VendorAnalyticsSection() {
             clientes
           </p>
         </div>
-        <Button onClick={handleRefresh} disabled={refreshing}>
+        <Button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center space-x-2 bg-green-600 text-white hover:bg-green-700"
+        >
           {refreshing ? (
             <RefreshCw className="w-4 h-4 animate-spin mr-2" />
           ) : (

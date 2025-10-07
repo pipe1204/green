@@ -18,11 +18,25 @@ interface InquiryRecord {
  * GET /api/vendor/analytics/vehicles/[id]
  * Get detailed analytics for a specific vehicle
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Params = { id: string };
+type RouteContext = { params: Params } | { params: Promise<Params> };
+
+function isPromise<T>(value: unknown): value is Promise<T> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { then?: unknown }).then === "function"
+  );
+}
+
+export async function GET(request: NextRequest, context: RouteContext) {
   try {
+    // Resolve params (support both direct object and Promise in different runtimes)
+    const resolvedParams = isPromise<Params>(context.params)
+      ? await context.params
+      : context.params;
+    const vehicleId = resolvedParams.id;
+
     // Get user from auth header
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
@@ -33,8 +47,6 @@ export async function GET(
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const vehicleId = params.id;
-
     if (!vehicleId) {
       return NextResponse.json(
         { error: "Vehicle ID is required" },
