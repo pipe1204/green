@@ -112,6 +112,9 @@ export interface Vehicle {
     email: string;
     rating: number;
   };
+  // Sale fields
+  is_on_sale?: boolean;
+  sale_price?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -600,5 +603,17 @@ export interface TrackViewResponse {
 export interface VendorAnalyticsResponse {
   success: boolean;
   analytics?: VendorAnalytics;
+  error?: string;
+}
+
+// Sale functionality types
+export interface UpdateVehicleSaleRequest {
+  is_on_sale: boolean;
+  sale_price?: number;
+}
+
+export interface UpdateVehicleSaleResponse {
+  success: boolean;
+  vehicle?: Vehicle;
   error?: string;
 }
