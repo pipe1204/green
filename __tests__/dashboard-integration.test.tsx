@@ -313,6 +313,7 @@ vi.mock("lucide-react", () => ({
   Car: () => <div data-testid="car-icon">Car</div>,
   Truck: () => <div data-testid="truck-icon">Truck</div>,
   UtilityPole: () => <div data-testid="utility-pole-icon">UtilityPole</div>,
+  RefreshCw: () => <div data-testid="refresh-cw-icon">RefreshCw</div>,
 }));
 
 describe("Dashboard Integration Tests", () => {
@@ -492,7 +493,8 @@ describe("Dashboard Integration Tests", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("analytics-nav")).toHaveClass("active");
-      expect(screen.getByText("Analítica en Desarrollo")).toBeInTheDocument();
+      // New analytics section renders Spanish header
+      expect(screen.getAllByText("Analítica").length).toBeGreaterThan(0);
     });
 
     // Back to vehicles

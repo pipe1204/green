@@ -100,7 +100,7 @@ describe("ResponsiveDashboardSidebar", () => {
       expect(activeButtons.length).toBeGreaterThan(0);
     });
 
-    it("disables analytics section", () => {
+    it("enables analytics section", () => {
       render(
         <ResponsiveDashboardSidebar
           activeSection="vehicles"
@@ -112,11 +112,11 @@ describe("ResponsiveDashboardSidebar", () => {
       // There are multiple "Analítica" elements (desktop and mobile), so we use getAllByText
       const analyticsButtons = screen.getAllByText("Analítica");
       expect(analyticsButtons.length).toBeGreaterThan(0);
-      // Check that at least one is disabled
+      // Ensure none are disabled now that analytics is enabled
       const disabledButtons = analyticsButtons.filter((button) =>
         button.closest("button")?.hasAttribute("disabled")
       );
-      expect(disabledButtons.length).toBeGreaterThan(0);
+      expect(disabledButtons.length).toBe(0);
     });
   });
 
@@ -305,7 +305,7 @@ describe("ResponsiveDashboardSidebar", () => {
       expect(navigations.length).toBeGreaterThan(0);
     });
 
-    it("disables navigation items when they are disabled", () => {
+    it("does not disable analytics item anymore", () => {
       render(
         <ResponsiveDashboardSidebar
           activeSection="vehicles"
@@ -317,11 +317,10 @@ describe("ResponsiveDashboardSidebar", () => {
       // There are multiple "Analítica" elements (desktop and mobile), so we use getAllByText
       const analyticsButtons = screen.getAllByText("Analítica");
       expect(analyticsButtons.length).toBeGreaterThan(0);
-      // Check that at least one is disabled
       const disabledButtons = analyticsButtons.filter((button) =>
         button.closest("button")?.hasAttribute("disabled")
       );
-      expect(disabledButtons.length).toBeGreaterThan(0);
+      expect(disabledButtons.length).toBe(0);
     });
   });
 

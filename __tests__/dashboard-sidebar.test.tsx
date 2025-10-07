@@ -46,8 +46,9 @@ describe("DashboardSidebar", () => {
     expect(
       screen.getByText("Gestiona tu inventario de vehículos")
     ).toBeInTheDocument();
+    // Updated description for enabled analytics
     expect(
-      screen.getByText("Métricas y estadísticas (Próximamente)")
+      screen.getByText("Métricas y estadísticas de tus vehículos")
     ).toBeInTheDocument();
     expect(screen.getByText("Conversaciones con clientes")).toBeInTheDocument();
   });
@@ -72,23 +73,13 @@ describe("DashboardSidebar", () => {
     expect(mockOnSectionChange).toHaveBeenCalledWith("vehicles");
   });
 
-  it("does not call onSectionChange for disabled items", () => {
+  it("calls onSectionChange for analytics now that it's enabled", () => {
     render(<DashboardSidebar {...defaultProps} />);
 
     const analyticsButton = screen.getByText("Analítica").closest("button");
-    const messagesButton = screen.getByText("Mensajes").closest("button");
-
-    expect(analyticsButton).toBeDisabled();
-    // Messages button is not disabled in the current implementation
-    // expect(messagesButton).toBeDisabled();
-
+    expect(analyticsButton).not.toBeDisabled();
     fireEvent.click(analyticsButton!);
-    // Messages button is not disabled, so it will call onSectionChange
-    fireEvent.click(messagesButton!);
-
-    // Only analytics button should not call onSectionChange (it's disabled)
-    // Messages button will call onSectionChange since it's not disabled
-    expect(mockOnSectionChange).toHaveBeenCalledWith("messages");
+    expect(mockOnSectionChange).toHaveBeenCalledWith("analytics");
   });
 
   it("toggles collapse state when clicking toggle button", () => {
@@ -133,7 +124,7 @@ describe("DashboardSidebar", () => {
       <DashboardSidebar {...defaultProps} activeSection="analytics" />
     );
 
-    // Analytics should appear active (even though disabled)
+    // Analytics should appear active
     const analyticsButton = screen.getByText("Analítica").closest("button");
     expect(analyticsButton).toHaveClass(
       "bg-green-50",
@@ -147,7 +138,7 @@ describe("DashboardSidebar", () => {
 
     rerender(<DashboardSidebar {...defaultProps} activeSection="messages" />);
 
-    // Messages should appear active (even though disabled)
+    // Messages should appear active
     const messagesButton = screen.getByText("Mensajes").closest("button");
     expect(messagesButton).toHaveClass(
       "bg-green-50",

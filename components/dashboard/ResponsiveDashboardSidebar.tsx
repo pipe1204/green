@@ -64,8 +64,8 @@ const vendorNavigationItems = [
     id: "analytics" as DashboardSection,
     label: "Analítica",
     icon: BarChart3,
-    description: "Métricas y estadísticas (Próximamente)",
-    disabled: true,
+    description: "Métricas y estadísticas de tus vehículos",
+    disabled: false,
   },
 ];
 

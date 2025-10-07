@@ -42,3 +42,15 @@ export interface FileUploadResult {
   fileType: string;
   fileSize: number;
 }
+
+export interface ViewRecord {
+  viewed_at: string;
+}
+
+export interface FavoriteRecord {
+  created_at: string;
+}
+
+export interface InquiryRecord {
+  created_at: string;
+}
