@@ -41,6 +41,12 @@ vi.mock("next/navigation", () => ({
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
+  useSearchParams: () => ({
+    get: vi.fn((key: string) => {
+      if (key === "section") return null;
+      return null;
+    }),
+  }),
 }));
 
 vi.mock("@/components/auth/AuthProvider", () => ({
@@ -57,6 +63,15 @@ vi.mock("@/lib/supabase", () => ({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           single: vi.fn().mockResolvedValue({
+            data: {
+              id: "vendor-1",
+              business_name: "Test Store",
+              rating: 4.5,
+              locations: [],
+            },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
             data: {
               id: "vendor-1",
               business_name: "Test Store",
@@ -294,6 +309,10 @@ vi.mock("lucide-react", () => ({
   Download: () => <div data-testid="download-icon">Download</div>,
   Upload: () => <div data-testid="upload-icon">Upload</div>,
   X: () => <div data-testid="x-icon">X</div>,
+  Bike: () => <div data-testid="bike-icon">Bike</div>,
+  Car: () => <div data-testid="car-icon">Car</div>,
+  Truck: () => <div data-testid="truck-icon">Truck</div>,
+  UtilityPole: () => <div data-testid="utility-pole-icon">UtilityPole</div>,
 }));
 
 describe("Dashboard Integration Tests", () => {

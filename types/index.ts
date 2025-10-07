@@ -443,4 +443,96 @@ export type CustomerDashboardSection =
   | "favorites"
   | "testDrives"
   | "priceAlerts"
-  | "inquiries";
+  | "inquiries"
+  | "profile";
+
+// Profile management types
+export interface CustomerProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateProfileRequest {
+  full_name?: string;
+  avatar_url?: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  profile?: CustomerProfile;
+  error?: string;
+}
+
+export interface DeleteAccountRequest {
+  confirmation: string; // User must type "DELETE" to confirm
+}
+
+export interface DeleteAccountResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+// Vendor profile management types
+export interface VendorProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+  // Business details from vendors table
+  business_name: string;
+  business_type?: string;
+  nit?: string;
+  address?: string;
+  city?: string;
+  department?: string;
+  state?: string;
+  country: string;
+  phone?: string;
+  website?: string;
+  description?: string;
+  locations?: VendorLocation[];
+  is_verified: boolean;
+  rating: number;
+  total_reviews: number;
+  business_created_at: string;
+  business_updated_at: string;
+}
+
+export interface UpdateVendorProfileRequest {
+  full_name?: string;
+  avatar_url?: string;
+  business_name?: string;
+  business_type?: string;
+  nit?: string;
+  address?: string;
+  city?: string;
+  department?: string;
+  state?: string;
+  country?: string;
+  phone?: string;
+  website?: string;
+  description?: string;
+}
+
+export interface UpdateVendorProfileResponse {
+  success: boolean;
+  profile?: VendorProfile;
+  error?: string;
+}
+
+export interface DeleteVendorAccountRequest {
+  confirmation: string; // User must type "DELETE" to confirm
+}
+
+export interface DeleteVendorAccountResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}

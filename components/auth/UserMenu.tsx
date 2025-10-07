@@ -96,6 +96,28 @@ export function UserMenu() {
     fetchProfile();
   }, [user]);
 
+  // Listen for profile updates from other components
+  useEffect(() => {
+    const handleProfileUpdate = (event: CustomEvent) => {
+      const { profile } = event.detail;
+      if (profile) {
+        setProfile(profile);
+      }
+    };
+
+    window.addEventListener(
+      "profileUpdated",
+      handleProfileUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "profileUpdated",
+        handleProfileUpdate as EventListener
+      );
+    };
+  }, []);
+
   const handleSignOut = async () => {
     await signOut();
     setShowUserMenu(false);
@@ -185,7 +207,16 @@ export function UserMenu() {
           <button
             onClick={() => {
               setShowUserMenu(false);
-              // Navigate to profile settings
+              // Navigate to customer dashboard with profile section
+              const userRole = profile?.role || "customer";
+              if (userRole === "vendor") {
+                // Add timestamp to force navigation
+                router.push(`/dashboard?section=profile&t=${Date.now()}`);
+              } else {
+                router.push(
+                  `/customer-dashboard?section=profile&t=${Date.now()}`
+                );
+              }
             }}
             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
