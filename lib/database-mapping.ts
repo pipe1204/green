@@ -5,7 +5,6 @@ import {
   CustomerInquiry,
 } from "@/types";
 
-// Convert frontend Vehicle (camelCase) to database format (snake_case)
 export function vehicleToDatabase(vehicle: Vehicle) {
   return {
     id: vehicle.id,
@@ -26,6 +25,8 @@ export function vehicleToDatabase(vehicle: Vehicle) {
     description: vehicle.description,
     features: vehicle.features,
     reviews: vehicle.reviews,
+    is_on_sale: vehicle.is_on_sale,
+    sale_price: vehicle.sale_price,
     created_at: vehicle.createdAt,
     updated_at: vehicle.updatedAt,
   };
@@ -114,6 +115,8 @@ export function databaseToVehicle(dbVehicle: unknown): Vehicle {
       average: 0,
       count: 0,
     },
+    is_on_sale: Boolean(raw.is_on_sale ?? false),
+    sale_price: raw.sale_price ? Number(raw.sale_price) : undefined,
     vendor: {
       businessName: String(
         (raw.vendors as { business_name?: string })?.business_name ?? ""
@@ -195,6 +198,8 @@ export function databaseToPriceAlertWithVehicle(
             average: 0,
             count: 0,
           },
+          is_on_sale: false,
+          sale_price: undefined,
           vendor: {
             businessName: "",
             phone: "",
@@ -288,6 +293,8 @@ export function databaseToTestDriveWithVehicle(
             average: 0,
             count: 0,
           },
+          is_on_sale: false,
+          sale_price: undefined,
           vendor: {
             businessName: "",
             phone: "",
@@ -379,6 +386,8 @@ export function databaseToInquiryWithVehicle(
             average: 0,
             count: 0,
           },
+          is_on_sale: false,
+          sale_price: undefined,
           vendor: {
             businessName: "",
             phone: "",
