@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ export function VehicleTable({
     return String(val ?? "");
   };
 
-  const coerceText = (val: unknown): string => coerceEnum(val);
+  const coerceText = useCallback((val: unknown): string => coerceEnum(val), []);
 
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
@@ -76,7 +76,7 @@ export function VehicleTable({
     }));
   };
 
-  const sortedVehicles = React.useMemo(() => {
+  const sortedVehicles = useMemo(() => {
     if (!sortConfig.field) return vehicles;
 
     return [...vehicles].sort((a, b) => {
@@ -118,7 +118,7 @@ export function VehicleTable({
       }
       return 0;
     });
-  }, [vehicles, sortConfig]);
+  }, [vehicles, sortConfig, coerceText]);
 
   const SortButton = ({
     field,
@@ -270,10 +270,35 @@ export function VehicleTable({
 
                 {/* Price */}
                 <div className="col-span-2">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {formatPrice(vehicle.price)}
-                  </p>
-                  <p className="text-xs text-gray-500">COP</p>
+                  {vehicle.is_on_sale && vehicle.sale_price ? (
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-red-600">
+                          {formatPrice(vehicle.sale_price)}
+                        </p>
+                        <span className="bg-green-100 text-green-800 px-1 py-0.5 rounded text-xs font-bold">
+                          -
+                          {Math.round(
+                            ((vehicle.price - vehicle.sale_price) /
+                              vehicle.price) *
+                              100
+                          )}
+                          % OFF
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 line-through">
+                        {formatPrice(vehicle.price)}
+                      </p>
+                      <p className="text-xs text-gray-500">COP</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formatPrice(vehicle.price)}
+                      </p>
+                      <p className="text-xs text-gray-500">COP</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Specifications */}

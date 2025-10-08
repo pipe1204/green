@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { supabase } from "@/lib/supabase";
 
@@ -15,16 +15,7 @@ export const usePriceAlert = (vehicleId: string) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user && vehicleId) {
-      checkPriceAlert();
-    } else {
-      setHasAlert(false);
-      setAlertData(null);
-    }
-  }, [user, vehicleId]);
-
-  const checkPriceAlert = async () => {
+  const checkPriceAlert = useCallback(async () => {
     if (!user || !vehicleId) return;
 
     setLoading(true);
@@ -56,7 +47,16 @@ export const usePriceAlert = (vehicleId: string) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, vehicleId]);
+
+  useEffect(() => {
+    if (user && vehicleId) {
+      checkPriceAlert();
+    } else {
+      setHasAlert(false);
+      setAlertData(null);
+    }
+  }, [user, vehicleId, checkPriceAlert]);
 
   const refreshAlert = () => {
     checkPriceAlert();

@@ -61,6 +61,8 @@ export function ProductForm({
       average: 0,
       count: 0,
     },
+    is_on_sale: false,
+    sale_price: 0,
   });
 
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -106,6 +108,8 @@ export function ProductForm({
           specifications: editingVehicle.specifications,
           features: editingVehicle.features,
           reviews: editingVehicle.reviews,
+          is_on_sale: editingVehicle.is_on_sale || false,
+          sale_price: editingVehicle.sale_price || 0,
         });
       } else {
         setFormData({
@@ -132,6 +136,8 @@ export function ProductForm({
             average: 0,
             count: 0,
           },
+          is_on_sale: false,
+          sale_price: 0,
         });
       }
     }
@@ -182,6 +188,19 @@ export function ProductForm({
     ) {
       setValidationError("Por favor completa todos los campos requeridos.");
       return;
+    }
+
+    if (formData.is_on_sale) {
+      if (formData.sale_price <= 0) {
+        setValidationError("El precio de oferta debe ser mayor a 0.");
+        return;
+      }
+      if (formData.sale_price >= formData.price) {
+        setValidationError(
+          "El precio de oferta debe ser menor al precio regular."
+        );
+        return;
+      }
     }
     // Attach structured warranty
     const payload = {
@@ -381,6 +400,75 @@ export function ProductForm({
                   required
                   placeholder="50000000"
                 />
+              </div>
+
+              {/* Sale Section */}
+              <div className="md:col-span-2">
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <input
+                      type="checkbox"
+                      id="is_on_sale"
+                      checked={formData.is_on_sale}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          is_on_sale: e.target.checked,
+                          sale_price: e.target.checked
+                            ? formData.sale_price
+                            : 0,
+                        })
+                      }
+                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    />
+                    <label
+                      htmlFor="is_on_sale"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      🔥 Activar Oferta
+                    </label>
+                  </div>
+
+                  {formData.is_on_sale && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Precio de Oferta (COP) *
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.sale_price}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            sale_price: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        required={formData.is_on_sale}
+                        placeholder="40000000"
+                        className="bg-white"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Debe ser menor al precio regular ($
+                        {formData.price.toLocaleString()})
+                      </p>
+                      {formData.sale_price > 0 && formData.price > 0 && (
+                        <p className="text-sm text-green-600 mt-1 font-medium">
+                          Ahorro: $
+                          {(
+                            formData.price - formData.sale_price
+                          ).toLocaleString()}
+                          (
+                          {Math.round(
+                            ((formData.price - formData.sale_price) /
+                              formData.price) *
+                              100
+                          )}
+                          % OFF)
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>

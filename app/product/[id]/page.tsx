@@ -263,6 +263,15 @@ export default function ProductPage() {
                   <p className="text-sm text-gray-500">Imagen no disponible</p>
                 </div>
               </div>
+
+              {/* Sale Badge Overlay */}
+              {vehicle.is_on_sale && (
+                <div className="absolute top-4 left-4">
+                  <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                    🔥 ¡OFERTA!
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Thumbnail Images */}
@@ -307,10 +316,49 @@ export default function ProductPage() {
           <div className="space-y-8">
             {/* Price & Rating */}
             <div>
+              {/* Sale Badge */}
+              {vehicle.is_on_sale && (
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-lg font-bold shadow-lg animate-pulse">
+                    🔥 ¡OFERTA ESPECIAL!
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-3xl font-bold text-gray-900">
-                  ${vehicle.price.toLocaleString("es-CO")} COP
-                </h2>
+                {vehicle.is_on_sale && vehicle.sale_price ? (
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-4xl font-bold text-red-600">
+                        ${vehicle.sale_price.toLocaleString("es-CO")} COP
+                      </h2>
+                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-lg font-bold">
+                        -
+                        {Math.round(
+                          ((vehicle.price - vehicle.sale_price) /
+                            vehicle.price) *
+                            100
+                        )}
+                        % OFF
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <p className="text-2xl text-gray-400 line-through">
+                        ${vehicle.price.toLocaleString("es-CO")} COP
+                      </p>
+                      <p className="text-lg text-green-600 font-semibold">
+                        Ahorras: $
+                        {(vehicle.price - vehicle.sale_price).toLocaleString(
+                          "es-CO"
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    ${vehicle.price.toLocaleString("es-CO")} COP
+                  </h2>
+                )}
                 {hasAlert && (
                   <div className="flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm font-medium">
                     <Bell className="w-4 h-4" />
