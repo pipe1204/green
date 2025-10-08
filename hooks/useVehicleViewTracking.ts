@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { TrackViewRequest } from "@/types";
 
@@ -22,43 +22,46 @@ export function useVehicleViewTracking({
   }
 
   // Track the view
-  const trackView = async (viewDuration?: number) => {
-    if (!enabled || !vehicleId || hasTrackedRef.current) {
-      return;
-    }
-
-    try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-
-      if (session?.access_token) {
-        headers["Authorization"] = `Bearer ${session.access_token}`;
+  const trackView = useCallback(
+    async (viewDuration?: number) => {
+      if (!enabled || !vehicleId || hasTrackedRef.current) {
+        return;
       }
 
-      const trackData: TrackViewRequest = {
-        vehicle_id: vehicleId,
-        session_id: session?.access_token ? undefined : sessionIdRef.current,
-        user_agent: navigator.userAgent,
-        referrer: document.referrer || undefined,
-        view_duration: viewDuration,
-      };
+      try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
 
-      const response = await fetch("/api/analytics/track-view", {
-        method: "POST",
-        headers,
-        body: JSON.stringify(trackData),
-      });
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
 
-      if (response.ok) {
-        hasTrackedRef.current = true;
-      } else {
-        console.error("Failed to track vehicle view:", response.statusText);
+        const trackData: TrackViewRequest = {
+          vehicle_id: vehicleId,
+          session_id: session?.access_token ? undefined : sessionIdRef.current,
+          user_agent: navigator.userAgent,
+          referrer: document.referrer || undefined,
+          view_duration: viewDuration,
+        };
+
+        const response = await fetch("/api/analytics/track-view", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(trackData),
+        });
+
+        if (response.ok) {
+          hasTrackedRef.current = true;
+        } else {
+          console.error("Failed to track vehicle view:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error tracking vehicle view:", error);
       }
-    } catch (error) {
-      console.error("Error tracking vehicle view:", error);
-    }
-  };
+    },
+    [enabled, vehicleId, session?.access_token]
+  );
 
   // Track view on component mount
   useEffect(() => {
@@ -66,7 +69,7 @@ export function useVehicleViewTracking({
       startTimeRef.current = Date.now();
       trackView();
     }
-  }, [vehicleId, enabled]);
+  }, [vehicleId, enabled, trackView]);
 
   // Track view duration on component unmount or page visibility change
   useEffect(() => {
@@ -134,7 +137,7 @@ export function useVehicleViewTracking({
         }
       };
     }
-  }, [vehicleId, enabled, session?.access_token]);
+  }, [vehicleId, enabled, session?.access_token, trackView]);
 
   return {
     trackView,

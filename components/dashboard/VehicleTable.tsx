@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ export function VehicleTable({
     return String(val ?? "");
   };
 
-  const coerceText = (val: unknown): string => coerceEnum(val);
+  const coerceText = useCallback((val: unknown): string => coerceEnum(val), []);
 
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
@@ -76,7 +76,7 @@ export function VehicleTable({
     }));
   };
 
-  const sortedVehicles = React.useMemo(() => {
+  const sortedVehicles = useMemo(() => {
     if (!sortConfig.field) return vehicles;
 
     return [...vehicles].sort((a, b) => {
@@ -118,7 +118,7 @@ export function VehicleTable({
       }
       return 0;
     });
-  }, [vehicles, sortConfig]);
+  }, [vehicles, sortConfig, coerceText]);
 
   const SortButton = ({
     field,

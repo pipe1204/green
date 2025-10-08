@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { VendorAnalytics, VehicleAnalytics } from "@/types";
 import {
@@ -289,7 +289,7 @@ export function VendorAnalyticsSection() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     if (!session?.access_token) {
       setError("No hay token de acceso disponible");
       setLoading(false);
@@ -326,11 +326,11 @@ export function VendorAnalyticsSection() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [session?.access_token]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [session?.access_token]);
+  }, [fetchAnalytics]);
 
   const handleRefresh = () => {
     setRefreshing(true);

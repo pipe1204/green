@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Message } from "@/types/messaging";
 import { MessageAttachment } from "./MessageAttachment";
 import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
@@ -29,11 +29,11 @@ export function MessageItem({
     }
   };
 
-  const handleMessageRead = () => {
+  const handleMessageRead = useCallback(() => {
     if (!isOwn && !message.isRead && onMessageRead) {
       onMessageRead(message.id);
     }
-  };
+  }, [isOwn, message.isRead, message.id, onMessageRead]);
 
   useEffect(() => {
     // Mark message as read when it comes into view (if it's not our own message)
@@ -44,7 +44,7 @@ export function MessageItem({
 
       return () => clearTimeout(timer);
     }
-  }, [isOwn, message.isRead, message.id, onMessageRead]);
+  }, [isOwn, message.isRead, message.id, handleMessageRead]);
 
   return (
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
