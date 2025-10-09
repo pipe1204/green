@@ -14,8 +14,6 @@ export interface BaseEmailData {
  */
 export interface VendorNewEnquiryEmailData extends BaseEmailData {
   customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
   vehicleName: string;
   vehicleBrand: string;
   message: string;
@@ -42,8 +40,6 @@ export interface CustomerVendorReplyEmailData extends BaseEmailData {
  */
 export interface VendorTestBookingEmailData extends BaseEmailData {
   customerName: string;
-  customerEmail: string;
-  customerPhone: string;
   vehicleName: string;
   vehicleBrand: string;
   preferredDate: string;
@@ -61,7 +57,7 @@ export interface CustomerTestStatusEmailData extends BaseEmailData {
   vehicleName: string;
   vehicleBrand: string;
   status: "accepted" | "declined";
-  vendorMessage: string;
+  vendorMessage?: string;
   preferredDate: string;
   preferredTime: string;
   dashboardUrl: string;
