@@ -171,13 +171,20 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const vehicleResponse: Vehicle = databaseToVehicle(updatedVehicle);
 
     // Check for price alerts that match the new price
-    if (is_on_sale && sale_price) {
+    // Determine which price to check:
+    // - If sale is ON: check sale_price
+    // - If sale is OFF: check regular price (in case it was lowered)
+    const priceToCheck =
+      is_on_sale && sale_price ? sale_price : updatedVehicle.price;
+
+    // Always check alerts when there's a valid price
+    if (priceToCheck && priceToCheck > 0) {
       try {
         const { sendPriceAlertMatchEmail } = await import(
           "@/lib/email-service"
         );
 
-        // Find active price alerts for this vehicle where target price >= new sale price
+        // Find active price alerts for this vehicle where target price >= new price
         const { data: matchingAlerts } = await serviceSupabase
           .from("price_alerts")
           .select(
@@ -190,7 +197,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           )
           .eq("vehicle_id", vehicleId)
           .eq("is_active", true)
-          .gte("target_price", sale_price);
+          .gte("target_price", priceToCheck);
 
         // Send email to each customer with matching alert
         if (matchingAlerts && matchingAlerts.length > 0) {
@@ -210,9 +217,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
                 vehicleBrand: updatedVehicle.brand,
                 vehicleType: updatedVehicle.type,
                 oldPrice: updatedVehicle.price,
-                newPrice: sale_price,
+                newPrice: priceToCheck,
                 targetPrice: alert.target_price,
-                savings: updatedVehicle.price - sale_price,
+                savings: updatedVehicle.price - priceToCheck,
                 vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}/product/${vehicleId}`,
                 vehicleImageUrl: updatedVehicle.images?.[0]?.url || undefined,
               });
