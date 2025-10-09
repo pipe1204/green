@@ -227,6 +227,9 @@ export function PriceAlertsSection() {
             ? calculateSavings(alert.vehicle.price, alert.target_price)
             : { savings: 0, percentage: "0" };
 
+          // Check if alert target has been reached (savings >= 0 means current price <= target)
+          const targetReached = savings >= 0;
+
           return (
             <div key={alert.id} className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-start justify-between mb-4">
@@ -235,8 +238,14 @@ export function PriceAlertsSection() {
                     <h3 className="text-lg font-semibold text-gray-900">
                       {alert.vehicle?.name || "Vehículo no disponible"}
                     </h3>
-                    <Badge className="bg-purple-100 text-purple-800">
-                      Alerta Activa
+                    <Badge
+                      className={
+                        targetReached
+                          ? "bg-green-100 text-green-800"
+                          : "bg-purple-100 text-purple-800"
+                      }
+                    >
+                      {targetReached ? "Alerta Alcanzada" : "Alerta Activa"}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600">

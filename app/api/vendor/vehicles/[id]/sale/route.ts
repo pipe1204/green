@@ -177,73 +177,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const priceToCheck =
       is_on_sale && sale_price ? sale_price : updatedVehicle.price;
 
-    // Always check alerts when there's a valid price
-    if (priceToCheck && priceToCheck > 0) {
-      try {
-        const { sendPriceAlertMatchEmail } = await import(
-          "@/lib/email-service"
-        );
-
-        // Find active price alerts for this vehicle where target price >= new price
-        const { data: matchingAlerts } = await serviceSupabase
-          .from("price_alerts")
-          .select(
-            `
-            id,
-            target_price,
-            customer_id,
-            profiles!price_alerts_customer_id_fkey(full_name, email)
-          `
-          )
-          .eq("vehicle_id", vehicleId)
-          .eq("is_active", true)
-          .gte("target_price", priceToCheck);
-
-        // Send email to each customer with matching alert
-        if (matchingAlerts && matchingAlerts.length > 0) {
-          for (const alert of matchingAlerts) {
-            const profileData = alert.profiles as unknown as {
-              email: string;
-              full_name: string;
-            } | null;
-            const customerEmail = profileData?.email;
-            const customerName = profileData?.full_name;
-
-            if (customerEmail) {
-              await sendPriceAlertMatchEmail({
-                recipientEmail: customerEmail,
-                recipientName: customerName || "Cliente",
-                vehicleName: updatedVehicle.name,
-                vehicleBrand: updatedVehicle.brand,
-                vehicleType: updatedVehicle.type,
-                oldPrice: updatedVehicle.price,
-                newPrice: priceToCheck,
-                targetPrice: alert.target_price,
-                savings: updatedVehicle.price - priceToCheck,
-                vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}/product/${vehicleId}`,
-                vehicleImageUrl: updatedVehicle.images?.[0]?.url || undefined,
-              });
-
-              // Optionally deactivate the alert after sending (one-time notification)
-              await serviceSupabase
-                .from("price_alerts")
-                .update({
-                  is_active: false,
-                  updated_at: new Date().toISOString(),
-                })
-                .eq("id", alert.id);
-            }
-          }
-
-          console.log(
-            `Sent ${matchingAlerts.length} price alert emails for vehicle ${vehicleId}`
-          );
-        }
-      } catch (emailError) {
-        // Log email error but don't fail the request
-        console.error("Error processing price alerts:", emailError);
-      }
-    }
+    // Check and send price alerts
+    const { checkAndSendPriceAlerts } = await import(
+      "@/lib/price-alert-checker"
+    );
+    await checkAndSendPriceAlerts(vehicleId, priceToCheck, {
+      name: updatedVehicle.name,
+      brand: updatedVehicle.brand,
+      type: updatedVehicle.type,
+      price: updatedVehicle.price,
+      images: updatedVehicle.images,
+    });
 
     return NextResponse.json<UpdateVehicleSaleResponse>(
       { success: true, vehicle: vehicleResponse },

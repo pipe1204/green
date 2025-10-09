@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { sendPriceAlertMatchEmail } from "./email-service";
 
 const serviceSupabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,24 +6,47 @@ const serviceSupabase = createClient(
 );
 
 /**
- * Check and trigger price alerts for a vehicle
- * @param vehicleId - ID of the vehicle
- * @param newPrice - The new price to check against alerts (could be sale_price or regular price)
- * @param vehicleData - Vehicle data for email
+ * Check and send price alert emails for a vehicle
+ * @param vehicleId - The vehicle ID to check alerts for
+ * @param effectivePrice - The effective price to check against (sale price if on sale, otherwise regular price)
+ * @param vehicleData - Vehicle data for email template (optional, will fetch if not provided)
  */
-export async function checkAndTriggerPriceAlerts(
+export async function checkAndSendPriceAlerts(
   vehicleId: string,
-  newPrice: number,
-  vehicleData: {
+  effectivePrice: number,
+  vehicleData?: {
     name: string;
     brand: string;
     type: string;
-    regularPrice: number;
-    images?: { url: string }[];
+    price: number;
+    images?: Array<{ url: string }> | null;
   }
-): Promise<void> {
+) {
+  if (!effectivePrice || effectivePrice <= 0) {
+    return;
+  }
+
   try {
-    // Find active price alerts for this vehicle where target price >= new price
+    const { sendPriceAlertMatchEmail } = await import("@/lib/email-service");
+
+    // Fetch vehicle data if not provided
+    let vehicle = vehicleData;
+    if (!vehicle) {
+      const { data: fetchedVehicle } = await serviceSupabase
+        .from("vehicles")
+        .select("name, brand, type, price, images")
+        .eq("id", vehicleId)
+        .single();
+
+      if (!fetchedVehicle) {
+        console.error(`Vehicle ${vehicleId} not found for price alert check`);
+        return;
+      }
+
+      vehicle = fetchedVehicle;
+    }
+
+    // Find active price alerts for this vehicle where target price >= effective price
     const { data: matchingAlerts } = await serviceSupabase
       .from("price_alerts")
       .select(
@@ -37,7 +59,7 @@ export async function checkAndTriggerPriceAlerts(
       )
       .eq("vehicle_id", vehicleId)
       .eq("is_active", true)
-      .gte("target_price", newPrice);
+      .gte("target_price", effectivePrice);
 
     // Send email to each customer with matching alert
     if (matchingAlerts && matchingAlerts.length > 0) {
@@ -53,15 +75,15 @@ export async function checkAndTriggerPriceAlerts(
           await sendPriceAlertMatchEmail({
             recipientEmail: customerEmail,
             recipientName: customerName || "Cliente",
-            vehicleName: vehicleData.name,
-            vehicleBrand: vehicleData.brand,
-            vehicleType: vehicleData.type,
-            oldPrice: vehicleData.regularPrice,
-            newPrice: newPrice,
+            vehicleName: vehicle.name,
+            vehicleBrand: vehicle.brand,
+            vehicleType: vehicle.type,
+            oldPrice: vehicle.price,
+            newPrice: effectivePrice,
             targetPrice: alert.target_price,
-            savings: vehicleData.regularPrice - newPrice,
+            savings: vehicle.price - effectivePrice,
             vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/product/${vehicleId}`,
-            vehicleImageUrl: vehicleData.images?.[0]?.url || undefined,
+            vehicleImageUrl: vehicle.images?.[0]?.url || undefined,
           });
 
           // Deactivate the alert after sending (one-time notification)
@@ -79,8 +101,8 @@ export async function checkAndTriggerPriceAlerts(
         `Sent ${matchingAlerts.length} price alert emails for vehicle ${vehicleId}`
       );
     }
-  } catch (error) {
-    console.error("Error processing price alerts:", error);
-    // Don't throw - we don't want to fail the main operation
+  } catch (emailError) {
+    // Log email error but don't fail the request
+    console.error("Error processing price alerts:", emailError);
   }
 }

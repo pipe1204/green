@@ -180,6 +180,35 @@ export function VendorDashboard() {
 
       if (error) throw error;
 
+      // Check price alerts after successful vehicle update
+      try {
+        const token = (await supabase.auth.getSession()).data.session
+          ?.access_token;
+        if (token && editingVehicle?.id) {
+          // Only check alerts if we're editing an existing vehicle (price might have changed)
+          const response = await fetch(
+            `/api/vendor/vehicles/${editingVehicle.id}/price-alerts`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            console.warn(
+              "Failed to check price alerts:",
+              await response.text()
+            );
+          }
+        }
+      } catch (alertError) {
+        // Don't fail the vehicle save if price alert check fails
+        console.warn("Error checking price alerts:", alertError);
+      }
+
       setShowAddModal(false);
       setEditingVehicle(null);
       fetchVehicles();
