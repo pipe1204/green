@@ -196,7 +196,7 @@ export async function POST(
             senderName: senderProfile?.full_name || "Un usuario",
             messagePreview,
             conversationId,
-            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=messages`,
+            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
             recipientType: isCustomer ? "vendor" : "customer",
           });
         }

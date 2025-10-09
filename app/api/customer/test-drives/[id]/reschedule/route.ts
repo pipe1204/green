@@ -164,7 +164,7 @@ export async function POST(
           newDate: newDate,
           newTime: newTime,
           reason: reason.trim(),
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
         });
       }
     } catch (emailError) {

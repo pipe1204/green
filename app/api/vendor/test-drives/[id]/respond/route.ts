@@ -147,7 +147,7 @@ export async function PATCH(
           vendorMessage: message.trim(),
           preferredDate: updatedBooking.preferred_date,
           preferredTime: updatedBooking.preferred_time,
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=testDrives`,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
         });
       }
     } catch (emailError) {

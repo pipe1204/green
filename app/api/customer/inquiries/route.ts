@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
           vehicleName: vehicle.name,
           vehicleBrand: vehicle.brand,
           message: message.trim(),
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
           isGuest: !userId,
         });
       }

@@ -96,8 +96,9 @@ export async function POST(
           vehicleName: inquiry.vehicles?.name || "el vehículo",
           vehicleBrand: inquiry.vehicles?.brand || "",
           vendorMessage: message,
-          platformUrl: process.env.NEXT_PUBLIC_APP_URL || "https://green.co",
-          loginUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/login`,
+          platformUrl:
+            process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/",
+          loginUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
         });
       } else {
         // For REGISTERED users: Send notification to check their messages
@@ -112,7 +113,7 @@ export async function POST(
           messagePreview:
             message.length > 100 ? message.substring(0, 100) : message,
           conversationId: inquiryId, // Using inquiry ID as reference
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
           recipientType: "customer",
         });
       }

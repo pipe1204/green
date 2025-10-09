@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
           preferredDate,
           preferredTime,
           message: message || undefined,
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
         });
       }
     } catch (emailError) {

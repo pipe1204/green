@@ -16,13 +16,14 @@ export const EMAIL_CONFIG = {
   replyTo: "notificaciones@green.co",
 
   // Platform URLs
-  platformUrl: process.env.NEXT_PUBLIC_APP_URL || "https://green.co",
+  platformUrl:
+    process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/",
   dashboardUrl: process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
-    : "https://green.co/dashboard",
+    : "https://green-ev.vercel.app//dashboard",
   loginUrl: process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/login`
-    : "https://green.co/login",
+    : "https://green-ev.vercel.app/",
 };
 
 // Helper function to format email address

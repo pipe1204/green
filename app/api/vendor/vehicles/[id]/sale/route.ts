@@ -213,7 +213,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
                 newPrice: sale_price,
                 targetPrice: alert.target_price,
                 savings: updatedVehicle.price - sale_price,
-                vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/product/${vehicleId}`,
+                vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}/product/${vehicleId}`,
                 vehicleImageUrl: updatedVehicle.images?.[0]?.url || undefined,
               });
 
