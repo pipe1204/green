@@ -62,12 +62,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, linkedCount: 0 });
     }
 
-    // Update the inquiries to link them to the user
+    // Update the inquiries to link them to the user and mark as converted
     const { error: updateError } = await serviceSupabase
       .from("customer_inquiries")
       .update({
         customer_id: user.id,
         is_guest: false,
+        status: "converted", // Mark as converted since we'll create conversations
         // Keep guest info for reference but mark as linked
         guest_name: null,
         guest_email: null,
@@ -84,9 +85,147 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create conversations for each linked inquiry
+    let conversationsCreated = 0;
+    for (const inquiry of guestInquiries) {
+      try {
+        // Get full inquiry details including vehicle and vendor info
+        const { data: fullInquiry } = await serviceSupabase
+          .from("customer_inquiries")
+          .select(
+            `
+            id,
+            vehicle_id,
+            vendor_id,
+            message,
+            vehicles(name, brand),
+            vendors(business_name)
+          `
+          )
+          .eq("id", inquiry.id)
+          .single();
+
+        if (!fullInquiry) continue;
+
+        // Check if conversation already exists
+        const { data: existingConversation } = await serviceSupabase
+          .from("conversations")
+          .select("id")
+          .eq("vehicle_id", fullInquiry.vehicle_id)
+          .eq("customer_id", user.id)
+          .eq("vendor_id", fullInquiry.vendor_id)
+          .single();
+
+        if (existingConversation) {
+          console.log(`Conversation already exists for inquiry ${inquiry.id}`);
+          continue;
+        }
+
+        // Create the conversation
+        const vehiclesData = fullInquiry.vehicles as Array<{
+          name: string;
+          brand: string;
+        }> | null;
+        const vehicleData = vehiclesData?.[0] || null;
+        const vehicleName = vehicleData?.name || "";
+        const vehicleBrand = vehicleData?.brand || "";
+        const vehicleDisplay =
+          [vehicleBrand, vehicleName].filter(Boolean).join(" ") || "Vehículo";
+
+        const { data: conversation, error: conversationError } =
+          await serviceSupabase
+            .from("conversations")
+            .insert({
+              customer_id: user.id,
+              vendor_id: fullInquiry.vendor_id,
+              vehicle_id: fullInquiry.vehicle_id,
+              subject: `Consulta sobre ${vehicleDisplay}`,
+              last_message_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+        if (conversationError) {
+          console.error(
+            `Error creating conversation for inquiry ${inquiry.id}:`,
+            conversationError
+          );
+          continue;
+        }
+
+        // Create the initial message from the customer (their original inquiry)
+        const { error: messageError } = await serviceSupabase
+          .from("messages")
+          .insert({
+            conversation_id: conversation.id,
+            sender_id: user.id,
+            sender_type: "customer",
+            content: fullInquiry.message,
+            message_type: "text",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (messageError) {
+          console.error(
+            `Error creating initial message for conversation ${conversation.id}:`,
+            messageError
+          );
+          continue;
+        }
+
+        // Send email notification to customer about the new conversation
+        try {
+          const { sendNewMessageNotificationEmail } = await import(
+            "@/lib/email-service"
+          );
+
+          const messagePreview =
+            fullInquiry.message.length > 100
+              ? fullInquiry.message.substring(0, 100)
+              : fullInquiry.message;
+
+          const vendorsData = fullInquiry.vendors as Array<{
+            business_name: string;
+          }> | null;
+          const vendorData = vendorsData?.[0] || null;
+
+          await sendNewMessageNotificationEmail({
+            recipientEmail: user.email!,
+            recipientName: user.user_metadata?.full_name || "Cliente",
+            senderName: vendorData?.business_name || "El vendedor",
+            messagePreview,
+            conversationId: conversation.id,
+            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=messages`,
+            recipientType: "customer",
+          });
+
+          console.log(
+            `Sent conversation notification email for inquiry ${inquiry.id}`
+          );
+        } catch (emailError) {
+          console.error(
+            `Error sending conversation notification for inquiry ${inquiry.id}:`,
+            emailError
+          );
+          // Don't fail the process, just log the error
+        }
+
+        conversationsCreated++;
+        console.log(
+          `Created conversation ${conversation.id} for inquiry ${inquiry.id}`
+        );
+      } catch (error) {
+        console.error(`Error processing inquiry ${inquiry.id}:`, error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       linkedCount: guestInquiries.length,
+      conversationsCreated,
     });
   } catch (error) {
     console.error("Unexpected error in link-guest-inquiries API:", error);

@@ -70,6 +70,14 @@ export function UserMenu() {
                   "linkedInquiriesCount",
                   linkingResult.linkedCount.toString()
                 );
+
+                // Store conversations created count
+                if (linkingResult.conversationsCreated > 0) {
+                  localStorage.setItem(
+                    "conversationsCreatedCount",
+                    linkingResult.conversationsCreated.toString()
+                  );
+                }
               } else if (
                 linkingResult.success &&
                 linkingResult.linkedCount === 0
