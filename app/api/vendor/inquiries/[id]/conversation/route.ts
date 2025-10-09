@@ -36,7 +36,7 @@ export async function POST(
     // Get vendor record for this user
     const { data: vendor, error: vendorError } = await supabase
       .from("vendors")
-      .select("id")
+      .select("id, business_name")
       .eq("user_id", user.id)
       .single();
 
@@ -69,7 +69,8 @@ export async function POST(
       .select(
         `
         *,
-        vehicles(name, brand)
+        vehicles(name, brand),
+        profiles!customer_inquiries_customer_id_fkey(full_name, email)
       `
       )
       .eq("id", inquiryId)
@@ -161,6 +162,41 @@ export async function POST(
     if (updateError) {
       console.error("Error updating inquiry status:", updateError);
       // Don't fail the request, just log the error
+    }
+
+    // Send email notification to customer (registered user)
+    try {
+      const { sendNewMessageNotificationEmail } = await import(
+        "@/lib/email-service"
+      );
+
+      const customerEmail = inquiry.profiles?.email;
+      const customerName = inquiry.profiles?.full_name;
+
+      if (customerEmail) {
+        const messagePreview =
+          initialMessage.length > 100
+            ? initialMessage.substring(0, 100)
+            : initialMessage;
+
+        await sendNewMessageNotificationEmail({
+          recipientEmail: customerEmail,
+          recipientName: customerName || "Cliente",
+          senderName: vendor.business_name || "El vendedor",
+          messagePreview,
+          conversationId: conversation.id,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          recipientType: "customer",
+        });
+
+        console.log("Conversation email notification sent to:", customerEmail);
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error(
+        "Error sending conversation notification email:",
+        emailError
+      );
     }
 
     return NextResponse.json({

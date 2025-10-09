@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * POST /api/vendor/inquiries/[id]/email
@@ -57,8 +58,14 @@ export async function POST(
       );
     }
 
+    // Use service role client to bypass RLS
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     // Get inquiry details
-    const { data: inquiry, error: inquiryError } = await supabase
+    const { data: inquiry, error: inquiryError } = await serviceSupabase
       .from("customer_inquiries")
       .select(
         `
