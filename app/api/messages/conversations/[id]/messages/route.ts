@@ -160,6 +160,52 @@ export async function POST(
     if (completeError || !completeMessage)
       throw completeError || new Error("Message not found");
 
+    // Send email notification to recipient
+    try {
+      const { sendNewMessageNotificationEmail } = await import(
+        "@/lib/email-service"
+      );
+
+      // Determine recipient (opposite of sender)
+      const recipientId = isCustomer
+        ? conversation.vendors?.user_id
+        : conversation.customer_id;
+
+      if (recipientId) {
+        // Get recipient's profile
+        const { data: recipientProfile } = await supabaseClient
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", recipientId)
+          .single();
+
+        // Get sender's profile
+        const { data: senderProfile } = await supabaseClient
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+
+        if (recipientProfile?.email) {
+          const messagePreview =
+            content.length > 100 ? content.substring(0, 100) : content;
+
+          await sendNewMessageNotificationEmail({
+            recipientEmail: recipientProfile.email,
+            recipientName: recipientProfile.full_name || "Usuario",
+            senderName: senderProfile?.full_name || "Un usuario",
+            messagePreview,
+            conversationId,
+            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=messages`,
+            recipientType: isCustomer ? "vendor" : "customer",
+          });
+        }
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error("Error sending message notification email:", emailError);
+    }
+
     // Transform message data
     const transformedMessage = {
       id: completeMessage.id,

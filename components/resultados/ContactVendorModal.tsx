@@ -79,44 +79,36 @@ export const ContactVendorModal: React.FC<ContactVendorModalProps> = ({
     setError(null);
 
     try {
-      // Get vendor ID from vehicle
-      const { data: vehicleData, error: vehicleError } = await supabase
-        .from("vehicles")
-        .select("vendor_id")
-        .eq("id", vehicle.id)
-        .single();
+      // Use API endpoint instead of direct Supabase insert
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (vehicleError) throw vehicleError;
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
 
-      // Create inquiry - supports both authenticated and guest users
-      const inquiryData = user
-        ? {
-            // Authenticated user
-            customer_id: user.id,
-            vehicle_id: vehicle.id,
-            vendor_id: vehicleData.vendor_id,
-            message: formData.message,
-            is_guest: false,
-            status: "pending",
-          }
-        : {
-            // Guest user
-            customer_id: null,
-            vehicle_id: vehicle.id,
-            vendor_id: vehicleData.vendor_id,
-            message: formData.message,
-            is_guest: true,
-            guest_name: formData.name,
-            guest_email: formData.email,
-            guest_phone: formData.phone || null,
-            status: "pending",
-          };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
 
-      const { error: insertError } = await supabase
-        .from("customer_inquiries")
-        .insert(inquiryData);
+      const response = await fetch("/api/customer/inquiries", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          vehicleId: vehicle.id,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          message: formData.message,
+        }),
+      });
 
-      if (insertError) throw insertError;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Error creating inquiry");
+      }
 
       // Success!
       setSuccess(true);

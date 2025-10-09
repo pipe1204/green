@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
+// Type for vendor data from query
+type VendorWithProfile = {
+  business_name: string;
+  profiles: {
+    full_name: string;
+    email: string;
+  };
+};
+
 /**
  * GET /api/customer/test-drives
  * Get all test drive bookings for the authenticated customer
@@ -132,6 +141,152 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching customer test drives:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/customer/test-drives
+ * Create a new test drive booking (supports both authenticated and guest users)
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      vehicleId,
+      name,
+      email,
+      phone,
+      preferredDate,
+      preferredTime,
+      message,
+    } = body;
+
+    // Validate required fields
+    if (
+      !vehicleId ||
+      !name ||
+      !email ||
+      !phone ||
+      !preferredDate ||
+      !preferredTime
+    ) {
+      return NextResponse.json(
+        { error: "All fields except message are required" },
+        { status: 400 }
+      );
+    }
+
+    // Get authenticated user (optional - supports guest users)
+    const authHeader = request.headers.get("authorization");
+    let userId: string | null = null;
+
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(token);
+      userId = user?.id || null;
+    }
+
+    // Use service role client
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Get vehicle and vendor information
+    const { data: vehicle, error: vehicleError } = await serviceSupabase
+      .from("vehicles")
+      .select(
+        `
+        id,
+        name,
+        brand,
+        vendor_id,
+        vendors!inner(
+          business_name,
+          profiles!vendors_user_id_fkey(full_name, email)
+        )
+      `
+      )
+      .eq("id", vehicleId)
+      .single();
+
+    if (vehicleError || !vehicle) {
+      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
+    }
+
+    // Create test drive booking
+    const { data: booking, error: insertError } = await serviceSupabase
+      .from("test_drive_bookings")
+      .insert({
+        vehicle_id: vehicleId,
+        customer_id: userId,
+        vendor_id: vehicle.vendor_id,
+        customer_name: name,
+        customer_email: email,
+        customer_phone: phone,
+        preferred_date: preferredDate,
+        preferred_time: preferredTime,
+        message: message || null,
+        status: "pending",
+        vendor_response: "pending",
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error("Error creating test drive booking:", insertError);
+      return NextResponse.json(
+        { error: "Error creating test drive booking" },
+        { status: 500 }
+      );
+    }
+
+    // Send email notification to vendor
+    try {
+      const { sendVendorTestBookingEmail } = await import(
+        "@/lib/email-service"
+      );
+
+      const vendorData = vehicle.vendors as unknown as VendorWithProfile;
+      const vendorProfile = vendorData?.profiles;
+      const vendorEmail = vendorProfile?.email;
+      const vendorName =
+        vendorProfile?.full_name || vendorData?.business_name || "Vendedor";
+
+      if (vendorEmail) {
+        await sendVendorTestBookingEmail({
+          recipientEmail: vendorEmail,
+          recipientName: vendorName,
+          customerName: name,
+          vehicleName: vehicle.name,
+          vehicleBrand: vehicle.brand,
+          preferredDate,
+          preferredTime,
+          message: message || undefined,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+        });
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error("Error sending vendor test booking email:", emailError);
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Test drive booking created successfully",
+        bookingId: booking.id,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error processing test drive booking:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

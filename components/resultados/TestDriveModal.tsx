@@ -75,32 +75,38 @@ export const TestDriveModal: React.FC<TestDriveModalProps> = ({
     setError(null);
 
     try {
-      // Get vendor ID from vehicle
-      const { data: vehicleData, error: vehicleError } = await supabase
-        .from("vehicles")
-        .select("vendor_id")
-        .eq("id", vehicle.id)
-        .single();
+      // Use API endpoint instead of direct Supabase insert
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (vehicleError) throw vehicleError;
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
 
-      // Create test drive booking
-      const { error: insertError } = await supabase
-        .from("test_drive_bookings")
-        .insert({
-          vehicle_id: vehicle.id,
-          customer_id: user?.id || null,
-          vendor_id: vehicleData.vendor_id,
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          preferred_date: formData.preferredDate,
-          preferred_time: formData.preferredTime,
-          message: formData.message || null,
-          status: "pending",
-        });
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
 
-      if (insertError) throw insertError;
+      const response = await fetch("/api/customer/test-drives", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          vehicleId: vehicle.id,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          preferredDate: formData.preferredDate,
+          preferredTime: formData.preferredTime,
+          message: formData.message || undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Error booking test drive");
+      }
 
       // Success!
       setSuccess(true);

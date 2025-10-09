@@ -81,30 +81,51 @@ export async function POST(
       ? inquiry.guest_email
       : inquiry.profiles?.email;
 
-    // TODO: Implement actual email sending
-    // For now, we'll just log the email details
-    console.log("Email to be sent:", {
-      to: customerEmail,
-      from: "Green Platform",
-      subject: `Respuesta sobre ${inquiry.vehicles?.name}`,
-      message: message,
-      vendor: vendor.business_name,
-      inquiryId: inquiryId,
-      isGuest: isGuest,
-    });
+    // Send email notification based on customer type
+    try {
+      if (isGuest) {
+        // For GUEST users: Send email with vendor's message and link to create account
+        const { sendCustomerVendorReplyEmail } = await import(
+          "@/lib/email-service"
+        );
 
-    // TODO: Send email using your email service (SendGrid, Resend, etc.)
-    // For GUEST users:
-    // 1. Come from "Green Platform"
-    // 2. Include vendor's message
-    // 3. Have a reply-to that goes back to your platform
-    // 4. Include a link for customer to reply
-    //
-    // For REGISTERED users:
-    // 1. Come from "Green Platform"
-    // 2. Say "You have a new message on Green Platform"
-    // 3. Include link to login and view message
-    // 4. Don't include the actual message content
+        await sendCustomerVendorReplyEmail({
+          recipientEmail: customerEmail!,
+          recipientName: inquiry.guest_name || "Cliente",
+          vendorName: vendor.business_name,
+          vehicleName: inquiry.vehicles?.name || "el vehículo",
+          vehicleBrand: inquiry.vehicles?.brand || "",
+          vendorMessage: message,
+          platformUrl: process.env.NEXT_PUBLIC_APP_URL || "https://green.co",
+          loginUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/login`,
+        });
+      } else {
+        // For REGISTERED users: Send notification to check their messages
+        const { sendNewMessageNotificationEmail } = await import(
+          "@/lib/email-service"
+        );
+
+        await sendNewMessageNotificationEmail({
+          recipientEmail: customerEmail!,
+          recipientName: inquiry.profiles?.full_name || "Cliente",
+          senderName: vendor.business_name,
+          messagePreview:
+            message.length > 100 ? message.substring(0, 100) : message,
+          conversationId: inquiryId, // Using inquiry ID as reference
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
+          recipientType: "customer",
+        });
+      }
+
+      console.log("Email sent successfully:", {
+        to: customerEmail,
+        vendor: vendor.business_name,
+        isGuest: isGuest,
+      });
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error("Error sending email to customer:", emailError);
+    }
 
     return NextResponse.json({
       success: true,

@@ -170,6 +170,74 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     // Convert database vehicle to frontend Vehicle type
     const vehicleResponse: Vehicle = databaseToVehicle(updatedVehicle);
 
+    // Check for price alerts that match the new price
+    if (is_on_sale && sale_price) {
+      try {
+        const { sendPriceAlertMatchEmail } = await import(
+          "@/lib/email-service"
+        );
+
+        // Find active price alerts for this vehicle where target price >= new sale price
+        const { data: matchingAlerts } = await serviceSupabase
+          .from("price_alerts")
+          .select(
+            `
+            id,
+            target_price,
+            customer_id,
+            profiles!price_alerts_customer_id_fkey(full_name, email)
+          `
+          )
+          .eq("vehicle_id", vehicleId)
+          .eq("is_active", true)
+          .gte("target_price", sale_price);
+
+        // Send email to each customer with matching alert
+        if (matchingAlerts && matchingAlerts.length > 0) {
+          for (const alert of matchingAlerts) {
+            const profileData = alert.profiles as unknown as {
+              email: string;
+              full_name: string;
+            } | null;
+            const customerEmail = profileData?.email;
+            const customerName = profileData?.full_name;
+
+            if (customerEmail) {
+              await sendPriceAlertMatchEmail({
+                recipientEmail: customerEmail,
+                recipientName: customerName || "Cliente",
+                vehicleName: updatedVehicle.name,
+                vehicleBrand: updatedVehicle.brand,
+                vehicleType: updatedVehicle.type,
+                oldPrice: updatedVehicle.price,
+                newPrice: sale_price,
+                targetPrice: alert.target_price,
+                savings: updatedVehicle.price - sale_price,
+                vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/product/${vehicleId}`,
+                vehicleImageUrl: updatedVehicle.images?.[0]?.url || undefined,
+              });
+
+              // Optionally deactivate the alert after sending (one-time notification)
+              await serviceSupabase
+                .from("price_alerts")
+                .update({
+                  is_active: false,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", alert.id);
+            }
+          }
+
+          console.log(
+            `Sent ${matchingAlerts.length} price alert emails for vehicle ${vehicleId}`
+          );
+        }
+      } catch (emailError) {
+        // Log email error but don't fail the request
+        console.error("Error processing price alerts:", emailError);
+      }
+    }
+
     return NextResponse.json<UpdateVehicleSaleResponse>(
       { success: true, vehicle: vehicleResponse },
       { status: 200 }
