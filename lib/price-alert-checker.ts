@@ -9,11 +9,13 @@ const serviceSupabase = createClient(
  * Check and send price alert emails for a vehicle
  * @param vehicleId - The vehicle ID to check alerts for
  * @param effectivePrice - The effective price to check against (sale price if on sale, otherwise regular price)
+ * @param previousPrice - The previous price before the update (for accurate savings calculation)
  * @param vehicleData - Vehicle data for email template (optional, will fetch if not provided)
  */
 export async function checkAndSendPriceAlerts(
   vehicleId: string,
   effectivePrice: number,
+  previousPrice: number,
   vehicleData?: {
     name: string;
     brand: string;
@@ -78,10 +80,10 @@ export async function checkAndSendPriceAlerts(
             vehicleName: vehicle.name,
             vehicleBrand: vehicle.brand,
             vehicleType: vehicle.type,
-            oldPrice: vehicle.price,
+            oldPrice: previousPrice,
             newPrice: effectivePrice,
             targetPrice: alert.target_price,
-            savings: vehicle.price - effectivePrice,
+            savings: previousPrice - effectivePrice,
             vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/product/${vehicleId}`,
             vehicleImageUrl: vehicle.images?.[0]?.url || undefined,
           });

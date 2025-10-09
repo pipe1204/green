@@ -48,6 +48,10 @@ export async function POST(
       );
     }
 
+    // Get request body to see if previous price was provided
+    const body = await request.json().catch(() => ({}));
+    const { previousPrice } = body;
+
     // Verify vehicle exists and belongs to this vendor
     const { data: vehicle, error: vehicleError } = await serviceSupabase
       .from("vehicles")
@@ -87,12 +91,15 @@ export async function POST(
         ? vehicle.sale_price
         : vehicle.price;
 
+    // Use provided previous price or fallback to current price (for backwards compatibility)
+    const priceForSavings = previousPrice || vehicle.price;
+
     // Check and send price alerts
     const { checkAndSendPriceAlerts } = await import(
       "@/lib/price-alert-checker"
     );
 
-    await checkAndSendPriceAlerts(vehicleId, effectivePrice, {
+    await checkAndSendPriceAlerts(vehicleId, effectivePrice, priceForSavings, {
       name: vehicle.name,
       brand: vehicle.brand,
       type: vehicle.type,

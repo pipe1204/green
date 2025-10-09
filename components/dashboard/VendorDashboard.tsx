@@ -147,6 +147,17 @@ export function VendorDashboard() {
       const ensuredId =
         editingVehicle?.id ?? (formData as Vehicle).id ?? crypto.randomUUID();
 
+      // Capture previous price if editing an existing vehicle
+      let previousPrice: number | undefined;
+      if (editingVehicle?.id) {
+        const { data: currentVehicle } = await supabase
+          .from("vehicles")
+          .select("price")
+          .eq("id", editingVehicle.id)
+          .single();
+        previousPrice = currentVehicle?.price;
+      }
+
       // derive dealer defaults if empty
       const v: VendorRow = (vendorData || {
         id: "",
@@ -184,7 +195,7 @@ export function VendorDashboard() {
       try {
         const token = (await supabase.auth.getSession()).data.session
           ?.access_token;
-        if (token && editingVehicle?.id) {
+        if (token && editingVehicle?.id && previousPrice) {
           // Only check alerts if we're editing an existing vehicle (price might have changed)
           const response = await fetch(
             `/api/vendor/vehicles/${editingVehicle.id}/price-alerts`,
@@ -194,6 +205,9 @@ export function VendorDashboard() {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
+              body: JSON.stringify({
+                previousPrice: previousPrice,
+              }),
             }
           );
 

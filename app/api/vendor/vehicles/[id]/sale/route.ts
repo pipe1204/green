@@ -181,13 +181,18 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const { checkAndSendPriceAlerts } = await import(
       "@/lib/price-alert-checker"
     );
-    await checkAndSendPriceAlerts(vehicleId, priceToCheck, {
-      name: updatedVehicle.name,
-      brand: updatedVehicle.brand,
-      type: updatedVehicle.type,
-      price: updatedVehicle.price,
-      images: updatedVehicle.images,
-    });
+    await checkAndSendPriceAlerts(
+      vehicleId,
+      priceToCheck,
+      vehicle.price, // previous price before update
+      {
+        name: updatedVehicle.name,
+        brand: updatedVehicle.brand,
+        type: updatedVehicle.type,
+        price: updatedVehicle.price,
+        images: updatedVehicle.images,
+      }
+    );
 
     return NextResponse.json<UpdateVehicleSaleResponse>(
       { success: true, vehicle: vehicleResponse },
