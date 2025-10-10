@@ -113,6 +113,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       inquiriesResult,
       testDrivesResult,
       priceAlertsResult,
+      whatsappClicksResult,
       reviewsResult,
     ] = await Promise.all([
       // Views
@@ -150,6 +151,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
         .eq("vehicle_id", vehicleId)
         .gte("created_at", `${startDateStr}T00:00:00.000Z`),
 
+      // WhatsApp clicks
+      serviceSupabase
+        .from("whatsapp_clicks")
+        .select("id, customer_id, clicked_at")
+        .eq("vehicle_id", vehicleId)
+        .gte("clicked_at", `${startDateStr}T00:00:00.000Z`),
+
       // Reviews
       serviceSupabase
         .from("reviews")
@@ -162,6 +170,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const inquiries = inquiriesResult.data || [];
     const testDrives = testDrivesResult.data || [];
     const priceAlerts = priceAlertsResult.data || [];
+    const whatsappClicks = whatsappClicksResult.data || [];
     const reviews = reviewsResult.data || [];
 
     // Calculate metrics
@@ -173,6 +182,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const inquiriesCount = inquiries.length;
     const testDrivesCount = testDrives.length;
     const priceAlertsCount = priceAlerts.length;
+    const whatsappClicksCount = whatsappClicks.length;
     const conversionRate =
       totalViews > 0 ? (inquiriesCount / totalViews) * 100 : 0;
 
@@ -193,15 +203,21 @@ export async function GET(request: NextRequest, context: RouteContext) {
         : 0;
 
     // Group by status for inquiries and test drives
-    const inquiriesByStatus = inquiries.reduce((acc, inquiry) => {
-      acc[inquiry.status] = (acc[inquiry.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const inquiriesByStatus = inquiries.reduce(
+      (acc, inquiry) => {
+        acc[inquiry.status] = (acc[inquiry.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
-    const testDrivesByStatus = testDrives.reduce((acc, testDrive) => {
-      acc[testDrive.status] = (acc[testDrive.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const testDrivesByStatus = testDrives.reduce(
+      (acc, testDrive) => {
+        acc[testDrive.status] = (acc[testDrive.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Group by day for trends
     const viewsByDay = groupByDay(views, "viewed_at");
@@ -228,6 +244,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       inquiries_count: inquiriesCount,
       test_drives_count: testDrivesCount,
       price_alerts_count: priceAlertsCount,
+      whatsapp_clicks_count: whatsappClicksCount,
       conversion_rate: Math.round(conversionRate * 100) / 100,
       average_view_duration: Math.round(averageViewDuration),
       average_rating: Math.round(averageRating * 100) / 100,
@@ -259,15 +276,18 @@ function groupByDay(
   data: ViewRecord[] | FavoriteRecord[] | InquiryRecord[],
   dateField: string
 ) {
-  const grouped = data.reduce((acc, item) => {
-    const dateValue =
-      dateField === "viewed_at"
-        ? (item as ViewRecord).viewed_at
-        : (item as FavoriteRecord | InquiryRecord).created_at;
-    const date = new Date(dateValue).toISOString().split("T")[0];
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const grouped = data.reduce(
+    (acc, item) => {
+      const dateValue =
+        dateField === "viewed_at"
+          ? (item as ViewRecord).viewed_at
+          : (item as FavoriteRecord | InquiryRecord).created_at;
+      const date = new Date(dateValue).toISOString().split("T")[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return Object.entries(grouped)
     .map(([date, count]) => ({ date, count }))
