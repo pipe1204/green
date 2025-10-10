@@ -44,6 +44,7 @@ export function staticVehicleToVehicle(staticVehicle: StaticVehicle): Vehicle {
       phone: "+57 300 123 4567", // Placeholder phone
       email: "contacto@ejemplo.com", // Placeholder email
       rating: 4.5, // Placeholder rating
+      isPro: false, // Placeholder - set to false for static data
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
