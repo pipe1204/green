@@ -26,13 +26,13 @@ export function ProCardBorder({
           padding: 2px; /* border width */
           background: linear-gradient(
             135deg,
-            #667eea 0%,
-            #764ba2 50%,
-            #f093fb 100%
+            #6ee7b7 0%,
+            #34d399 50%,
+            #10b981 100%
           );
           background-size: 200% 200%;
           animation: gradient-shift 3s ease infinite;
-          box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+          box-shadow: 0 4px 16px rgba(52, 211, 153, 0.15);
         }
 
         @keyframes gradient-shift {

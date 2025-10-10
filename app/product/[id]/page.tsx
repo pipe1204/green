@@ -36,6 +36,8 @@ import {
   Bell,
 } from "lucide-react";
 import { WhatsAppContactButton } from "@/components/resultados/WhatsAppContactButton";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { RespuestaRapidaBadge } from "@/components/RespuestaRapidaBadge";
 
 export default function ProductPage() {
   const params = useParams();
@@ -200,8 +202,13 @@ export default function ProductPage() {
             <span className="text-md text-gray-500">
               {vehicle.vendor.businessName}
             </span>
-
             <WhatsAppContactButton vehicle={vehicle} />
+            {vehicle.vendor.isPro && (
+              <>
+                <VerifiedBadge size="md" showTooltip />
+                <RespuestaRapidaBadge size="md" />
+              </>
+            )}
           </div>
 
           <p className="text-xl text-gray-600 max-w-3xl">
@@ -394,7 +401,14 @@ export default function ProductPage() {
               </h3>
               <p className="text-gray-600 mb-4">
                 ¿Tienes preguntas sobre {vehicle.name}? Envía un mensaje al
-                vendedor y te responderán pronto.
+                vendedor
+                {vehicle.vendor.isPro && (
+                  <span className="text-green-600 font-semibold">
+                    {" "}
+                    y obtén respuesta rápida garantizada
+                  </span>
+                )}
+                .
               </p>
               <Button
                 onClick={() => setIsContactModalOpen(true)}

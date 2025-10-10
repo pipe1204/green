@@ -38,12 +38,12 @@ export function VerifiedBadge({
       className={`inline-flex items-center gap-1 bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white rounded-full font-bold shadow-md ${config.container} ${className}`}
       title={
         showTooltip
-          ? "Vendedor Verificado Pro - Respuesta rápida garantizada"
+          ? "Vendedor Verificado - Respuesta rápida garantizada"
           : undefined
       }
     >
       <ShieldCheck className={config.icon} />
-      <span className={config.text}>Verificado Pro</span>
+      <span className={config.text}>Verificado</span>
     </div>
   );
 }
