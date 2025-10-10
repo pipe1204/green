@@ -329,6 +329,7 @@ export class CSVParser {
           phone: "", // Will be set by the API
           email: "", // Will be set by the API
           rating: 0, // Will be set by the API
+          isPro: false, // Will be set by the API based on vendor subscription
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

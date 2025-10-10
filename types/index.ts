@@ -64,6 +64,11 @@ export interface Vendor {
   is_verified: boolean;
   rating: number;
   total_reviews: number;
+  // Subscription fields
+  subscription_tier: "starter" | "pro";
+  subscription_start_date?: string;
+  is_trial: boolean;
+  trial_end_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -111,6 +116,7 @@ export interface Vehicle {
     phone: string;
     email: string;
     rating: number;
+    isPro: boolean;
   };
   // Sale fields
   is_on_sale?: boolean;
@@ -564,6 +570,7 @@ export interface VehicleAnalytics {
   inquiries_count: number;
   test_drives_count: number;
   price_alerts_count: number;
+  whatsapp_clicks_count: number;
   conversion_rate: number;
 }
 
@@ -575,6 +582,7 @@ export interface VendorAnalytics {
     total_inquiries: number;
     total_test_drives: number;
     total_price_alerts: number;
+    total_whatsapp_clicks: number;
     average_conversion_rate: number;
   };
   top_performing_vehicles: VehicleAnalytics[];
