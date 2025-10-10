@@ -21,6 +21,7 @@ import {
   TrendingDown,
   Zap,
   RefreshCw,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -161,6 +162,14 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
                 </th>
                 <th
                   className="text-right p-2 font-medium cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleSort("whatsapp_clicks_count")}
+                >
+                  WhatsApp{" "}
+                  {sortField === "whatsapp_clicks_count" &&
+                    (sortDirection === "desc" ? "↓" : "↑")}
+                </th>
+                <th
+                  className="text-right p-2 font-medium cursor-pointer hover:bg-gray-50"
                   onClick={() => handleSort("conversion_rate")}
                 >
                   Conversión{" "}
@@ -182,13 +191,16 @@ function VehiclePerformanceTable({ vehicles }: VehiclePerformanceTableProps) {
                   <td className="text-right p-2">{vehicle.favorites_count}</td>
                   <td className="text-right p-2">{vehicle.inquiries_count}</td>
                   <td className="text-right p-2">
+                    {vehicle.whatsapp_clicks_count}
+                  </td>
+                  <td className="text-right p-2">
                     <span
                       className={`font-medium ${
                         vehicle.conversion_rate >= 5
                           ? "text-green-600"
                           : vehicle.conversion_rate >= 2
-                          ? "text-yellow-600"
-                          : "text-red-600"
+                            ? "text-yellow-600"
+                            : "text-red-600"
                       }`}
                     >
                       {vehicle.conversion_rate}%
@@ -469,7 +481,7 @@ export function VendorAnalyticsSection() {
       </div>
 
       {/* Additional Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <AnalyticsSummaryCard
           title="Consultas"
           value={analytics.summary.total_inquiries}
@@ -487,6 +499,12 @@ export function VendorAnalyticsSection() {
           value={analytics.summary.total_price_alerts}
           icon={<Bell className="h-4 w-4" />}
           description="Alertas de precio activas"
+        />
+        <AnalyticsSummaryCard
+          title="Contactos WhatsApp"
+          value={analytics.summary.total_whatsapp_clicks}
+          icon={<MessageCircle className="h-4 w-4" />}
+          description="Clics en botón de WhatsApp"
         />
       </div>
 

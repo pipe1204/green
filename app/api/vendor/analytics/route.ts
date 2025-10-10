@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
             total_inquiries: 0,
             total_test_drives: 0,
             total_price_alerts: 0,
+            total_whatsapp_clicks: 0,
             average_conversion_rate: 0,
           },
           top_performing_vehicles: [],
@@ -137,6 +138,13 @@ export async function GET(request: NextRequest) {
         .eq("vehicle_id", vehicle.id)
         .gte("created_at", `${startDateStr}T00:00:00.000Z`);
 
+      // Get WhatsApp clicks
+      const { data: whatsappClicks } = await serviceSupabase
+        .from("whatsapp_clicks")
+        .select("id")
+        .eq("vehicle_id", vehicle.id)
+        .gte("clicked_at", `${startDateStr}T00:00:00.000Z`);
+
       const totalViews = views?.length || 0;
       const uniqueViewers = new Set(
         views?.map((v) => v.customer_id).filter(Boolean)
@@ -145,6 +153,7 @@ export async function GET(request: NextRequest) {
       const inquiriesCount = inquiries?.length || 0;
       const testDrivesCount = testDrives?.length || 0;
       const priceAlertsCount = priceAlerts?.length || 0;
+      const whatsappClicksCount = whatsappClicks?.length || 0;
 
       // Calculate conversion rate (inquiries / views)
       const conversionRate =
@@ -159,6 +168,7 @@ export async function GET(request: NextRequest) {
         inquiries_count: inquiriesCount,
         test_drives_count: testDrivesCount,
         price_alerts_count: priceAlertsCount,
+        whatsapp_clicks_count: whatsappClicksCount,
         conversion_rate: Math.round(conversionRate * 100) / 100,
       } as VehicleAnalytics;
     });
@@ -186,6 +196,10 @@ export async function GET(request: NextRequest) {
       ),
       total_price_alerts: vehiclePerformance.reduce(
         (sum, v) => sum + v.price_alerts_count,
+        0
+      ),
+      total_whatsapp_clicks: vehiclePerformance.reduce(
+        (sum, v) => sum + v.whatsapp_clicks_count,
         0
       ),
       average_conversion_rate:
@@ -238,15 +252,18 @@ export async function GET(request: NextRequest) {
       data: ViewRecord[] | FavoriteRecord[] | InquiryRecord[],
       dateField: string
     ) => {
-      const grouped = data.reduce((acc, item) => {
-        const dateValue =
-          dateField === "viewed_at"
-            ? (item as ViewRecord).viewed_at
-            : (item as FavoriteRecord | InquiryRecord).created_at;
-        const date = new Date(dateValue).toISOString().split("T")[0];
-        acc[date] = (acc[date] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const grouped = data.reduce(
+        (acc, item) => {
+          const dateValue =
+            dateField === "viewed_at"
+              ? (item as ViewRecord).viewed_at
+              : (item as FavoriteRecord | InquiryRecord).created_at;
+          const date = new Date(dateValue).toISOString().split("T")[0];
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       return Object.entries(grouped).map(([date, count]) => ({
         date,

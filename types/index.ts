@@ -564,6 +564,7 @@ export interface VehicleAnalytics {
   inquiries_count: number;
   test_drives_count: number;
   price_alerts_count: number;
+  whatsapp_clicks_count: number;
   conversion_rate: number;
 }
 
@@ -575,6 +576,7 @@ export interface VendorAnalytics {
     total_inquiries: number;
     total_test_drives: number;
     total_price_alerts: number;
+    total_whatsapp_clicks: number;
     average_conversion_rate: number;
   };
   top_performing_vehicles: VehicleAnalytics[];
