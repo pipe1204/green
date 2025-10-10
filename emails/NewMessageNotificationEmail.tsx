@@ -7,13 +7,7 @@ import { NewMessageNotificationEmailData } from "@/types/email";
 export function NewMessageNotificationEmail(
   props: NewMessageNotificationEmailData
 ) {
-  const {
-    recipientName,
-    senderName,
-    messagePreview,
-    dashboardUrl,
-    recipientType,
-  } = props;
+  const { recipientName, senderName, messagePreview, dashboardUrl } = props;
 
   return (
     <EmailLayout previewText={`Nuevo mensaje de ${senderName}`}>

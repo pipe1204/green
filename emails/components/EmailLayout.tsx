@@ -5,7 +5,6 @@ import {
   Body,
   Container,
   Section,
-  Img,
   Text,
   Hr,
 } from "@react-email/components";
@@ -15,7 +14,7 @@ interface EmailLayoutProps {
   previewText: string;
 }
 
-export function EmailLayout({ children, previewText }: EmailLayoutProps) {
+export function EmailLayout({ children }: EmailLayoutProps) {
   return (
     <Html>
       <Head />

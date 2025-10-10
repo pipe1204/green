@@ -11,7 +11,6 @@ export function CustomerVendorReplyEmail(props: CustomerVendorReplyEmailData) {
     vehicleName,
     vehicleBrand,
     vendorMessage,
-    platformUrl,
     loginUrl,
   } = props;
 

@@ -9,7 +9,6 @@ export function PriceAlertMatchEmail(props: PriceAlertMatchEmailData) {
     recipientName,
     vehicleName,
     vehicleBrand,
-    vehicleType,
     oldPrice,
     newPrice,
     targetPrice,

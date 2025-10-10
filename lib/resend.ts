@@ -27,6 +27,6 @@ export const EMAIL_CONFIG = {
 };
 
 // Helper function to format email address
-export function formatEmailAddress(name: string, email: string): string {
+export function formatEmailAddress(): string {
   return `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`;
 }
