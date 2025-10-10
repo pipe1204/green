@@ -164,40 +164,8 @@ export async function POST(
       // Don't fail the request, just log the error
     }
 
-    // Send email notification to customer (registered user)
-    try {
-      const { sendNewMessageNotificationEmail } = await import(
-        "@/lib/email-service"
-      );
-
-      const customerEmail = inquiry.profiles?.email;
-      const customerName = inquiry.profiles?.full_name;
-
-      if (customerEmail) {
-        const messagePreview =
-          initialMessage.length > 100
-            ? initialMessage.substring(0, 100)
-            : initialMessage;
-
-        await sendNewMessageNotificationEmail({
-          recipientEmail: customerEmail,
-          recipientName: customerName || "Cliente",
-          senderName: vendor.business_name || "El vendedor",
-          messagePreview,
-          conversationId: conversation.id,
-          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=inquiries`,
-          recipientType: "customer",
-        });
-
-        console.log("Conversation email notification sent to:", customerEmail);
-      }
-    } catch (emailError) {
-      // Log email error but don't fail the request
-      console.error(
-        "Error sending conversation notification email:",
-        emailError
-      );
-    }
+    // Note: Email notifications for conversations have been removed
+    // Users should check the dashboard for new messages
 
     return NextResponse.json({
       success: true,

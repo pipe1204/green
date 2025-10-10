@@ -108,6 +108,16 @@ export interface PriceAlertMatchEmailData extends BaseEmailData {
 }
 
 /**
+ * Email data for customer account creation notification
+ * Sent to vendor when a guest customer who previously sent inquiries registers an account
+ */
+export interface CustomerAccountCreatedEmailData extends BaseEmailData {
+  customerName: string;
+  inquiryCount: number;
+  dashboardUrl: string;
+}
+
+/**
  * Generic email response
  */
 export interface EmailResponse {

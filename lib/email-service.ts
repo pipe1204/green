@@ -8,6 +8,7 @@ import {
   VendorTestRescheduleEmailData,
   NewMessageNotificationEmailData,
   PriceAlertMatchEmailData,
+  CustomerAccountCreatedEmailData,
   EmailResponse,
 } from "@/types/email";
 
@@ -19,6 +20,7 @@ import { CustomerTestStatusEmail } from "@/emails/CustomerTestStatusEmail";
 import { VendorTestRescheduleEmail } from "@/emails/VendorTestRescheduleEmail";
 import { NewMessageNotificationEmail } from "@/emails/NewMessageNotificationEmail";
 import { PriceAlertMatchEmail } from "@/emails/PriceAlertMatchEmail";
+import { CustomerAccountCreatedEmail } from "@/emails/CustomerAccountCreatedEmail";
 
 /**
  * Send email notification to vendor when customer sends inquiry
@@ -242,6 +244,41 @@ export async function sendPriceAlertMatchEmail(
     return { success: true, messageId: result.data?.id };
   } catch (error) {
     console.error("Error in sendPriceAlertMatchEmail:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Send email notification to vendor when guest customer registers account
+ */
+export async function sendCustomerAccountCreatedEmail(
+  data: CustomerAccountCreatedEmailData
+): Promise<EmailResponse> {
+  try {
+    const emailHtml = await render(CustomerAccountCreatedEmail(data));
+
+    const result = await resend.emails.send({
+      from: `${EMAIL_CONFIG.fromName} <${EMAIL_CONFIG.fromEmail}>`,
+      to: data.recipientEmail,
+      subject: `¡Cliente registrado! ${data.customerName} ahora tiene cuenta en Green`,
+      html: emailHtml,
+      replyTo: EMAIL_CONFIG.replyTo,
+    });
+
+    if (result.error) {
+      console.error(
+        "Error sending customer account created email:",
+        result.error
+      );
+      return { success: false, error: result.error.message };
+    }
+
+    return { success: true, messageId: result.data?.id };
+  } catch (error) {
+    console.error("Error in sendCustomerAccountCreatedEmail:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

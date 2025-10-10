@@ -85,6 +85,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get unique vendors to notify about the customer registration
+    const uniqueVendors = new Map();
+
     // Create conversations for each linked inquiry
     let conversationsCreated = 0;
     for (const inquiry of guestInquiries) {
@@ -99,7 +102,7 @@ export async function POST(request: NextRequest) {
             vendor_id,
             message,
             vehicles(name, brand),
-            vendors(business_name)
+            vendors(business_name, user_id)
           `
           )
           .eq("id", inquiry.id)
@@ -176,42 +179,22 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Send email notification to customer about the new conversation
-        try {
-          const { sendNewMessageNotificationEmail } = await import(
-            "@/lib/email-service"
-          );
+        // Store vendor info for notification (avoid duplicates)
+        const vendorsData = fullInquiry.vendors as Array<{
+          business_name: string;
+          user_id: string;
+        }> | null;
+        const vendorData = vendorsData?.[0] || null;
 
-          const messagePreview =
-            fullInquiry.message.length > 100
-              ? fullInquiry.message.substring(0, 100)
-              : fullInquiry.message;
-
-          const vendorsData = fullInquiry.vendors as Array<{
-            business_name: string;
-          }> | null;
-          const vendorData = vendorsData?.[0] || null;
-
-          await sendNewMessageNotificationEmail({
-            recipientEmail: user.email!,
-            recipientName: user.user_metadata?.full_name || "Cliente",
-            senderName: vendorData?.business_name || "El vendedor",
-            messagePreview,
-            conversationId: conversation.id,
-            dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=messages`,
-            recipientType: "customer",
+        if (vendorData && !uniqueVendors.has(vendorData.user_id)) {
+          uniqueVendors.set(vendorData.user_id, {
+            business_name: vendorData.business_name,
+            user_id: vendorData.user_id,
           });
-
-          console.log(
-            `Sent conversation notification email for inquiry ${inquiry.id}`
-          );
-        } catch (emailError) {
-          console.error(
-            `Error sending conversation notification for inquiry ${inquiry.id}:`,
-            emailError
-          );
-          // Don't fail the process, just log the error
         }
+
+        // Note: Email notifications for conversations have been removed
+        // Users should check the dashboard for new messages
 
         conversationsCreated++;
         console.log(
@@ -219,6 +202,42 @@ export async function POST(request: NextRequest) {
         );
       } catch (error) {
         console.error(`Error processing inquiry ${inquiry.id}:`, error);
+      }
+    }
+
+    // Send email notifications to vendors about the customer registration
+    if (uniqueVendors.size > 0) {
+      try {
+        const { sendCustomerAccountCreatedEmail } = await import(
+          "@/lib/email-service"
+        );
+
+        for (const [vendorUserId, vendorInfo] of uniqueVendors) {
+          // Get vendor's profile for email
+          const { data: vendorProfile } = await serviceSupabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("id", vendorUserId)
+            .single();
+
+          if (vendorProfile?.email) {
+            await sendCustomerAccountCreatedEmail({
+              recipientEmail: vendorProfile.email,
+              recipientName:
+                vendorProfile.full_name || vendorInfo.business_name,
+              customerName: user.user_metadata?.full_name || "Cliente",
+              inquiryCount: guestInquiries.length,
+              dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/dashboard?section=messages`,
+            });
+
+            console.log(
+              `Sent account creation notification to vendor ${vendorInfo.business_name}`
+            );
+          }
+        }
+      } catch (emailError) {
+        console.error("Error sending vendor notifications:", emailError);
+        // Don't fail the request, just log the error
       }
     }
 
