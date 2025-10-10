@@ -4,6 +4,7 @@ import {
   TestDriveBooking,
   CustomerInquiry,
 } from "@/types";
+import { isVendorPro } from "./subscription-helpers";
 
 export function vehicleToDatabase(vehicle: Vehicle) {
   return {
@@ -126,6 +127,17 @@ export function databaseToVehicle(dbVehicle: unknown): Vehicle {
       phone: String((raw.vendors as { phone?: string })?.phone ?? ""),
       email: String((raw.vendors as { email?: string })?.email ?? ""),
       rating: Number((raw.vendors as { rating?: number })?.rating ?? 0),
+      isPro: isVendorPro({
+        subscription_tier:
+          (raw.vendors as { subscription_tier?: "starter" | "pro" })
+            ?.subscription_tier ?? "starter",
+        is_trial: Boolean(
+          (raw.vendors as { is_trial?: boolean })?.is_trial ?? false
+        ),
+        trial_end_date:
+          (raw.vendors as { trial_end_date?: string | null })?.trial_end_date ??
+          null,
+      }),
     },
     createdAt: String(raw.created_at ?? new Date().toISOString()),
     updatedAt: String(raw.updated_at ?? new Date().toISOString()),
@@ -207,6 +219,7 @@ export function databaseToPriceAlertWithVehicle(
             phone: "",
             email: "",
             rating: 0,
+            isPro: false,
           },
           createdAt: "",
           updatedAt: "",
@@ -302,6 +315,7 @@ export function databaseToTestDriveWithVehicle(
             phone: "",
             email: "",
             rating: 0,
+            isPro: false,
           },
           createdAt: "",
           updatedAt: "",
@@ -395,6 +409,7 @@ export function databaseToInquiryWithVehicle(
             phone: "",
             email: "",
             rating: 0,
+            isPro: false,
           },
           createdAt: "",
           updatedAt: "",

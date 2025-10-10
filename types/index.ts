@@ -64,6 +64,11 @@ export interface Vendor {
   is_verified: boolean;
   rating: number;
   total_reviews: number;
+  // Subscription fields
+  subscription_tier: "starter" | "pro";
+  subscription_start_date?: string;
+  is_trial: boolean;
+  trial_end_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -111,6 +116,7 @@ export interface Vehicle {
     phone: string;
     email: string;
     rating: number;
+    isPro: boolean;
   };
   // Sale fields
   is_on_sale?: boolean;

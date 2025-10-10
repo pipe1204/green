@@ -17,7 +17,10 @@ export async function getAllVehicles(): Promise<Vehicle[]> {
         business_name,
         phone,
         email,
-        rating
+        rating,
+        subscription_tier,
+        is_trial,
+        trial_end_date
       )
     `
     )
@@ -28,7 +31,14 @@ export async function getAllVehicles(): Promise<Vehicle[]> {
     throw new Error("No se pudieron cargar los vehículos");
   }
 
-  return (data || []).map(databaseToVehicle);
+  const vehicles = (data || []).map(databaseToVehicle);
+
+  // Sort: Pro vendors first, then by rating
+  return vehicles.sort((a, b) => {
+    if (a.vendor.isPro && !b.vendor.isPro) return -1;
+    if (!a.vendor.isPro && b.vendor.isPro) return 1;
+    return b.vendor.rating - a.vendor.rating;
+  });
 }
 
 /**
@@ -45,7 +55,10 @@ export async function getVehicleById(id: string): Promise<Vehicle | null> {
         business_name,
         phone,
         email,
-        rating
+        rating,
+        subscription_tier,
+        is_trial,
+        trial_end_date
       )
     `
     )
@@ -82,7 +95,10 @@ export async function getVehiclesByIds(ids: string[]): Promise<Vehicle[]> {
         business_name,
         phone,
         email,
-        rating
+        rating,
+        subscription_tier,
+        is_trial,
+        trial_end_date
       )
     `
     )
@@ -115,7 +131,10 @@ function buildVehicleQuery(
       business_name,
       phone,
       email,
-      rating
+      rating,
+      subscription_tier,
+      is_trial,
+      trial_end_date
     )
   `,
     { count: "exact" }
