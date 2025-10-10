@@ -36,7 +36,7 @@ export async function PATCH(
     // Get vendor record for this user
     const { data: vendor, error: vendorError } = await supabase
       .from("vendors")
-      .select("id")
+      .select("id, business_name")
       .eq("user_id", user.id)
       .single();
 
@@ -108,7 +108,13 @@ export async function PATCH(
       })
       .eq("id", bookingId)
       .eq("vendor_id", vendor.id)
-      .select()
+      .select(
+        `
+        *,
+        vehicles(name, brand),
+        profiles!test_drive_bookings_customer_id_fkey(full_name, email)
+      `
+      )
       .single();
 
     if (updateError) {
@@ -117,6 +123,36 @@ export async function PATCH(
         { error: "Error updating test drive booking" },
         { status: 500 }
       );
+    }
+
+    // Send email notification to customer
+    try {
+      const { sendCustomerTestStatusEmail } = await import(
+        "@/lib/email-service"
+      );
+
+      const customerEmail =
+        updatedBooking.profiles?.email || updatedBooking.customer_email;
+      const customerName =
+        updatedBooking.profiles?.full_name || updatedBooking.customer_name;
+
+      if (customerEmail) {
+        await sendCustomerTestStatusEmail({
+          recipientEmail: customerEmail,
+          recipientName: customerName,
+          vendorName: vendor.business_name || "El vendedor",
+          vehicleName: updatedBooking.vehicles?.name || "el vehículo",
+          vehicleBrand: updatedBooking.vehicles?.brand || "",
+          status: response,
+          vendorMessage: message.trim(),
+          preferredDate: updatedBooking.preferred_date,
+          preferredTime: updatedBooking.preferred_time,
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
+        });
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error("Error sending test status email:", emailError);
     }
 
     return NextResponse.json({

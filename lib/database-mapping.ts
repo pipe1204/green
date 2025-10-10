@@ -25,8 +25,10 @@ export function vehicleToDatabase(vehicle: Vehicle) {
     description: vehicle.description,
     features: vehicle.features,
     reviews: vehicle.reviews,
-    is_on_sale: vehicle.is_on_sale,
-    sale_price: vehicle.sale_price,
+    is_on_sale: vehicle.is_on_sale || false,
+    // Only include sale_price if is_on_sale is true, otherwise set to null
+    sale_price:
+      vehicle.is_on_sale && vehicle.sale_price ? vehicle.sale_price : null,
     created_at: vehicle.createdAt,
     updated_at: vehicle.updatedAt,
   };

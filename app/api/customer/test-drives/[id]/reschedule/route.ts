@@ -120,7 +120,13 @@ export async function POST(
       })
       .eq("id", bookingId)
       .eq("customer_id", user.id)
-      .select()
+      .select(
+        `
+        *,
+        vehicles(name, brand),
+        vendors(business_name, profiles!vendors_user_id_fkey(full_name, email))
+      `
+      )
       .single();
 
     if (updateError) {
@@ -132,6 +138,38 @@ export async function POST(
         { error: "Error processing reschedule request" },
         { status: 500 }
       );
+    }
+
+    // Send email notification to vendor
+    try {
+      const { sendVendorTestRescheduleEmail } = await import(
+        "@/lib/email-service"
+      );
+
+      const vendorEmail = updatedBooking.vendors?.profiles?.email;
+      const vendorName =
+        updatedBooking.vendors?.profiles?.full_name ||
+        updatedBooking.vendors?.business_name ||
+        "Vendedor";
+
+      if (vendorEmail) {
+        await sendVendorTestRescheduleEmail({
+          recipientEmail: vendorEmail,
+          recipientName: vendorName,
+          customerName: updatedBooking.customer_name,
+          vehicleName: updatedBooking.vehicles?.name || "el vehículo",
+          vehicleBrand: updatedBooking.vehicles?.brand || "",
+          oldDate: booking.preferred_date,
+          oldTime: booking.preferred_time,
+          newDate: newDate,
+          newTime: newTime,
+          reason: reason.trim(),
+          dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app/"}`,
+        });
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error("Error sending reschedule email:", emailError);
     }
 
     const response: RescheduleResponse = {

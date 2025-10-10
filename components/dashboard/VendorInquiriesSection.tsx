@@ -17,13 +17,11 @@ import {
 import {
   CustomerInquiryWithDetails,
   VendorInquiriesResponse,
-  CreateConversationResponse,
   VendorTestDriveBooking,
   VendorTestDrivesResponse,
   TestDriveResponseResponse,
   VendorRescheduleResponseResponse,
 } from "@/types";
-import { StartConversationModal } from "./StartConversationModal";
 import { SendMessageModal } from "./SendMessageModal";
 import { TestDriveResponseModal } from "./TestDriveResponseModal";
 import { VendorRescheduleResponseModal } from "./VendorRescheduleResponseModal";
@@ -34,8 +32,6 @@ export function VendorInquiriesSection() {
   const [inquiries, setInquiries] = useState<CustomerInquiryWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showStartConversationModal, setShowStartConversationModal] =
-    useState(false);
   const [showSendMessageModal, setShowSendMessageModal] = useState(false);
   const [selectedInquiry, setSelectedInquiry] =
     useState<CustomerInquiryWithDetails | null>(null);
@@ -166,53 +162,7 @@ export function VendorInquiriesSection() {
     }
   };
 
-  const createConversation = async (initialMessage: string) => {
-    if (!selectedInquiry) return;
-
-    try {
-      setActionLoading(true);
-      console.log("Creating conversation for inquiry:", selectedInquiry.id);
-      console.log("Initial message:", initialMessage);
-
-      const response = await fetch(
-        `/api/vendor/inquiries/${selectedInquiry.id}/conversation`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({ initialMessage }),
-        }
-      );
-
-      const data: CreateConversationResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error creating conversation");
-      }
-
-      // Only update local state after successful API call
-      setInquiries((prev) =>
-        prev.map((inquiry) =>
-          inquiry.id === selectedInquiry.id
-            ? { ...inquiry, status: "converted" }
-            : inquiry
-        )
-      );
-
-      setShowStartConversationModal(false);
-      setSelectedInquiry(null);
-
-      return data;
-    } catch (err) {
-      console.error("Error creating conversation:", err);
-      setError("Error creating conversation");
-      throw err;
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  // Note: Conversation creation is now handled automatically when customers register
 
   const sendEmailToCustomer = async (message: string) => {
     if (!selectedInquiry) return;
@@ -681,16 +631,14 @@ export function VendorInquiriesSection() {
                                 Enviar Email
                               </Button>
                             ) : (
-                              // Registered users: Only conversation option
+                              // Registered users: Conversation will be auto-created when they register
                               <Button
                                 size="sm"
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={() => {
-                                  setSelectedInquiry(inquiry);
-                                  setShowStartConversationModal(true);
-                                }}
+                                variant="outline"
+                                className="bg-gray-50 text-gray-600 border-gray-200"
+                                disabled
                               >
-                                Iniciar Conversación
+                                Conversación pendiente
                               </Button>
                             )}
                           </>
@@ -945,18 +893,6 @@ export function VendorInquiriesSection() {
       </TabsContent>
 
       {/* Modals */}
-      <StartConversationModal
-        isOpen={showStartConversationModal}
-        onClose={() => {
-          setShowStartConversationModal(false);
-          setSelectedInquiry(null);
-        }}
-        onSubmit={createConversation}
-        customerName={selectedInquiry?.customer.name || ""}
-        vehicleName={selectedInquiry?.vehicle.name || ""}
-        loading={actionLoading}
-      />
-
       {selectedInquiry?.isGuest && (
         <SendMessageModal
           isOpen={showSendMessageModal}

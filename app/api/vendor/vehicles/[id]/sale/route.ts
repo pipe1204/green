@@ -170,6 +170,30 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     // Convert database vehicle to frontend Vehicle type
     const vehicleResponse: Vehicle = databaseToVehicle(updatedVehicle);
 
+    // Check for price alerts that match the new price
+    // Determine which price to check:
+    // - If sale is ON: check sale_price
+    // - If sale is OFF: check regular price (in case it was lowered)
+    const priceToCheck =
+      is_on_sale && sale_price ? sale_price : updatedVehicle.price;
+
+    // Check and send price alerts
+    const { checkAndSendPriceAlerts } = await import(
+      "@/lib/price-alert-checker"
+    );
+    await checkAndSendPriceAlerts(
+      vehicleId,
+      priceToCheck,
+      vehicle.price, // previous price before update
+      {
+        name: updatedVehicle.name,
+        brand: updatedVehicle.brand,
+        type: updatedVehicle.type,
+        price: updatedVehicle.price,
+        images: updatedVehicle.images,
+      }
+    );
+
     return NextResponse.json<UpdateVehicleSaleResponse>(
       { success: true, vehicle: vehicleResponse },
       { status: 200 }

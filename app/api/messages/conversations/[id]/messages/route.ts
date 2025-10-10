@@ -160,6 +160,9 @@ export async function POST(
     if (completeError || !completeMessage)
       throw completeError || new Error("Message not found");
 
+    // Note: Email notifications for conversations have been removed
+    // Users should check the dashboard for new messages
+
     // Transform message data
     const transformedMessage = {
       id: completeMessage.id,

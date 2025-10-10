@@ -36,7 +36,7 @@ export async function POST(
     // Get vendor record for this user
     const { data: vendor, error: vendorError } = await supabase
       .from("vendors")
-      .select("id")
+      .select("id, business_name")
       .eq("user_id", user.id)
       .single();
 
@@ -69,7 +69,8 @@ export async function POST(
       .select(
         `
         *,
-        vehicles(name, brand)
+        vehicles(name, brand),
+        profiles!customer_inquiries_customer_id_fkey(full_name, email)
       `
       )
       .eq("id", inquiryId)
@@ -162,6 +163,9 @@ export async function POST(
       console.error("Error updating inquiry status:", updateError);
       // Don't fail the request, just log the error
     }
+
+    // Note: Email notifications for conversations have been removed
+    // Users should check the dashboard for new messages
 
     return NextResponse.json({
       success: true,

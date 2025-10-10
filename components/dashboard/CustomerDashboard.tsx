@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageSquare, X } from "lucide-react";
 import Header from "@/components/Header";
 import { ResponsiveDashboardSidebar } from "./ResponsiveDashboardSidebar";
 
@@ -19,6 +19,8 @@ export function CustomerDashboard() {
   const searchParams = useSearchParams();
   const [activeSection, setActiveSection] =
     useState<CustomerDashboardSection>("favorites");
+  const [showConversationNotification, setShowConversationNotification] =
+    useState(false);
 
   // Handle URL parameters to set active section
   useEffect(() => {
@@ -36,6 +38,18 @@ export function CustomerDashboard() {
       setActiveSection(section as CustomerDashboardSection);
     }
   }, [searchParams]);
+
+  // Check for auto-created conversations notification
+  useEffect(() => {
+    const conversationsCreated = localStorage.getItem(
+      "conversationsCreatedCount"
+    );
+    if (conversationsCreated && parseInt(conversationsCreated) > 0) {
+      setShowConversationNotification(true);
+      // Clear the notification after showing it
+      localStorage.removeItem("conversationsCreatedCount");
+    }
+  }, []);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -57,6 +71,34 @@ export function CustomerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+
+      {/* Auto-created conversations notification */}
+      {showConversationNotification && (
+        <div className="bg-green-50 border-l-4 border-green-400 p-4 mx-6 mt-4 rounded-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <MessageSquare className="h-5 w-5 text-green-400 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-green-800">
+                  ¡Conversaciones creadas automáticamente!
+                </p>
+                <p className="text-sm text-green-700">
+                  Se han creado conversaciones para tus consultas anteriores. Ve
+                  a la sección &quot;Mis Consultas&quot; para verlas.
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowConversationNotification(false)}
+              className="text-green-600 hover:text-green-800"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex h-screen pt-16">
         {/* Responsive Sidebar */}
