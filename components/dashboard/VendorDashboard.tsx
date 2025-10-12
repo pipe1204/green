@@ -471,7 +471,7 @@ export function VendorDashboard() {
       case "profile":
         return <VendorProfilePage />;
       case "analytics":
-        return <VendorAnalyticsSection />;
+        return <VendorAnalyticsSection vendor={vendor} />;
       default:
         return null;
     }

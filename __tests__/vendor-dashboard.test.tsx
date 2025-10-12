@@ -267,6 +267,10 @@ vi.mock("lucide-react", () => ({
   CreditCard: () => <div data-testid="credit-card-icon">💳</div>,
   Bell: () => <div data-testid="bell-icon">🔔</div>,
   Search: () => <div data-testid="search-icon">🔍</div>,
+  // Icons for ProductForm Pro features
+  Crown: () => <div data-testid="crown-icon">👑</div>,
+  Sparkles: () => <div data-testid="sparkles-icon">✨</div>,
+  Lock: () => <div data-testid="lock-icon">🔒</div>,
 }));
 
 // Mock FloatingAskButton

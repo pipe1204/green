@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { VendorAnalytics, VehicleAnalytics } from "@/types";
+import { VendorAnalytics, VehicleAnalytics, Vendor } from "@/types";
+import { isVendorPro } from "@/lib/subscription-helpers";
 import {
   Card,
   CardContent,
@@ -22,6 +23,8 @@ import {
   Zap,
   RefreshCw,
   MessageCircle,
+  Crown,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -294,12 +297,21 @@ function EngagementChart({ data }: EngagementChartProps) {
   );
 }
 
-export function VendorAnalyticsSection() {
+interface VendorAnalyticsSectionProps {
+  vendor?: Vendor | null;
+}
+
+export function VendorAnalyticsSection({
+  vendor,
+}: VendorAnalyticsSectionProps) {
   const { session } = useAuth();
   const [analytics, setAnalytics] = useState<VendorAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Check if vendor is Pro
+  const isPro = vendor ? isVendorPro(vendor) : false;
 
   const fetchAnalytics = useCallback(async () => {
     if (!session?.access_token) {
@@ -480,37 +492,105 @@ export function VendorAnalyticsSection() {
         />
       </div>
 
-      {/* Additional Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <AnalyticsSummaryCard
-          title="Consultas"
-          value={analytics.summary.total_inquiries}
-          icon={<MessageSquare className="h-4 w-4" />}
-          description="Consultas de clientes"
-        />
-        <AnalyticsSummaryCard
-          title="Pruebas de Manejo"
-          value={analytics.summary.total_test_drives}
-          icon={<Calendar className="h-4 w-4" />}
-          description="Pruebas de manejo agendadas"
-        />
-        <AnalyticsSummaryCard
-          title="Alertas de Precio"
-          value={analytics.summary.total_price_alerts}
-          icon={<Bell className="h-4 w-4" />}
-          description="Alertas de precio activas"
-        />
-        <AnalyticsSummaryCard
-          title="Contactos WhatsApp"
-          value={analytics.summary.total_whatsapp_clicks}
-          icon={<MessageCircle className="h-4 w-4" />}
-          description="Clics en botón de WhatsApp"
-        />
+      {/* Additional Metrics - Pro Only (Blurred for Starter) */}
+      <div className="relative">
+        <div
+          className={`grid grid-cols-1 md:grid-cols-4 gap-4 ${
+            !isPro ? "blur-sm pointer-events-none select-none" : ""
+          }`}
+        >
+          <AnalyticsSummaryCard
+            title="Consultas"
+            value={analytics.summary.total_inquiries}
+            icon={<MessageSquare className="h-4 w-4" />}
+            description="Consultas de clientes"
+          />
+          <AnalyticsSummaryCard
+            title="Pruebas de Manejo"
+            value={analytics.summary.total_test_drives}
+            icon={<Calendar className="h-4 w-4" />}
+            description="Pruebas de manejo agendadas"
+          />
+          <AnalyticsSummaryCard
+            title="Alertas de Precio"
+            value={analytics.summary.total_price_alerts}
+            icon={<Bell className="h-4 w-4" />}
+            description="Alertas de precio activas"
+          />
+          <AnalyticsSummaryCard
+            title="Contactos WhatsApp"
+            value={analytics.summary.total_whatsapp_clicks}
+            icon={<MessageCircle className="h-4 w-4" />}
+            description="Clics en botón de WhatsApp"
+          />
+        </div>
+
+        {/* Upgrade Overlay for Starter */}
+        {!isPro && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white/95 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-6 shadow-xl max-w-md">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-3">
+                  <Lock className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">
+                  Métricas Avanzadas - Plan Pro
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Consultas, pruebas de manejo, alertas de precio y contactos
+                  WhatsApp
+                </p>
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  onClick={() => window.open("/tiendas", "_blank")}
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Actualizar a Pro
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Charts and Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <EngagementChart data={analytics.engagement_metrics} />
+        {/* Engagement Chart - Pro Only (Blurred for Starter) */}
+        <div className="relative">
+          <div
+            className={!isPro ? "blur-sm pointer-events-none select-none" : ""}
+          >
+            <EngagementChart data={analytics.engagement_metrics} />
+          </div>
+
+          {/* Upgrade Overlay for Engagement Chart */}
+          {!isPro && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/95 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-6 shadow-xl max-w-sm">
+                <div className="text-center">
+                  <Lock className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+                  <h4 className="font-bold text-gray-900 mb-2">
+                    Gráfico de Tendencias - Plan Pro
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Visualiza tendencias de engagement a lo largo del tiempo
+                  </p>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    onClick={() => window.open("/tiendas", "_blank")}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Actualizar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Vehicle Performance Table - Always Visible */}
         <VehiclePerformanceTable vehicles={analytics.vehicle_performance} />
       </div>
 
