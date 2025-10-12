@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/auth/AuthProvider";
 import {
   Check,
   X,
@@ -27,12 +29,55 @@ import {
 interface VendorPricingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onTriggerSignup?: () => void;
 }
 
 export function VendorPricingModal({
   isOpen,
   onClose,
+  onTriggerSignup,
 }: VendorPricingModalProps) {
+  const { user, session } = useAuth();
+  const router = useRouter();
+  const [error, setError] = React.useState("");
+
+  const handleStartFreeTrial = async () => {
+    setError("");
+
+    // Check if user is logged in
+    if (!user || !session) {
+      // Not logged in - open signup modal
+      if (onTriggerSignup) {
+        onTriggerSignup();
+      }
+      return;
+    }
+
+    // User is logged in - check their role
+    try {
+      const { data: profile } = await fetch("/api/user/profile").then((res) =>
+        res.json()
+      );
+
+      if (profile?.role === "customer") {
+        // Show error - customer trying to sign up as vendor
+        setError(
+          "Ya tienes una cuenta como comprador. Usa un email diferente para crear una cuenta de vendedor."
+        );
+        return;
+      }
+
+      if (profile?.role === "vendor") {
+        // Already a vendor - redirect to dashboard
+        onClose();
+        router.push("/dashboard?notification=already-vendor");
+        return;
+      }
+    } catch (err) {
+      console.error("Error checking user profile:", err);
+      setError("Ocurrió un error. Por favor intenta de nuevo.");
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -53,6 +98,13 @@ export function VendorPricingModal({
               negocio
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+              <p className="text-red-800 text-sm text-center">{error}</p>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
@@ -150,7 +202,7 @@ export function VendorPricingModal({
             <Button
               className="w-full bg-gray-600 hover:bg-gray-700 text-white"
               size="lg"
-              disabled
+              onClick={handleStartFreeTrial}
             >
               Comenzar Prueba Gratis
             </Button>
@@ -301,7 +353,7 @@ export function VendorPricingModal({
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               size="lg"
-              disabled
+              onClick={handleStartFreeTrial}
             >
               Comenzar Prueba Gratis
             </Button>

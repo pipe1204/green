@@ -20,10 +20,14 @@ import {
 } from "lucide-react";
 import SplashCursor from "@/components/SplashCursor";
 import { VendorPricingModal } from "@/components/VendorPricingModal";
+import { SignUpModal } from "@/components/auth/SignUpModal";
+import { LoginModal } from "@/components/auth/LoginModal";
 import CountUp from "@/components/CountUp";
 
 export default function TiendasPage() {
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -535,6 +539,32 @@ export default function TiendasPage() {
       <VendorPricingModal
         isOpen={isPricingModalOpen}
         onClose={() => setIsPricingModalOpen(false)}
+        onTriggerSignup={() => {
+          setIsPricingModalOpen(false);
+          setIsSignUpModalOpen(true);
+        }}
+      />
+
+      {/* SignUp Modal - Vendor Locked */}
+      <SignUpModal
+        isOpen={isSignUpModalOpen}
+        onClose={() => setIsSignUpModalOpen(false)}
+        onSwitchToLogin={() => {
+          setIsSignUpModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
+        defaultUserType="vendor"
+        lockUserType={true}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSwitchToSignUp={() => {
+          setIsLoginModalOpen(false);
+          setIsSignUpModalOpen(true);
+        }}
       />
     </div>
   );
