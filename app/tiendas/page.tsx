@@ -79,9 +79,9 @@ export default function TiendasPage() {
                   separator=","
                   direction="up"
                   duration={1}
-                  className="count-up-text text-4xl md:text-6xl font-bold text-green-600"
+                  className="count-up-text text-4xl md:text-5xl font-bold text-green-600"
                 />
-                <span className="text-4xl md:text-6xl font-bold text-green-600">
+                <span className="text-4xl md:text-5xl font-bold text-green-600">
                   +
                 </span>
               </div>
@@ -95,9 +95,9 @@ export default function TiendasPage() {
                   separator=","
                   direction="up"
                   duration={1}
-                  className="count-up-text text-4xl md:text-6xl font-bold text-green-600"
+                  className="count-up-text text-4xl md:text-5xl font-bold text-green-600"
                 />
-                <span className="text-4xl md:text-6xl font-bold text-green-600">
+                <span className="text-4xl md:text-5xl font-bold text-green-600">
                   Mil
                 </span>
               </div>
@@ -111,9 +111,9 @@ export default function TiendasPage() {
                   separator=","
                   direction="up"
                   duration={1}
-                  className="count-up-text text-4xl md:text-6xl font-bold text-green-600"
+                  className="count-up-text text-4xl md:text-5xl font-bold text-green-600"
                 />
-                <span className="text-4xl md:text-6xl font-bold text-green-600">
+                <span className="text-4xl md:text-5xl font-bold text-green-600">
                   %
                 </span>
               </div>
@@ -121,7 +121,7 @@ export default function TiendasPage() {
             </div>
             <div className="text-center">
               <div>
-                <span className="text-4xl md:text-6xl font-bold text-green-600">
+                <span className="text-4xl md:text-5xl font-bold text-green-600">
                   $
                 </span>
                 <CountUp
@@ -130,9 +130,9 @@ export default function TiendasPage() {
                   separator=","
                   direction="up"
                   duration={1}
-                  className="count-up-text text-4xl md:text-6xl font-bold text-green-600"
+                  className="count-up-text text-4xl md:text-5xl font-bold text-green-600"
                 />
-                <span className="text-4xl md:text-6xl font-bold text-green-600">
+                <span className="text-4xl md:text-5xl font-bold text-green-600">
                   +
                 </span>
               </div>
