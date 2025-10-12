@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Vehicle } from "@/types";
+import { Vehicle, Vendor } from "@/types";
 import { Zap, X } from "lucide-react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -28,6 +28,7 @@ interface ProductFormProps {
   onSubmit: (data: Partial<Vehicle>) => Promise<void>;
   editingVehicle?: Vehicle | null;
   loading: boolean;
+  vendor?: Vendor | null;
 }
 
 export function ProductForm({
@@ -36,6 +37,7 @@ export function ProductForm({
   onSubmit,
   editingVehicle,
   loading,
+  vendor,
 }: ProductFormProps) {
   const [formData, setFormData] = useState({
     name: "",

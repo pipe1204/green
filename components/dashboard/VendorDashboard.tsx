@@ -554,6 +554,7 @@ export function VendorDashboard() {
         onSubmit={handleSubmit}
         editingVehicle={editingVehicle}
         loading={loading}
+        vendor={vendor}
       />
 
       <VehicleViewModal

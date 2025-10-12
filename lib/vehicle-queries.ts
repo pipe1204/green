@@ -478,3 +478,26 @@ export async function getVehicleCountByType(): Promise<Record<string, number>> {
 
   return counts;
 }
+
+/**
+ * Get count of vehicles with active sales for a vendor
+ * Used to enforce sale tag limits for Starter plan (max 3)
+ * @param vendorId - Vendor ID to count sales for
+ * @returns Number of vehicles with is_on_sale: true
+ */
+export async function getVendorSaleVehiclesCount(
+  vendorId: string
+): Promise<number> {
+  const { data, error, count } = await supabase
+    .from("vehicles")
+    .select("id", { count: "exact", head: false })
+    .eq("vendor_id", vendorId)
+    .eq("is_on_sale", true);
+
+  if (error) {
+    console.error("Error fetching sale vehicles count:", error);
+    return 0;
+  }
+
+  return count || data?.length || 0;
+}

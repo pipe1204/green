@@ -193,7 +193,7 @@ export function VendorPricingModal({
                     Etiquetas promocionales
                   </p>
                   <p className="text-sm text-gray-600">
-                    Marca vehículos en oferta (2 etiquetas al mes)
+                    Máximo 3 vehículos en oferta simultáneamente
                   </p>
                 </div>
               </div>
