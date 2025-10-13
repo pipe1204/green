@@ -98,3 +98,40 @@ export function getSubscriptionStatus(
 
   return "Plan Starter";
 }
+
+/**
+ * Check if vendor has an active subscription (not expired trial)
+ * @param vendor - Vendor object with subscription fields
+ * @returns true if vendor has active paid subscription or active trial
+ */
+export function hasActiveSubscription(
+  vendor: Pick<Vendor, "subscription_tier" | "is_trial" | "trial_end_date">
+): boolean {
+  // If in trial and not expired
+  if (vendor.is_trial && vendor.trial_end_date) {
+    const trialEndDate = new Date(vendor.trial_end_date);
+    if (trialEndDate > new Date()) {
+      return true;
+    }
+    return false; // Trial expired
+  }
+
+  // If not in trial, any subscription tier is active
+  if (!vendor.is_trial) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Get trial end date
+ * @param vendor - Vendor object with trial_end_date
+ * @returns Date object or null
+ */
+export function getTrialEndDate(
+  vendor: Pick<Vendor, "trial_end_date">
+): Date | null {
+  if (!vendor.trial_end_date) return null;
+  return new Date(vendor.trial_end_date);
+}

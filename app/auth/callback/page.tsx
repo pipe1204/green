@@ -51,6 +51,10 @@ export default function AuthCallback() {
                   ) || vendorData.locations[0];
 
                 // Create vendor profile with actual form data
+                // All new vendors get 30-day Pro trial
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 30);
+
                 await supabase.from("vendors").insert({
                   user_id: data.session.user.id,
                   business_name: vendorData.businessName,
@@ -66,12 +70,21 @@ export default function AuthCallback() {
                   is_verified: false,
                   rating: 0,
                   total_reviews: 0,
+                  // 30-day Pro trial for all new vendors
+                  subscription_tier: "pro",
+                  is_trial: true,
+                  trial_end_date: trialEndDate.toISOString(),
+                  subscription_start_date: new Date().toISOString(),
                 });
 
                 // Clean up localStorage
                 localStorage.removeItem("pendingVendorData");
               } else {
                 // Fallback to default values if no data found
+                // All new vendors get 30-day Pro trial
+                const trialEndDate = new Date();
+                trialEndDate.setDate(trialEndDate.getDate() + 30);
+
                 await supabase.from("vendors").insert({
                   user_id: data.session.user.id,
                   business_name: "Mi Empresa",
@@ -80,6 +93,11 @@ export default function AuthCallback() {
                   is_verified: false,
                   rating: 0,
                   total_reviews: 0,
+                  // 30-day Pro trial for all new vendors
+                  subscription_tier: "pro",
+                  is_trial: true,
+                  trial_end_date: trialEndDate.toISOString(),
+                  subscription_start_date: new Date().toISOString(),
                 });
               }
             }

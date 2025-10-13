@@ -253,6 +253,24 @@ vi.mock("lucide-react", () => ({
   Truck: () => <div data-testid="truck-icon">Truck</div>,
   UtilityPole: () => <div data-testid="utility-pole-icon">UtilityPole</div>,
   RefreshCw: () => <div data-testid="refresh-cw-icon">RefreshCw</div>,
+  // New icons for subscription components
+  Check: () => <div data-testid="check-icon">✓</div>,
+  Clock: () => <div data-testid="clock-icon">Clock</div>,
+  Loader2: () => <div data-testid="loader2-icon">Loading</div>,
+  // Icons for VendorPricingModal
+  Star: () => <div data-testid="star-icon">★</div>,
+  TrendingUp: () => <div data-testid="trending-up-icon">↗</div>,
+  BarChart3: () => <div data-testid="barchart3-icon">📊</div>,
+  Shield: () => <div data-testid="shield-icon">🛡️</div>,
+  Tag: () => <div data-testid="tag-icon">🏷️</div>,
+  HeadphonesIcon: () => <div data-testid="headphones-icon">🎧</div>,
+  CreditCard: () => <div data-testid="credit-card-icon">💳</div>,
+  Bell: () => <div data-testid="bell-icon">🔔</div>,
+  Search: () => <div data-testid="search-icon">🔍</div>,
+  // Icons for ProductForm Pro features
+  Crown: () => <div data-testid="crown-icon">👑</div>,
+  Sparkles: () => <div data-testid="sparkles-icon">✨</div>,
+  Lock: () => <div data-testid="lock-icon">🔒</div>,
 }));
 
 // Mock FloatingAskButton

@@ -17,10 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Vehicle } from "@/types";
-import { Zap, X } from "lucide-react";
+import { Vehicle, Vendor } from "@/types";
+import { Zap, X, Sparkles, Crown } from "lucide-react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { getVendorSaleVehiclesCount } from "@/lib/vehicle-queries";
+import { isVendorPro } from "@/lib/subscription-helpers";
 
 interface ProductFormProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ interface ProductFormProps {
   onSubmit: (data: Partial<Vehicle>) => Promise<void>;
   editingVehicle?: Vehicle | null;
   loading: boolean;
+  vendor?: Vendor | null;
 }
 
 export function ProductForm({
@@ -36,6 +39,7 @@ export function ProductForm({
   onSubmit,
   editingVehicle,
   loading,
+  vendor,
 }: ProductFormProps) {
   const [formData, setFormData] = useState({
     name: "",
@@ -72,6 +76,9 @@ export function ProductForm({
   const [warrantyUnit, setWarrantyUnit] = useState<"years" | "km">("years");
   const [warrantyValue, setWarrantyValue] = useState<string>("");
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  // Sale tag limit tracking
+  const [saleVehiclesCount, setSaleVehiclesCount] = useState(0);
+  const [checkingSaleLimit, setCheckingSaleLimit] = useState(false);
 
   // Reset form when modal opens/closes or editing vehicle changes
   React.useEffect(() => {
@@ -145,24 +152,30 @@ export function ProductForm({
 
   // Load vendor cities from vendors.locations for the current user
   React.useEffect(() => {
-    const loadVendorCities = async () => {
+    const loadVendorData = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
       const userId = sessionData.session?.user?.id;
       if (!userId) return;
-      const { data: vendor } = await supabase
+      const { data: vendorData } = await supabase
         .from("vendors")
-        .select("locations")
+        .select("id, locations")
         .eq("user_id", userId)
         .single();
-      if (vendor?.locations && Array.isArray(vendor.locations)) {
-        const cities = vendor.locations
+      if (vendorData?.locations && Array.isArray(vendorData.locations)) {
+        const cities = vendorData.locations
           .map((loc: { city?: string }) => loc?.city)
           .filter((c: string | undefined): c is string => Boolean(c));
         setVendorCities(Array.from(new Set(cities)));
       }
+
+      // Fetch sale vehicles count for limit checking
+      if (vendorData?.id) {
+        const count = await getVendorSaleVehiclesCount(vendorData.id);
+        setSaleVehiclesCount(count);
+      }
     };
     if (isOpen) {
-      loadVendorCities();
+      loadVendorData();
     }
   }, [isOpen]);
 
@@ -405,29 +418,118 @@ export function ProductForm({
               {/* Sale Section */}
               <div className="md:col-span-2">
                 <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <input
-                      type="checkbox"
-                      id="is_on_sale"
-                      checked={formData.is_on_sale}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          is_on_sale: e.target.checked,
-                          sale_price: e.target.checked
-                            ? formData.sale_price
-                            : 0,
-                        })
-                      }
-                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                    />
-                    <label
-                      htmlFor="is_on_sale"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      🔥 Activar Oferta
-                    </label>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        id="is_on_sale"
+                        checked={formData.is_on_sale}
+                        onChange={async (e) => {
+                          const isChecking = e.target.checked;
+
+                          // If unchecking, always allow
+                          if (!isChecking) {
+                            setFormData({
+                              ...formData,
+                              is_on_sale: false,
+                              sale_price: 0,
+                            });
+                            return;
+                          }
+
+                          // If checking, verify limits for Starter plan
+                          if (vendor && !isVendorPro(vendor)) {
+                            // Starter plan - check limit
+                            setCheckingSaleLimit(true);
+
+                            // If editing existing sale vehicle, allow
+                            if (editingVehicle?.is_on_sale) {
+                              setFormData({
+                                ...formData,
+                                is_on_sale: true,
+                              });
+                              setCheckingSaleLimit(false);
+                              return;
+                            }
+
+                            // Check if at limit (3 vehicles)
+                            if (saleVehiclesCount >= 3) {
+                              setValidationError(
+                                "Plan Starter limitado a 3 vehículos en oferta simultáneamente. Actualiza a Pro para ofertas ilimitadas."
+                              );
+                              setCheckingSaleLimit(false);
+                              return;
+                            }
+                          }
+
+                          // Allow the change
+                          setFormData({
+                            ...formData,
+                            is_on_sale: true,
+                          });
+                          setCheckingSaleLimit(false);
+                        }}
+                        disabled={checkingSaleLimit}
+                        className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2 disabled:opacity-50"
+                      />
+                      <label
+                        htmlFor="is_on_sale"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        🔥 Activar Oferta
+                      </label>
+                    </div>
+
+                    {/* Sale Limit Badge */}
+                    {vendor && (
+                      <div>
+                        {isVendorPro(vendor) ? (
+                          <div className="flex items-center gap-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200">
+                            <Crown className="w-3 h-3" />
+                            <span>Ilimitado</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold border border-orange-200">
+                            <span>{saleVehiclesCount}/3 ofertas</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
+
+                  {/* Upgrade CTA for Starter at limit */}
+                  {vendor &&
+                    !isVendorPro(vendor) &&
+                    saleVehiclesCount >= 3 &&
+                    !editingVehicle?.is_on_sale && (
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4 mt-4">
+                        <div className="flex items-start gap-3">
+                          <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-1" />
+                          <div className="flex-1">
+                            <h4 className="font-bold text-purple-900 mb-1">
+                              ¿Necesitas más ofertas?
+                            </h4>
+                            <p className="text-sm text-purple-700 mb-3">
+                              Has alcanzado el límite de 3 vehículos en oferta
+                              del Plan Starter. Actualiza a Pro para ofertas
+                              ilimitadas y más beneficios.
+                            </p>
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                              onClick={() => {
+                                // Open pricing modal (to be implemented)
+                                window.open("/tiendas", "_blank");
+                              }}
+                            >
+                              <Crown className="w-4 h-4 mr-2" />
+                              Ver Plan Pro
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                   {formData.is_on_sale && (
                     <div>

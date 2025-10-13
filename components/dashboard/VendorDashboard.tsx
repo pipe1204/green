@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Plus, Zap, ArrowLeft, Upload } from "lucide-react";
+import { Plus, Zap, ArrowLeft, Upload, Crown, Star } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Vehicle } from "@/types";
@@ -22,6 +22,11 @@ import VendorProfilePage from "./VendorProfile";
 import { CSVTemplateGenerator } from "./CSVTemplateGenerator";
 import { BulkUploadModal } from "./BulkUploadModal";
 import { VendorAnalyticsSection } from "./VendorAnalyticsSection";
+import { TrialBanner } from "./TrialBanner";
+import { SubscriptionRequiredModal } from "./SubscriptionRequiredModal";
+import { VendorPricingModal } from "../VendorPricingModal";
+import { Vendor } from "@/types";
+import { isVendorPro, getSubscriptionStatus } from "@/lib/subscription-helpers";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,6 +70,12 @@ export function VendorDashboard() {
   // Client-side pagination for vehicles
   const [page, setPage] = useState<number>(1);
   const pageSize = 10;
+  // Vendor and subscription state
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
 
   const fetchVehicles = useCallback(async () => {
     try {
@@ -73,13 +84,26 @@ export function VendorDashboard() {
       // First, get the vendor record for this user
       const { data: vendorData, error: vendorError } = await supabase
         .from("vendors")
-        .select("id,business_name,rating,locations")
+        .select("*")
         .eq("user_id", user?.id)
         .single();
 
       if (vendorError) {
         setError(handleVendorError(vendorError));
         return;
+      }
+
+      // Store vendor data with subscription info
+      setVendor(vendorData as Vendor);
+
+      // Check if trial has expired
+      if (vendorData.is_trial && vendorData.trial_end_date) {
+        const trialEndDate = new Date(vendorData.trial_end_date);
+        const now = new Date();
+        if (now > trialEndDate) {
+          // Trial has expired - show subscription modal
+          setShowSubscriptionModal(true);
+        }
       }
 
       // Then fetch vehicles for this vendor
@@ -122,6 +146,14 @@ export function VendorDashboard() {
       )
     ) {
       setActiveSection(section as DashboardSection);
+    }
+
+    // Handle notification parameter
+    const notificationParam = searchParams.get("notification");
+    if (notificationParam) {
+      setNotification(notificationParam);
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
     }
   }, [searchParams]);
 
@@ -440,7 +472,12 @@ export function VendorDashboard() {
       case "profile":
         return <VendorProfilePage />;
       case "analytics":
-        return <VendorAnalyticsSection />;
+        return (
+          <VendorAnalyticsSection
+            vendor={vendor}
+            onShowPricing={() => setShowPricingModal(true)}
+          />
+        );
       default:
         return null;
     }
@@ -475,8 +512,29 @@ export function VendorDashboard() {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="p-4 lg:p-6">
-            {/* Back Button */}
-            <div className="mb-6">
+            {/* Notification Banner */}
+            {notification && (
+              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 text-center font-medium">
+                  {notification === "already-vendor" &&
+                    "Ya tienes una cuenta de vendedor activa"}
+                  {notification === "trial-started" &&
+                    "¡Bienvenido! Tu prueba de 30 días ha comenzado"}
+                </p>
+              </div>
+            )}
+
+            {/* Trial Banner */}
+            {vendor && !trialBannerDismissed && (
+              <TrialBanner
+                vendor={vendor}
+                onViewPlans={() => setShowPricingModal(true)}
+                onDismiss={() => setTrialBannerDismissed(true)}
+              />
+            )}
+
+            {/* Back Button & Subscription Badge */}
+            <div className="mb-6 flex items-center justify-between">
               <Button
                 variant="outline"
                 onClick={() => router.push("/")}
@@ -485,6 +543,31 @@ export function VendorDashboard() {
                 <ArrowLeft className="w-4 h-4" />
                 <span>Volver al Inicio</span>
               </Button>
+
+              {/* Subscription Tier Badge */}
+              {vendor && (
+                <button
+                  onClick={() => setShowPricingModal(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 cursor-pointer ${
+                    isVendorPro(vendor)
+                      ? "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-2 border-purple-300 hover:from-purple-200 hover:to-pink-200"
+                      : "bg-gray-100 text-gray-700 border-2 border-gray-300 hover:bg-gray-200"
+                  }`}
+                  title="Click para ver planes y actualizar"
+                >
+                  {isVendorPro(vendor) ? (
+                    <>
+                      <Crown className="w-4 h-4" />
+                      <span>{getSubscriptionStatus(vendor)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Star className="w-4 h-4" />
+                      <span>Plan Starter</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {renderContent()}
@@ -502,6 +585,7 @@ export function VendorDashboard() {
         onSubmit={handleSubmit}
         editingVehicle={editingVehicle}
         loading={loading}
+        vendor={vendor}
       />
 
       <VehicleViewModal
@@ -539,6 +623,25 @@ export function VendorDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Subscription Required Modal (Blocking) */}
+      {vendor && (
+        <SubscriptionRequiredModal
+          isOpen={showSubscriptionModal}
+          vendorId={vendor.id}
+          onSubscriptionSelected={() => {
+            setShowSubscriptionModal(false);
+            // Refresh vendor data
+            fetchVehicles();
+          }}
+        />
+      )}
+
+      {/* Pricing Modal */}
+      <VendorPricingModal
+        isOpen={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
+      />
     </div>
   );
 }
