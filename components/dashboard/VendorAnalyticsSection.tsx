@@ -299,10 +299,12 @@ function EngagementChart({ data }: EngagementChartProps) {
 
 interface VendorAnalyticsSectionProps {
   vendor?: Vendor | null;
+  onShowPricing?: () => void;
 }
 
 export function VendorAnalyticsSection({
   vendor,
+  onShowPricing,
 }: VendorAnalyticsSectionProps) {
   const { session } = useAuth();
   const [analytics, setAnalytics] = useState<VendorAnalytics | null>(null);
@@ -492,66 +494,32 @@ export function VendorAnalyticsSection({
         />
       </div>
 
-      {/* Additional Metrics - Pro Only (Blurred for Starter) */}
-      <div className="relative">
-        <div
-          className={`grid grid-cols-1 md:grid-cols-4 gap-4 ${
-            !isPro ? "blur-sm pointer-events-none select-none" : ""
-          }`}
-        >
-          <AnalyticsSummaryCard
-            title="Consultas"
-            value={analytics.summary.total_inquiries}
-            icon={<MessageSquare className="h-4 w-4" />}
-            description="Consultas de clientes"
-          />
-          <AnalyticsSummaryCard
-            title="Pruebas de Manejo"
-            value={analytics.summary.total_test_drives}
-            icon={<Calendar className="h-4 w-4" />}
-            description="Pruebas de manejo agendadas"
-          />
-          <AnalyticsSummaryCard
-            title="Alertas de Precio"
-            value={analytics.summary.total_price_alerts}
-            icon={<Bell className="h-4 w-4" />}
-            description="Alertas de precio activas"
-          />
-          <AnalyticsSummaryCard
-            title="Contactos WhatsApp"
-            value={analytics.summary.total_whatsapp_clicks}
-            icon={<MessageCircle className="h-4 w-4" />}
-            description="Clics en botón de WhatsApp"
-          />
-        </div>
-
-        {/* Upgrade Overlay for Starter */}
-        {!isPro && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-white/95 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-6 shadow-xl max-w-md">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-3">
-                  <Lock className="w-6 h-6 text-purple-600" />
-                </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">
-                  Métricas Avanzadas - Plan Pro
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Consultas, pruebas de manejo, alertas de precio y contactos
-                  WhatsApp
-                </p>
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                  onClick={() => window.open("/tiendas", "_blank")}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Actualizar a Pro
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Additional Metrics - Always Visible for Starter */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AnalyticsSummaryCard
+          title="Consultas"
+          value={analytics.summary.total_inquiries}
+          icon={<MessageSquare className="h-4 w-4" />}
+          description="Consultas de clientes"
+        />
+        <AnalyticsSummaryCard
+          title="Pruebas de Manejo"
+          value={analytics.summary.total_test_drives}
+          icon={<Calendar className="h-4 w-4" />}
+          description="Pruebas de manejo agendadas"
+        />
+        <AnalyticsSummaryCard
+          title="Alertas de Precio"
+          value={analytics.summary.total_price_alerts}
+          icon={<Bell className="h-4 w-4" />}
+          description="Alertas de precio activas"
+        />
+        <AnalyticsSummaryCard
+          title="Contactos WhatsApp"
+          value={analytics.summary.total_whatsapp_clicks}
+          icon={<MessageCircle className="h-4 w-4" />}
+          description="Clics en botón de WhatsApp"
+        />
       </div>
 
       {/* Charts and Tables */}
@@ -579,7 +547,7 @@ export function VendorAnalyticsSection({
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                    onClick={() => window.open("/tiendas", "_blank")}
+                    onClick={onShowPricing}
                   >
                     <Crown className="w-4 h-4 mr-2" />
                     Actualizar
@@ -590,51 +558,115 @@ export function VendorAnalyticsSection({
           )}
         </div>
 
-        {/* Vehicle Performance Table - Always Visible */}
-        <VehiclePerformanceTable vehicles={analytics.vehicle_performance} />
+        {/* Vehicle Performance Table - Pro Only (Blurred for Starter) */}
+        <div className="relative">
+          <div
+            className={!isPro ? "blur-sm pointer-events-none select-none" : ""}
+          >
+            <VehiclePerformanceTable vehicles={analytics.vehicle_performance} />
+          </div>
+
+          {/* Upgrade Overlay for Vehicle Performance Table */}
+          {!isPro && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/95 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-6 shadow-xl max-w-sm">
+                <div className="text-center">
+                  <Lock className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+                  <h4 className="font-bold text-gray-900 mb-2">
+                    Tabla de Rendimiento - Plan Pro
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Métricas detalladas de cada uno de tus vehículos
+                  </p>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    onClick={onShowPricing}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Actualizar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Top Performing Vehicles */}
+      {/* Top Performing Vehicles - Pro Only (Blurred for Starter) */}
       {analytics.top_performing_vehicles.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Vehículos con Mejor Rendimiento</CardTitle>
-            <CardDescription>
-              Tus vehículos con mejor conversión por tasa de consultas
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analytics.top_performing_vehicles.map((vehicle, index) => (
-                <div
-                  key={vehicle.vehicle_id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <div className="font-medium">{vehicle.vehicle_name}</div>
-                      <div className="text-sm text-gray-500">
-                        {vehicle.total_views} vistas • {vehicle.favorites_count}{" "}
-                        favoritos
+        <div className="relative">
+          <div
+            className={!isPro ? "blur-sm pointer-events-none select-none" : ""}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Vehículos con Mejor Rendimiento</CardTitle>
+                <CardDescription>
+                  Tus vehículos con mejor conversión por tasa de consultas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {analytics.top_performing_vehicles.map((vehicle, index) => (
+                    <div
+                      key={vehicle.vehicle_id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {vehicle.vehicle_name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {vehicle.total_views} vistas •{" "}
+                            {vehicle.favorites_count} favoritos
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-green-600">
+                          {vehicle.conversion_rate}%
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {vehicle.inquiries_count} consultas
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-green-600">
-                      {vehicle.conversion_rate}%
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {vehicle.inquiries_count} consultas
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Upgrade Overlay for Top Performing Vehicles */}
+          {!isPro && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/95 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-6 shadow-xl max-w-sm">
+                <div className="text-center">
+                  <Lock className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+                  <h4 className="font-bold text-gray-900 mb-2">
+                    Mejores Vehículos - Plan Pro
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Ranking de vehículos con mejor conversión
+                  </p>
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    onClick={onShowPricing}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Actualizar
+                  </Button>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
       )}
     </div>
   );

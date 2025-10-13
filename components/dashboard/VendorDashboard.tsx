@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Plus, Zap, ArrowLeft, Upload } from "lucide-react";
+import { Plus, Zap, ArrowLeft, Upload, Crown, Star } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Vehicle } from "@/types";
@@ -26,6 +26,7 @@ import { TrialBanner } from "./TrialBanner";
 import { SubscriptionRequiredModal } from "./SubscriptionRequiredModal";
 import { VendorPricingModal } from "../VendorPricingModal";
 import { Vendor } from "@/types";
+import { isVendorPro, getSubscriptionStatus } from "@/lib/subscription-helpers";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -471,7 +472,12 @@ export function VendorDashboard() {
       case "profile":
         return <VendorProfilePage />;
       case "analytics":
-        return <VendorAnalyticsSection vendor={vendor} />;
+        return (
+          <VendorAnalyticsSection
+            vendor={vendor}
+            onShowPricing={() => setShowPricingModal(true)}
+          />
+        );
       default:
         return null;
     }
@@ -527,8 +533,8 @@ export function VendorDashboard() {
               />
             )}
 
-            {/* Back Button */}
-            <div className="mb-6">
+            {/* Back Button & Subscription Badge */}
+            <div className="mb-6 flex items-center justify-between">
               <Button
                 variant="outline"
                 onClick={() => router.push("/")}
@@ -537,6 +543,31 @@ export function VendorDashboard() {
                 <ArrowLeft className="w-4 h-4" />
                 <span>Volver al Inicio</span>
               </Button>
+
+              {/* Subscription Tier Badge */}
+              {vendor && (
+                <button
+                  onClick={() => setShowPricingModal(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 cursor-pointer ${
+                    isVendorPro(vendor)
+                      ? "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-2 border-purple-300 hover:from-purple-200 hover:to-pink-200"
+                      : "bg-gray-100 text-gray-700 border-2 border-gray-300 hover:bg-gray-200"
+                  }`}
+                  title="Click para ver planes y actualizar"
+                >
+                  {isVendorPro(vendor) ? (
+                    <>
+                      <Crown className="w-4 h-4" />
+                      <span>{getSubscriptionStatus(vendor)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Star className="w-4 h-4" />
+                      <span>Plan Starter</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {renderContent()}

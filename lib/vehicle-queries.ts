@@ -383,6 +383,15 @@ export async function getFilteredVehicles(
     // Step 4: Apply client-side sorting if needed (rating, range)
     if (sortBy === "rating" || sortBy === "range") {
       vehicles = applyClientSideSorting(vehicles, sortBy);
+    } else {
+      // Step 4b: Always prioritize Pro vendors in search results
+      vehicles.sort((a, b) => {
+        // Pro vendors always come first
+        if (a.vendor.isPro && !b.vendor.isPro) return -1;
+        if (!a.vendor.isPro && b.vendor.isPro) return 1;
+        // If both Pro or both Starter, maintain existing order
+        return 0;
+      });
     }
 
     // Step 5: Apply pagination to filtered results
@@ -442,7 +451,20 @@ export async function searchVehicles(
 
   const { data, error } = await supabase
     .from("vehicles")
-    .select("*")
+    .select(
+      `
+      *,
+      vendors (
+        business_name,
+        phone,
+        email,
+        rating,
+        subscription_tier,
+        is_trial,
+        trial_end_date
+      )
+    `
+    )
     .or(
       `name.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
     )
@@ -453,9 +475,16 @@ export async function searchVehicles(
     throw new Error("Error en la búsqueda de vehículos");
   }
 
-  return (data || []).map((row) =>
+  const vehicles = (data || []).map((row) =>
     databaseToVehicle(row as unknown as DbVehicleRow)
   );
+
+  // Prioritize Pro vendors in search results
+  return vehicles.sort((a, b) => {
+    if (a.vendor.isPro && !b.vendor.isPro) return -1;
+    if (!a.vendor.isPro && b.vendor.isPro) return 1;
+    return b.vendor.rating - a.vendor.rating;
+  });
 }
 
 /**
