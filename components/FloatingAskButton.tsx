@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 
 interface FloatingAskButtonProps {
   className?: string;
@@ -12,10 +12,11 @@ export default function FloatingAskButton({
   className,
 }: FloatingAskButtonProps) {
   const handleQuestionClick = () => {
-    window.open(
-      "mailto:info@green.co?subject=Consulta sobre vehículos eléctricos",
-      "_blank"
-    );
+    const phoneNumber = "+61433594026"; // WhatsApp number (with +)
+    const message =
+      "¡Hola! Me gustaría hacer una consulta sobre vehículos eléctricos en Green. ¿Podrían ayudarme?";
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${encodeURIComponent(phoneNumber)}&text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
   };
   return (
     <div className={`fixed bottom-4 right-4 z-50 ${className ?? ""}`}>

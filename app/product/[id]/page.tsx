@@ -195,20 +195,24 @@ export default function ProductPage() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center space-x-2 mb-4">
-            <MapPin className="w-4 h-4 text-gray-400" />
-            <span className="text-md text-gray-500">{vehicle.location}</span>
-            <span className="text-md text-gray-400">•</span>
-            <span className="text-md text-gray-500">
-              {vehicle.vendor.businessName}
-            </span>
-            <WhatsAppContactButton vehicle={vehicle} />
-            {vehicle.vendor.isPro && (
-              <>
-                <VerifiedBadge size="md" showTooltip />
-                <RespuestaRapidaBadge size="md" />
-              </>
-            )}
+          <div className="flex flex-col md:flex-row tems-start space-x-2 mb-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <MapPin className="w-4 h-4 text-gray-400" />
+              <span className="text-md text-gray-500">{vehicle.location}</span>
+              <span className="text-md text-gray-400">•</span>
+              <span className="text-md text-gray-500">
+                {vehicle.vendor.businessName}
+              </span>
+              <WhatsAppContactButton vehicle={vehicle} />
+            </div>
+            <div className="flex items-center space-x-2 mb-4">
+              {vehicle.vendor.isPro && (
+                <>
+                  <VerifiedBadge size="md" showTooltip />
+                  <RespuestaRapidaBadge size="md" />
+                </>
+              )}
+            </div>
           </div>
 
           <p className="text-xl text-gray-600 max-w-3xl">
