@@ -21,8 +21,21 @@ export function TrialBanner({
     if (!vendor.trial_end_date) return 0;
     const endDate = new Date(vendor.trial_end_date);
     const today = new Date();
-    const diffTime = endDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // Set time to start of day for accurate day calculation
+    const endDateOnly = new Date(
+      endDate.getFullYear(),
+      endDate.getMonth(),
+      endDate.getDate()
+    );
+    const todayOnly = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+    const diffTime = endDateOnly.getTime() - todayOnly.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
   };
 

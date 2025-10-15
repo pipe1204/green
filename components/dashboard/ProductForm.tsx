@@ -668,16 +668,16 @@ export function ProductForm({
 
             {/* Display Images */}
             {formData.images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
                 {formData.images.map((image, index) => (
-                  <div key={index} className="relative group aspect-[4/5]">
+                  <div key={index} className="relative group aspect-square">
                     <div className="relative w-full h-full rounded-lg overflow-hidden border border-gray-200">
                       <Image
                         src={image.url}
                         alt={image.alt}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 33vw"
+                        className="object-contain bg-gray-50"
+                        sizes="(max-width: 768px) 33vw, 25vw"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = "/images/placeholder.jpg";
