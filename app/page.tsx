@@ -6,6 +6,7 @@ import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import ProductCatalog from "@/components/ProductCatalog";
 import FloatingAskButton from "@/components/FloatingAskButton";
+import GreenFeaturesSection from "@/components/GreenFeaturesSection";
 
 const CTASection = dynamic(() => import("@/components/CTASection"), {
   ssr: false,
@@ -35,6 +36,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <ProductCatalog />
+        <GreenFeaturesSection />
         <HowItWorksSection />
         <ComparisonSection />
       </main>
