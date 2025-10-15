@@ -250,7 +250,7 @@ export default function ProductPage() {
                   src={currentImage?.url || "/images/placeholder.jpg"}
                   alt={vehicle.name}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
                   priority={selectedImageIndex === 0}
                   onError={(e) => {
@@ -291,7 +291,7 @@ export default function ProductPage() {
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative ${
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative bg-gray-50 ${
                     selectedImageIndex === index
                       ? "border-blue-600"
                       : "border-gray-200 hover:border-gray-400"
@@ -301,7 +301,7 @@ export default function ProductPage() {
                     src={image.url}
                     alt={`${vehicle.name} ${index + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="(max-width: 768px) 25vw, (max-width: 1200px) 12.5vw, 10vw"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;

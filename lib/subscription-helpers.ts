@@ -53,8 +53,17 @@ export function getDaysRemainingInTrial(
 
   const trialEnd = new Date(vendor.trial_end_date);
   const now = new Date();
-  const diffTime = trialEnd.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  // Set time to start of day for accurate day calculation
+  const trialEndDate = new Date(
+    trialEnd.getFullYear(),
+    trialEnd.getMonth(),
+    trialEnd.getDate()
+  );
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffTime = trialEndDate.getTime() - todayDate.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
   return Math.max(0, diffDays);
 }

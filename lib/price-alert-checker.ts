@@ -84,7 +84,7 @@ export async function checkAndSendPriceAlerts(
             newPrice: effectivePrice,
             targetPrice: alert.target_price,
             savings: previousPrice - effectivePrice,
-            vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green.co"}/product/${vehicleId}`,
+            vehicleUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://green-ev.vercel.app"}/product/${vehicleId}`,
             vehicleImageUrl: vehicle.images?.[0]?.url || undefined,
           });
 

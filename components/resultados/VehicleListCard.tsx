@@ -241,7 +241,7 @@ export const VehicleListCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 </div>
               </div>
               <div className="text-left sm:text-right">
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex flex-col items-end gap-2">
                   {vehicle.is_on_sale && vehicle.sale_price ? (
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-2">
