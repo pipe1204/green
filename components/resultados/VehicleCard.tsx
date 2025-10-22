@@ -88,7 +88,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 src={vehicle.images[currentImageIndex].url}
                 alt={vehicle.images[currentImageIndex].alt}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority={currentImageIndex === 0}
                 onError={(e) => {
