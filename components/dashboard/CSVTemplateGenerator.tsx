@@ -10,23 +10,23 @@ export function CSVTemplateGenerator({
   className = "",
 }: CSVTemplateGeneratorProps) {
   const generateCSVTemplate = () => {
-    // CSV headers with descriptions
+    // CSV headers in Spanish
     const headers = [
-      "name", // Nombre del vehículo (requerido)
-      "brand", // Marca (requerido)
-      "type", // Tipo: motocicleta, patineta, bicicleta, carro, camion (requerido)
-      "price", // Precio en COP (requerido)
-      "location", // Ubicación (requerido)
-      "availability", // Estado: in-stock, pre-order, coming-soon (requerido)
-      "range", // Autonomía en km (requerido)
-      "chargeTime", // Tiempo de carga en horas (requerido)
-      "battery", // Batería (requerido)
-      "warrantyUnit", // Unidad de garantía: years, km (requerido)
-      "warrantyValue", // Valor de garantía (requerido)
-      "maxSpeed", // Velocidad máxima en km/h (requerido)
-      "power", // Potencia en kW (requerido)
-      "description", // Descripción (opcional)
-      "features", // Características separadas por comas (opcional)
+      "nombre", // Nombre del vehículo (requerido)
+      "marca", // Marca (requerido)
+      "tipo", // Tipo: motocicleta, patineta, bicicleta, carro, camion (requerido)
+      "precio", // Precio en COP (requerido)
+      "ubicacion", // Ubicación (requerido)
+      "disponibilidad", // Estado: disponible, pre-orden, proximamente (requerido)
+      "autonomia", // Autonomía en km (requerido)
+      "tiempo_carga", // Tiempo de carga en horas (requerido)
+      "bateria", // Batería (requerido)
+      "unidad_garantia", // Unidad de garantía: años, año, km (requerido)
+      "valor_garantia", // Valor de garantía (requerido)
+      "velocidad_maxima", // Velocidad máxima en km/h (requerido)
+      "potencia", // Potencia en kW (requerido)
+      "descripcion", // Descripción (opcional)
+      "caracteristicas", // Características separadas por comas (opcional)
     ];
 
     // Sample data row
@@ -36,11 +36,11 @@ export function CSVTemplateGenerator({
       "carro",
       "50000000",
       "Bogotá",
-      "in-stock",
+      "disponible",
       "400",
       "8",
       "75 kWh",
-      "years",
+      "años",
       "8",
       "200",
       "300",

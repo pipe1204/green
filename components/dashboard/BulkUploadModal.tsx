@@ -176,6 +176,14 @@ function FileUploadStep({
           <li>• Completa todos los campos requeridos</li>
           <li>• Asegúrate de que los valores cumplan con las validaciones</li>
           <li>• El archivo debe tener extensión .csv</li>
+          <li>
+            • Usa &quot;años&quot; o &quot;año&quot; para garantía en años,
+            &quot;km&quot; para kilómetros
+          </li>
+          <li>
+            • Estados válidos: &quot;disponible&quot;, &quot;pre-orden&quot;,
+            &quot;proximamente&quot;
+          </li>
         </ul>
       </div>
 

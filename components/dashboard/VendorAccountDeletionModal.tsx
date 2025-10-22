@@ -94,7 +94,7 @@ export function VendorAccountDeletionModal({
             <AlertTriangle className="w-5 h-5" />
             <span>Eliminar Cuenta de Vendedor</span>
           </DialogTitle>
-          <DialogDescription className="text-left space-y-3">
+          <div className="text-left space-y-3 text-sm text-muted-foreground">
             <p>
               <strong>¡ADVERTENCIA!</strong> Esta acción es irreversible y
               eliminará permanentemente:
@@ -121,7 +121,7 @@ export function VendorAccountDeletionModal({
               </strong>{" "}
               en el campo de abajo.
             </p>
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">
